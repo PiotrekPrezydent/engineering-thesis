@@ -1,6 +1,6 @@
 namespace LADR.SharedKernel.Domain.Models;
 
-public interface IValueObject
+public class DomainException : Exception
 {
     
 }
