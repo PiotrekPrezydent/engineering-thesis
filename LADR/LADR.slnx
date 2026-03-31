@@ -2,8 +2,37 @@
   <Folder Name="/Apps/">
     <Project Path="src/Apps/TestCLI/LADR.Apps.TestCLI.csproj" />
   </Folder>
+  <Folder Name="/CorePlugins/">
+    <Project Path="src/CorePlugins/TestPlugin/TestPlugin.csproj" />
+  </Folder>
   <Folder Name="/Modules/" />
-  <Folder Name="/Plugins/" />
+  <Folder Name="/Modules/AI/">
+    <Project Path="src/Modules/AI/Application/LADR.Modules.AI.Application.csproj" />
+    <Project Path="src/Modules/AI/Domain/LADR.Modules.AI.Domain.csproj" />
+    <Project Path="src/Modules/AI/Infrastructure/LADR.Modules.AI.Infrastructure.csproj" />
+    <Project Path="src/Modules/AI/Interaction/LADR.Modules.AI.Interaction.csproj" />
+  </Folder>
+  <Folder Name="/Modules/AI/Tests/">
+    <Project Path="src/Modules/AI/Tests/CLI/LADR.Modules.AI.Tests.CLI.csproj" />
+  </Folder>
+  <Folder Name="/Modules/Communication/">
+    <Project Path="src/Modules/Communication/Application/LADR.Modules.Communication.Application.csproj" />
+    <Project Path="src/Modules/Communication/Domain/LADR.Modules.Communication.Domain.csproj" />
+    <Project Path="src/Modules/Communication/Infrastructure/LADR.Modules.Communication.Infrastructure.csproj" />
+    <Project Path="src/Modules/Communication/Interaction/LADR.Modules.Communication.Interaction.csproj" />
+  </Folder>
+  <Folder Name="/Modules/Communication/Tests/">
+    <Project Path="src/Modules/Communication/Tests/CLI/LADR.Modules.Communication.Tests.CLI.csproj" />
+  </Folder>
+  <Folder Name="/Modules/Plugins/">
+    <Project Path="src/Modules/Plugins/Application/LADR.Modules.Plugins.Application.csproj" />
+    <Project Path="src/Modules/Plugins/Domain/LADR.Modules.Plugins.Domain.csproj" />
+    <Project Path="src/Modules/Plugins/Infrastructure/LADR.Modules.Plugins.Infrastructure.csproj" />
+    <Project Path="src/Modules/Plugins/Interaction/LADR.Modules.Plugins.Interaction.csproj" />
+  </Folder>
+  <Folder Name="/Modules/Plugins/Tests/">
+    <Project Path="src/Modules/Plugins/Tests/CLI/LADR.Modules.Plugins.Tests.CLI.csproj" />
+  </Folder>
   <Folder Name="/SharedKernel/">
     <Project Path="src/SharedKernel/Application/LADR.SharedKernel.Application.csproj" />
     <Project Path="src/SharedKernel/Domain/LADR.SharedKernel.Domain.csproj" />
