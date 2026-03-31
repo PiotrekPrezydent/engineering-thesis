@@ -1,6 +1,5 @@
 namespace LADR.SharedKernel.Domain.Models;
 
-public interface IFactory
+public interface IRepository
 {
-    
 }

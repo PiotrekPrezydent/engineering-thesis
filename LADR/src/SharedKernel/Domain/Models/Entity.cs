@@ -1,4 +1,4 @@
-namespace LADR.SharedKernel.Domain;
+namespace LADR.SharedKernel.Domain.Models;
 
 public abstract class Entity : IEquatable<Entity>
 {
