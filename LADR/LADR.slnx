@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/Apps/">
+    <Project Path="src/Apps/TestCLI/LADR.Apps.TestCLI.csproj" />
+  </Folder>
+  <Folder Name="/Modules/" />
+  <Folder Name="/Plugins/" />
+  <Folder Name="/SharedKernel/">
+    <Project Path="src/SharedKernel/Application/LADR.SharedKernel.Application.csproj" />
+    <Project Path="src/SharedKernel/Domain/LADR.SharedKernel.Domain.csproj" />
+    <Project Path="src/SharedKernel/Infrastructure/LADR.SharedKernel.Infrastructure.csproj" />
+    <Project Path="src/SharedKernel/Integration/LADR.SharedKernel.Integration.csproj" />
+  </Folder>
+</Solution>
