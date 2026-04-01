@@ -2,6 +2,11 @@
   <Folder Name="/Apps/">
     <Project Path="src/Apps/TestCLI/LADR.Apps.TestCLI.csproj" />
   </Folder>
+  <Folder Name="/Apps/Tests/">
+    <Project Path="src/Apps/Tests/Client/LADR.Tests.Client.csproj" />
+    <Project Path="src/Apps/Tests/Server/LADR.Tests.Server.csproj" />
+    <Project Path="src/Apps/Tests/WebServer/LADR.Tests.WebServer.csproj" />
+  </Folder>
   <Folder Name="/CorePlugins/">
     <Project Path="src/CorePlugins/TestPlugin/TestPlugin.csproj" />
   </Folder>
@@ -41,6 +46,12 @@
     <Project Path="src/Modules/Reasoning/Domain/LADR.Modules.Reasoning.Domain.csproj" />
     <Project Path="src/Modules/Reasoning/Infrastructure/LADR.Modules.Reasoning.Infrastructure.csproj" />
     <Project Path="src/Modules/Reasoning/Integration/LADR.Modules.Reasoning.Integration.csproj" />
+  </Folder>
+  <Folder Name="/Prototype/">
+    <Project Path="src/Prototype/ClientCLI/LADR.Prototype.ClientCLI.csproj" />
+    <Project Path="src/Prototype/PluginA/LADR.Prototype.PluginA.csproj" />
+    <Project Path="src/Prototype/PluginB/LADR.Prototype.PluginB.csproj" />
+    <Project Path="src/Prototype/WebServer/LADR.Prototype.WebServer.csproj" />
   </Folder>
   <Folder Name="/SharedKernel/">
     <Project Path="src/SharedKernel/Application/LADR.SharedKernel.Application.csproj" />
