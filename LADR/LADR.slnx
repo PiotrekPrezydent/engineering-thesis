@@ -2,6 +2,11 @@
   <Folder Name="/Apps/">
     <Project Path="src/Apps/TestCLI/LADR.Apps.TestCLI.csproj" />
   </Folder>
+  <Folder Name="/Apps/Tests/">
+    <Project Path="src/Apps/Tests/Client/LADR.Tests.Client.csproj" />
+    <Project Path="src/Apps/Tests/Server/LADR.Tests.Server.csproj" />
+    <Project Path="src/Apps/Tests/WebServer/LADR.Tests.WebServer.csproj" />
+  </Folder>
   <Folder Name="/CorePlugins/">
     <Project Path="src/CorePlugins/TestPlugin/TestPlugin.csproj" />
   </Folder>
