@@ -47,6 +47,12 @@
     <Project Path="src/Modules/Reasoning/Infrastructure/LADR.Modules.Reasoning.Infrastructure.csproj" />
     <Project Path="src/Modules/Reasoning/Integration/LADR.Modules.Reasoning.Integration.csproj" />
   </Folder>
+  <Folder Name="/Prototype/">
+    <Project Path="src/Prototype/ClientCLI/LADR.Prototype.ClientCLI.csproj" />
+    <Project Path="src/Prototype/PluginA/LADR.Prototype.PluginA.csproj" />
+    <Project Path="src/Prototype/PluginB/LADR.Prototype.PluginB.csproj" />
+    <Project Path="src/Prototype/WebServer/LADR.Prototype.WebServer.csproj" />
+  </Folder>
   <Folder Name="/SharedKernel/">
     <Project Path="src/SharedKernel/Application/LADR.SharedKernel.Application.csproj" />
     <Project Path="src/SharedKernel/Domain/LADR.SharedKernel.Domain.csproj" />
