@@ -59,6 +59,7 @@ class Program
                 {
                     input = input.Substring("prompt".Length);
                     await connection.InvokeAsync("SendPrompt", roomId, input);
+                    continue;
                 }
                 
                 await connection.InvokeAsync("SendMessageToRoom", roomId, $"Message to room: {input}");
