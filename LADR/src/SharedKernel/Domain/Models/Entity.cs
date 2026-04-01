@@ -4,10 +4,6 @@ public abstract class Entity : IEquatable<Entity>
 {
     public Guid Id { get; protected set; }
 
-    private Entity()
-    {
-    }
-
     public bool Equals(Entity? other)
     {
         if (other is null)

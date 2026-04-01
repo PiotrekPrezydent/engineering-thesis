@@ -6,8 +6,4 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\..\..\SharedKernel\Domain\LADR.SharedKernel.Domain.csproj" />
-    </ItemGroup>
-
 </Project>

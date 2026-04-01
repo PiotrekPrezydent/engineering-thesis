@@ -6,14 +6,11 @@
     <Project Path="src/CorePlugins/TestPlugin/TestPlugin.csproj" />
   </Folder>
   <Folder Name="/Modules/" />
-  <Folder Name="/Modules/AI/">
-    <Project Path="src/Modules/AI/Application/LADR.Modules.AI.Application.csproj" />
-    <Project Path="src/Modules/AI/Domain/LADR.Modules.AI.Domain.csproj" />
-    <Project Path="src/Modules/AI/Infrastructure/LADR.Modules.AI.Infrastructure.csproj" />
-    <Project Path="src/Modules/AI/Interaction/LADR.Modules.AI.Interaction.csproj" />
-  </Folder>
-  <Folder Name="/Modules/AI/Tests/">
-    <Project Path="src/Modules/AI/Tests/CLI/LADR.Modules.AI.Tests.CLI.csproj" />
+  <Folder Name="/Modules/Client/">
+    <Project Path="src/Modules/Client/Application/LADR.Modules.Client.Application.csproj" />
+    <Project Path="src/Modules/Client/Domain/LADR.Modules.Client.Domain.csproj" />
+    <Project Path="src/Modules/Client/Infrastructure/LADR.Modules.Client.Infrastructure.csproj" />
+    <Project Path="src/Modules/Client/Integration/LADR.Modules.Client.Integration.csproj" />
   </Folder>
   <Folder Name="/Modules/Communication/">
     <Project Path="src/Modules/Communication/Application/LADR.Modules.Communication.Application.csproj" />
@@ -24,6 +21,12 @@
   <Folder Name="/Modules/Communication/Tests/">
     <Project Path="src/Modules/Communication/Tests/CLI/LADR.Modules.Communication.Tests.CLI.csproj" />
   </Folder>
+  <Folder Name="/Modules/Hub/">
+    <Project Path="src/Modules/Hub/Application/LADR.Modules.Hub.Application.csproj" />
+    <Project Path="src/Modules/Hub/Domain/LADR.Modules.Hub.Domain.csproj" />
+    <Project Path="src/Modules/Hub/Infrastructure/LADR.Modules.Hub.Infrastructure.csproj" />
+    <Project Path="src/Modules/Hub/Integration/LADR.Modules.Hub.Integration.csproj" />
+  </Folder>
   <Folder Name="/Modules/Plugins/">
     <Project Path="src/Modules/Plugins/Application/LADR.Modules.Plugins.Application.csproj" />
     <Project Path="src/Modules/Plugins/Domain/LADR.Modules.Plugins.Domain.csproj" />
@@ -32,6 +35,12 @@
   </Folder>
   <Folder Name="/Modules/Plugins/Tests/">
     <Project Path="src/Modules/Plugins/Tests/CLI/LADR.Modules.Plugins.Tests.CLI.csproj" />
+  </Folder>
+  <Folder Name="/Modules/Reasoning/">
+    <Project Path="src/Modules/Reasoning/Application/LADR.Modules.Reasoning.Application.csproj" />
+    <Project Path="src/Modules/Reasoning/Domain/LADR.Modules.Reasoning.Domain.csproj" />
+    <Project Path="src/Modules/Reasoning/Infrastructure/LADR.Modules.Reasoning.Infrastructure.csproj" />
+    <Project Path="src/Modules/Reasoning/Integration/LADR.Modules.Reasoning.Integration.csproj" />
   </Folder>
   <Folder Name="/SharedKernel/">
     <Project Path="src/SharedKernel/Application/LADR.SharedKernel.Application.csproj" />
