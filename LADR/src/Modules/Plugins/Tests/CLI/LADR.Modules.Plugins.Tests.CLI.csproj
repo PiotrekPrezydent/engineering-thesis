@@ -9,14 +9,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\Application\LADR.Modules.Plugins.Application.csproj" />
-      <ProjectReference Include="..\..\Domain\LADR.Modules.Plugins.Domain.csproj" />
-      <ProjectReference Include="..\..\Infrastructure\LADR.Modules.Plugins.Infrastructure.csproj" />
-      <ProjectReference Include="..\..\Interaction\LADR.Modules.Plugins.Interaction.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.5" />
     </ItemGroup>
     
-
 </Project>

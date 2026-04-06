@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+﻿using LADR.Modules.Plugins.Application;
 
 namespace LADR.Modules.Plugins.Tests.CLI;
 
@@ -6,16 +6,18 @@ class Program
 {
     static void Main(string[] args)
     {
-        var com = ModuleInitializer.InitializeTestsCommands();
-        
-        var files = Directory.GetFiles(Directory.GetCurrentDirectory() + "/Plugins", "*.dll");
-        foreach (var file in files)
+        ModuleInitializer.Initialize();
+
+        var loader = ModuleInitializer.GetPluginLoaderCommands();
+        var methods = ModuleInitializer.GetPluginMethodCommands();
+
+        foreach (var p in loader.GetAllAvaiblePluginsPath(Directory.GetCurrentDirectory() + "/Plugins"))
         {
-            com.AddPlugin(file);
+            loader.LoadPlugin(p);
         }
         
-        com.CreatePlugins();
-        com.InvokePluginMethod("AlphaPlugin","AlphaConsoleWriteLine","JAKISTEKSTEST");
+        
+        methods.InvokePluginMethod("AlphaPlugin","AlphaConsoleWriteLine","JAKISTEKSTEST1234");
         
     }
 }

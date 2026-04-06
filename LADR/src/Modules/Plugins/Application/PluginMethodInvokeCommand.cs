@@ -3,7 +3,7 @@ using LADR.Modules.Plugins.Domain.Repositories;
 
 namespace LADR.Modules.Plugins.Application;
 
-public class TestPluginCommands
+public class PluginMethodInvokeCommand
 {
     private readonly IPluginInstanceRepository _repository;
 
@@ -13,7 +13,7 @@ public class TestPluginCommands
     
     private readonly IPluginServices _pluginServices;
 
-    public TestPluginCommands(IPluginInstanceRepository repository, IPluginFactory pluginFactory,
+    public PluginMethodInvokeCommand(IPluginInstanceRepository repository, IPluginFactory pluginFactory,
         IPluginInstanceFactory pluginInstanceFactory, IPluginServices pluginServices)
     {
         _repository = repository;
@@ -21,24 +21,7 @@ public class TestPluginCommands
         _pluginInstanceFactory = pluginInstanceFactory;
         _pluginServices = pluginServices;
     }
-
-    public void AddPlugin(string path)
-    {
-        if (_repository == null)
-            return;
-
-        var pi = _pluginInstanceFactory.CreateFromPath(path);
-        _repository.Add(pi);
-    }
-
-    public void CreatePlugins()
-    {
-        var all = _repository.GetAll();
-        foreach (var plugin in all)
-        {
-            _pluginFactory.CreateFromPluginInstance(plugin);
-        }
-    }
+    
 
     public void InvokePluginMethod(string pluginName, string methodName, params object[] parameters)
     {

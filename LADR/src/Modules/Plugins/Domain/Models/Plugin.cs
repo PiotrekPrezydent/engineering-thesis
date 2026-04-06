@@ -41,4 +41,5 @@ public class Plugin : IAggregate
     {
         Methods.Remove(method);
     }
+    
 }

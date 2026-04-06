@@ -35,7 +35,7 @@ public class PluginFactory : IPluginFactory
         plugin.AddInstance(instance);
         plugin.AddMethodRange(pluginMethods);
         instance.AddPlugin(plugin);
-        Console.WriteLine("Created:" + plugin.Name);
+        
         return plugin;
     }
 
