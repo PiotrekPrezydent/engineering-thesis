@@ -11,15 +11,11 @@ class Program
         var files = Directory.GetFiles(Directory.GetCurrentDirectory() + "/Plugins", "*.dll");
         foreach (var file in files)
         {
-            var asse = Assembly.LoadFile(file);
-            var type = asse.ExportedTypes.First();
-            var instanceObj = Activator.CreateInstance(type);
-            Console.WriteLine(instanceObj == null ? "null" : instanceObj.ToString());
-            com.AddPlugin(instanceObj);
-            
-
+            com.AddPlugin(file);
         }
-        Console.WriteLine("added plugins");
-        com.PrintAllPlugins();
+        
+        com.CreatePlugins();
+        com.InvokePluginMethod("AlphaPlugin","AlphaConsoleWriteLine","JAKISTEKSTEST");
+        
     }
 }

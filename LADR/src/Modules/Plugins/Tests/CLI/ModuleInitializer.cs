@@ -13,9 +13,10 @@ public static class ModuleInitializer
     {
         var services = new ServiceCollection();
         
-        services.AddScoped<IPluginFactory, TestPluginFactory>();
-        services.AddScoped<IPluginInstanceFactory, TestPluginInstanceFactory>();
-        services.AddScoped<IPluginInstanceRepository, TestPluginInstanceRepository>();
+        services.AddScoped<IPluginFactory, PluginFactory>();
+        services.AddScoped<IPluginInstanceFactory, PluginInstanceFactory>();
+        services.AddScoped<IPluginInstanceRepository, PluginInstanceRepository>();
+        services.AddScoped<IPluginServices, PluginServices>();
         
         services.AddTransient<TestPluginCommands>();
         

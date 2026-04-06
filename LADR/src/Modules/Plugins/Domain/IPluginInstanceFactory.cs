@@ -5,6 +5,9 @@ namespace LADR.Modules.Plugins.Domain;
 
 public interface IPluginInstanceFactory
 {
-    public PluginInstance Create(object instanceObj);
+    public PluginInstance CreateFromType(Type exportedPluginType);
 
+    public PluginInstance CreateFromPath(string path);
+    
+    public PluginInstance CreateFromJson(string json);
 }

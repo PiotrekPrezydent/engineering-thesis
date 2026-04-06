@@ -4,5 +4,5 @@ namespace LADR.Modules.Plugins.Domain;
 
 public interface IPluginFactory
 {
-    public Plugin CreateFromInstance(PluginInstance instance);
+    public Plugin CreateFromPluginInstance(PluginInstance instance);
 }

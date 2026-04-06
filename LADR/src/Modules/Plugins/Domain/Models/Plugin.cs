@@ -2,15 +2,16 @@ using LADR.SharedKernel.Domain.Models;
 
 namespace LADR.Modules.Plugins.Domain.Models;
 
+//TD add adding and removing method validation
 public class Plugin : IAggregate
 {
-    public string Name { get; private set; }
+    public string Name { get; private set; } // Name of plugin
     
-    public string Description { get; private set; }
+    public string Description { get; private set; } // Description of plugin
     
-    public List<PluginMethod> Methods { get; private set; }
+    public List<PluginMethod> Methods { get; private set; } // all plugin methods
     
-    public PluginInstance PluginInstance { get; private set; }
+    public PluginInstance PluginInstance { get; private set; } // instance of plugin 
 
     public Plugin(string name, string description)
     {
@@ -31,21 +32,13 @@ public class Plugin : IAggregate
         Methods.Add(method);
     }
 
-    public string AllInfo()
+    public void AddMethodRange(List<PluginMethod> methods)
     {
-        string ret = "";
-        ret += Name + "\n";
-        ret += Description + "\n";
-        ret += "\nMETHODS:\n";
-        foreach (var method in Methods)
-        {
-            ret += method.Name + " - " + method.Description + "\n";
-        }
+        Methods.AddRange(methods);
+    }
 
-        ret += "\n";
-        ret += PluginInstance.ParentType.Name + " --- " + PluginInstance.InstanceObject.ToString();
-        ret += "\n\n\n";
-
-        return ret;
+    public void RemoveMethod(PluginMethod method)
+    {
+        Methods.Remove(method);
     }
 }

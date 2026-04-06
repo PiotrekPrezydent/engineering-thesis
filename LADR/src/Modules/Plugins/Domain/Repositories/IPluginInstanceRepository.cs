@@ -9,6 +9,4 @@ public interface IPluginInstanceRepository
     public IEnumerable<PluginInstance> GetAll();
     
     public bool Add(PluginInstance pluginInstance);
-    
-    public bool Update(PluginInstance pluginInstance);
 }
