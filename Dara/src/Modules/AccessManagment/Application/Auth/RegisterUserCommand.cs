@@ -6,7 +6,7 @@ namespace Dara.Modules.AccessManagment.Application.Auth;
 
 public record RegisterUserCommand(string email, string password, string nickname) : IApplicationCommand;
 
-class RegisterUserCommandHandler : IApplicationCommandHandler<RegisterUserCommand>
+public class RegisterUserCommandHandler : IApplicationCommandHandler<RegisterUserCommand>
 {
     private readonly IUserRepository _users;
     private readonly IPasswordHasher _passwordHasher;
@@ -25,6 +25,7 @@ class RegisterUserCommandHandler : IApplicationCommandHandler<RegisterUserComman
 
         _users.Add(new(email, password, nickname));
         Console.WriteLine("user added");
+        
         return Task.CompletedTask;
     }
 }
