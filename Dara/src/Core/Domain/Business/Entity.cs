@@ -1,8 +1,18 @@
+using Dara.Core.Domain.Events;
+
 namespace Dara.Core.Domain.Business;
 
 public abstract class Entity : IEquatable<Entity>
 {
     public Guid Id { get; protected set; }
+    
+    public IReadOnlyCollection<IDomainEvent> DomainEvents => _events.AsReadOnly();
+    protected readonly List<IDomainEvent> _events = new();
+    
+    public void ClearDomainEvents()
+    {
+        _events.Clear();
+    }
 
     public bool Equals(Entity? other)
     {
@@ -40,4 +50,6 @@ public abstract class Entity : IEquatable<Entity>
     {
         return !(left == right);
     }
+    
+
 }

@@ -1,6 +1,6 @@
 namespace Dara.Core.Domain.Events;
 
-public class BaseDomainEvent
+public class BaseDomainEvent : IDomainEvent
 {
     public Guid Id { get; }
 
