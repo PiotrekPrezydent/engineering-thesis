@@ -1,4 +1,4 @@
-namespace Dara.Core.Shared.Models;
+namespace Dara.Core.Domain.Exceptions;
 
 public class DomainException : Exception
 {

@@ -1,12 +1,12 @@
-namespace Dara.Core.Shared.Models;
+namespace Dara.Core.Domain.Events;
 
-public class DomainEvent
+public class BaseDomainEvent
 {
     public Guid Id { get; }
 
     public DateTime Timestamp { get; }
 
-    public DomainEvent()
+    public BaseDomainEvent()
     {
         Id = Guid.NewGuid();
         Timestamp = DateTime.Now;

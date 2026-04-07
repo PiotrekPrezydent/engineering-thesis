@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace Dara.Core.Shared.Models;
+namespace Dara.Core.Domain.Business;
 
 public abstract class ValueObject : IEquatable<ValueObject>
 {

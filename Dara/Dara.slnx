@@ -8,6 +8,9 @@
   </Folder>
   
   <Folder Name="/Core/">
+    <Project Path="src/Core/Application/Dara.Core.Application.csproj" />
+    <Project Path="src/Core/Domain/Dara.Core.Domain.csproj" />
+    <Project Path="src/Core/Infrastructure/Dara.Core.Infrastructure.csproj" />
     <Project Path="src/Core/Shared/Dara.Core.Shared.csproj" />
   </Folder>
   
