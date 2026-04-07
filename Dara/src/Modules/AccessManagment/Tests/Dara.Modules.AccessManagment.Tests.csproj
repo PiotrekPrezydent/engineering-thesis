@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Domain\Dara.Modules.AccessManagment.Domain.csproj" />
+    <ProjectReference Include="..\Application\Dara.Modules.AccessManagment.Application.csproj" />
+    <ProjectReference Include="..\Infrastructure\Dara.Modules.AccessManagment.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>
