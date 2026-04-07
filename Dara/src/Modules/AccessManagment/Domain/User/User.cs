@@ -15,42 +15,42 @@ public class User : Entity, IAggregateRoot
     public UserNickname Nickname { get; private set; }
 
     //for user registration
-    public User(string email, string hashedPassword, string nickname)
+    public User(UserEmail email, UserPassword hashedPassword, UserNickname nickname)
     {
         Id = Guid.NewGuid();
-        Email = new UserEmail(email);
-        Password = new UserPassword(hashedPassword);
-        Nickname = new UserNickname(nickname);
+        Email = email;
+        Password = hashedPassword;
+        Nickname = nickname;
         
         _events.Add(new UserCreatedEvent(Id));
     }
 
-    public void ChangeEmail(string newEmail)
+    public void ChangeEmail(UserEmail newEmail)
     {
-        Email = new UserEmail(newEmail);
+        Email = newEmail;
     }
 
-    public void ChangePassword(string hashedPassword)
+    public void ChangePassword(UserPassword newPassword)
     {
-        Password = new UserPassword(hashedPassword);
+        Password = newPassword;
     }
 
-    public void ChangeNickname(string nickname)
+    public void ChangeNickname(UserNickname newNickname)
     {
-        Nickname = new UserNickname(nickname);
+        Nickname = newNickname;
     }
     
-    public void AddDevice(string deviceName, string deviceToken)
+    public void AddDevice(string deviceName, DeviceAuthToken deviceToken)
     {
-        DeviceIdentity device = new(Id, deviceName, new(deviceToken));
+        DeviceIdentity device = new(Id, deviceName, deviceToken);
         _devices.Add(device);
         
         _events.Add(new UserDeviceAddedEvent(Id,  device.Id));
     }
 
-    public void RemoveDevice(string deviceName)
+    public void RemoveDevice(Guid deviceId)
     {
-        var device = _devices.Find(e => e.DeviceName == deviceName);
+        var device = _devices.Find(e => e.Id == deviceId);
         if (device == null)
             throw new DeviceNotFoundException();
         

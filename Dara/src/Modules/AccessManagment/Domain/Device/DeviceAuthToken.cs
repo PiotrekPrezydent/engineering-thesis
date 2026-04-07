@@ -6,7 +6,7 @@ public class DeviceAuthToken : ValueObject
 {
     internal string Token { get; }
     
-    internal DeviceAuthToken(string token)
+    public DeviceAuthToken(string token)
     {
         Token = token;
     }

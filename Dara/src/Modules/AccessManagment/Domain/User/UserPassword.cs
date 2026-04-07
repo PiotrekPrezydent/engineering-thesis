@@ -5,7 +5,7 @@ namespace Dara.Modules.AccessManagment.Domain.User;
 
 public class UserPassword : ValueObject
 {
-    internal string HashPassword { get; }
+    public string HashPassword { get; }
 
     public UserPassword(string hash)
     {
