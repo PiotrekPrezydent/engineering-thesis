@@ -7,7 +7,7 @@ public class UserNickname : ValueObject
 {
     internal string Nickname { get; }
     
-    internal UserNickname(string nickname)
+    public UserNickname(string nickname)
     {
         if (!IsValidNickname(nickname))
             throw new NotValidNicknameException();

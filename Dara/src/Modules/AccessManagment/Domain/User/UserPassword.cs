@@ -7,7 +7,7 @@ public class UserPassword : ValueObject
 {
     internal string HashPassword { get; }
 
-    internal UserPassword(string hash)
+    public UserPassword(string hash)
     {
         if (!IsValidPassword(hash))
             throw new NotValidPasswordException();

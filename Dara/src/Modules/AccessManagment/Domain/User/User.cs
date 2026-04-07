@@ -1,6 +1,7 @@
 using Dara.Core.Domain.Business;
 using Dara.Modules.AccessManagment.Domain.Device;
 using Dara.Modules.AccessManagment.Domain.Events;
+using Dara.Modules.AccessManagment.Domain.Exceptions;
 
 namespace Dara.Modules.AccessManagment.Domain.User;
 

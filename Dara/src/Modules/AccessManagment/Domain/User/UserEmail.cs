@@ -7,7 +7,7 @@ public class UserEmail : ValueObject
 {
     internal string Email { get; }
     
-    internal UserEmail(string email)
+    public UserEmail(string email)
     {
         if (!IsValidEmail(email))
             throw new NotValidEmailException();
