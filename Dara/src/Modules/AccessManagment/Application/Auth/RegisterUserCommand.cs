@@ -6,7 +6,9 @@ namespace Dara.Modules.AccessManagment.Application.Auth;
 
 public record RegisterUserCommand(string email, string password, string nickname) : IApplicationCommand;
 
-public class RegisterUserCommandHandler : IApplicationCommandHandler<RegisterUserCommand>
+public record RegisterUserCommandResult(Guid userId) : IApplicationCommandResult;
+
+public class RegisterUserCommandHandler : IApplicationCommandHandler<RegisterUserCommand, RegisterUserCommandResult>
 {
     private readonly IUserRepository _users;
     private readonly IPasswordHasher _passwordHasher;
@@ -17,15 +19,16 @@ public class RegisterUserCommandHandler : IApplicationCommandHandler<RegisterUse
         _passwordHasher = passwordHasher;
     }
 
-    public Task HandleAsync(RegisterUserCommand command)
+    public async Task<RegisterUserCommandResult> HandleAsync(RegisterUserCommand command)
     {
         UserEmail email = new UserEmail(command.email);
         UserPassword password = new UserPassword(_passwordHasher.HashPassword(command.password));
         UserNickname nickname = new UserNickname(command.nickname);
 
-        _users.Add(new(email, password, nickname));
-        Console.WriteLine("user added");
-        
-        return Task.CompletedTask;
+        await _users.Add(new(email, password, nickname));
+        var usr = _users.GetUserByEmail(email).Result;
+        Console.WriteLine("user added " + usr.Id);
+
+        return new RegisterUserCommandResult(usr.Id);
     }
 }

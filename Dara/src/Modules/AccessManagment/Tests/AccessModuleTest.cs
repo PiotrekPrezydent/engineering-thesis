@@ -15,7 +15,8 @@ public class AccessModuleTest
     public async Task RunApp()
     {
         Console.WriteLine("start");
-        await _dispatcher.DispatchAsync(new RegisterUserCommand("email", "password", "nickname"));
+        var test = await _dispatcher.DispatchAsync<RegisterUserCommand, RegisterUserCommandResult>(new RegisterUserCommand("email", "password", "nickname"));
+        Console.WriteLine(test.userId + " readed");
         Console.WriteLine("koniec");
     }
 }

@@ -25,7 +25,7 @@ class Program
                 services.AddSingleton<IDomainEventDispatcher, DomainEventDispatcher>();
                 
                 //app
-                services.AddScoped<IApplicationCommandHandler<RegisterUserCommand>, RegisterUserCommandHandler>();
+                services.AddScoped<IApplicationCommandHandler<RegisterUserCommand, RegisterUserCommandResult>, RegisterUserCommandHandler>();
                 
                 //module infra
                 services.AddScoped<IUserRepository, UserRepository>();
