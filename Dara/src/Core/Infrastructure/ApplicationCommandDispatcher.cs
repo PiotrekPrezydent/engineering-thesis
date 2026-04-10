@@ -12,10 +12,18 @@ public class ApplicationCommandDispatcher : IApplicationCommandDispatcher
         _serviceProvider = serviceProvider;
     }
     
-    public async Task DispatchAsync<TCommand>(TCommand command) where TCommand : IApplicationCommand
+    public async Task DispatchAsync<TCommand>(TCommand command) 
+        where TCommand : IApplicationCommand
     {
-        var handlers = _serviceProvider.GetServices<IApplicationCommandHandler<TCommand>>();
-        foreach (var handler in handlers)
-            await handler.HandleAsync((dynamic) command);
+        var handler = _serviceProvider.GetRequiredService<IApplicationCommandHandler<TCommand>>();
+        await handler.HandleAsync(command);
+    }
+
+    public async Task<TCommandResult> DispatchAsync<TCommand, TCommandResult>(TCommand command) 
+        where TCommandResult : IApplicationCommandResult 
+        where TCommand : IApplicationCommand
+    {
+        var handler = _serviceProvider.GetRequiredService<IApplicationCommandHandler<TCommand, TCommandResult>>();
+        return await handler.HandleAsync(command);
     }
 }
