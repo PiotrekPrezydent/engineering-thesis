@@ -1,11 +1,11 @@
 using Dara.Core.Domain.Commands;
 using Dara.Modules.AccessManagment.Domain.User;
 
-namespace Dara.Modules.AccessManagment.Application.Device;
+namespace Dara.Modules.AccessManagment.Application.Node;
 
-public record RevokeUserDeviceCommand(Guid userId, Guid deviceId) : IApplicationCommand;
+public record RevokeUserNodeCommand(Guid userId, Guid deviceId) : IApplicationCommand;
 
-class RevokeUserDeviceCommandHandler : IApplicationCommandHandler<RevokeUserDeviceCommand>
+class RevokeUserDeviceCommandHandler : IApplicationCommandHandler<RevokeUserNodeCommand>
 {
     private readonly IUserRepository _users;
 
@@ -14,10 +14,10 @@ class RevokeUserDeviceCommandHandler : IApplicationCommandHandler<RevokeUserDevi
         _users = users;
     }
 
-    public Task HandleAsync(RevokeUserDeviceCommand command)
+    public Task HandleAsync(RevokeUserNodeCommand command)
     {
         var user = _users.GetUserById(command.userId).Result;
-        user.RemoveDevice(command.deviceId);
+        user.RemoveNode(command.deviceId);
         
         return _users.Save(user);
     }

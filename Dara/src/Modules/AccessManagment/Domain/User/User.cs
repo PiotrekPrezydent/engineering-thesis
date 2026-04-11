@@ -1,14 +1,14 @@
 using Dara.Core.Domain.Business;
-using Dara.Modules.AccessManagment.Domain.Device;
 using Dara.Modules.AccessManagment.Domain.Events;
 using Dara.Modules.AccessManagment.Domain.Exceptions;
+using Dara.Modules.AccessManagment.Domain.Node;
 
 namespace Dara.Modules.AccessManagment.Domain.User;
 
 public class User : Entity, IAggregateRoot
 {
-    public IReadOnlyCollection<DeviceIdentity> Devices => _devices.AsReadOnly();
-    private readonly List<DeviceIdentity> _devices = new();
+    public IReadOnlyCollection<NodeIdentity> Nodes => _nodes.AsReadOnly();
+    private readonly List<NodeIdentity> _nodes = new();
     
     public UserEmail Email { get; private set; }
     public UserPassword Password { get; private set; }
@@ -40,22 +40,22 @@ public class User : Entity, IAggregateRoot
         Nickname = newNickname;
     }
     
-    public void AddDevice(string deviceName, DeviceAuthToken deviceToken)
+    public void AddNode(string nodeName, NodeAuthToken nodeToken)
     {
-        DeviceIdentity device = new(Id, deviceName, deviceToken);
-        _devices.Add(device);
+        NodeIdentity node = new(Id, nodeName, nodeToken);
+        _nodes.Add(node);
         
-        _events.Add(new UserDeviceAddedEvent(Id,  device.Id));
+        _events.Add(new UserNodeAddedEvent(Id,  node.Id));
     }
 
-    public void RemoveDevice(Guid deviceId)
+    public void RemoveNode(Guid nodeId)
     {
-        var device = _devices.Find(e => e.Id == deviceId);
+        var device = _nodes.Find(e => e.Id == nodeId);
         if (device == null)
-            throw new DeviceNotFoundException();
+            throw new NodeNotFoundException();
         
-        _devices.Remove(device);
-        _events.Add(new UserDeviceRemovedEvent(Id, device.Id));
+        _nodes.Remove(device);
+        _events.Add(new UserNodeRemovedEvent(Id, device.Id));
     }
     
 }

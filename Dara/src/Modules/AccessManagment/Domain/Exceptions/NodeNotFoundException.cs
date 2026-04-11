@@ -2,7 +2,7 @@ using Dara.Core.Domain.Exceptions;
 
 namespace Dara.Modules.AccessManagment.Domain.Exceptions;
 
-public class DeviceNotFoundException : DomainException
+public class NodeNotFoundException : DomainException
 {
     
 }

@@ -3,10 +3,6 @@
     <Project Path="src/API/Server/Dara.API.Server.csproj" />
   </Folder>
   
-  <Folder Name="/Clients/">
-    <Project Path="src/Clients/CLI/Dara.Clients.CLI.csproj" />
-  </Folder>
-  
   <Folder Name="/Core/">
     <Project Path="src/Core/Application/Dara.Core.Application.csproj" />
     <Project Path="src/Core/Domain/Dara.Core.Domain.csproj" />
@@ -62,6 +58,9 @@
     <Project Path="src/Modules/WorkspaceMemory/Domain/Dara.Modules.WorkspaceMemory.Domain.csproj" />
     <Project Path="src/Modules/WorkspaceMemory/Infrastructure/Dara.Modules.WorkspaceMemory.Infrastructure.csproj" />
     <Project Path="src/Modules/WorkspaceMemory/Tests/Dara.Modules.WorkspaceMemory.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Nodes/">
+    <Project Path="src\Clients\CLI\Dara.Nodes.CLI.csproj" />
   </Folder>
   
   <Folder Name="/Plugins/">

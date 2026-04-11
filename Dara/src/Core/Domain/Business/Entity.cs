@@ -50,6 +50,4 @@ public abstract class Entity : IEquatable<Entity>
     {
         return !(left == right);
     }
-    
-
 }

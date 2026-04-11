@@ -11,8 +11,6 @@ using Microsoft.Extensions.Hosting;
 
 namespace Dara.Modules.AccessManagment.Tests;
 
-
-//td add result option when sending command (ICommandResult, ICommandHandler<TCommand,TResult>, ICommandDispatcher Task<Result> sendAsync)
 class Program
 {
     static async Task Main(string[] args)
