@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/API/">
+    <Project Path="src/API/ModulesBuilder/Dara.API.ModulesBuilder.csproj" />
     <Project Path="src/API/Server/Dara.API.Server.csproj" />
   </Folder>
   

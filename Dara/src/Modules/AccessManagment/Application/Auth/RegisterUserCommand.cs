@@ -27,7 +27,6 @@ public class RegisterUserCommandHandler : IApplicationCommandHandler<RegisterUse
 
         await _users.Add(new(email, password, nickname));
         var usr = _users.GetUserByEmail(email).Result;
-        Console.WriteLine("user added " + usr.Id);
 
         return new RegisterUserCommandResult(usr.Id);
     }

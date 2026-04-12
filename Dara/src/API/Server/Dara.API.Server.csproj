@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
+        <AllowMissingPrunePackageData>true</AllowMissingPrunePackageData>
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
@@ -9,5 +10,12 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNet.SignalR" Version="2.4.3" />
     </ItemGroup>
+    
+    <ItemGroup>
+      <ProjectReference Include="..\..\Core\Shared\Dara.Core.Shared.csproj" />
+      <ProjectReference Include="..\ModulesBuilder\Dara.API.ModulesBuilder.csproj" />
+    </ItemGroup>
+    
+
 
 </Project>

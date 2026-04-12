@@ -1,30 +1,57 @@
-using Dara.Core.Shared.Services.Auth;
+using Dara.Core.Shared;
+using Dara.Core.Shared.Auth;
+using Dara.Core.Shared.Dto;
 using Dara.Nodes.CLI.ConsoleCommands;
+using Microsoft.AspNetCore.SignalR.Client;
+using TypedSignalR.Client;
 
 namespace Dara.Nodes.CLI.Services;
 
-public class AuthClient : IAuthService
+public class AuthClient : IAuthHubClient
 {
-    public Task<LoginResponse> LoginAsync(LoginRequest request)
-    {
-        Console.WriteLine($"{request.Email}:{request.Password}");
-        return null;
-    }
+    HubConnection _connection;
+    IAuthHub _hub;
 
-    public Task<RegisterResponse> RegisterAsync(RegisterRequest request)
+    public AuthClient(HubConnection connection)
     {
-        throw new NotImplementedException();
-    }
-
-    public Task<LogoutRequest> LogoutAsync(LogoutRequest request)
-    {
-        throw new NotImplementedException();
+        _connection = connection;
+        _hub = connection.CreateHubProxy<IAuthHub>();
     }
     
     [ConsoleCommand("login")]
-    void Login(string username, string password)
+    async Task Login(string email, string password)
     {
-        
+        try
+        {
+            await _hub.Login(new UserCredentialsDto(email, password));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+        finally
+        {
+            Console.WriteLine("fin");
+        }
+
+    }
+
+    public Task GetMessage(string message)
+    {
+        Console.WriteLine($"{message}-----------");
+        return Task.CompletedTask;
+    }
+
+    public Task GetExcetpion(Exception ex)
+    {
+        Console.WriteLine("called get");
+        throw ex;
+    }
+
+    public Task ReceiveUserId(Guid userId)
+    {
+        Console.WriteLine($"{userId}");
+        return Task.CompletedTask;
     }
 }
 

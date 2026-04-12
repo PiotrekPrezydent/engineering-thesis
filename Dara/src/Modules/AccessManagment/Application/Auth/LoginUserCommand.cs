@@ -6,7 +6,7 @@ namespace Dara.Modules.AccessManagment.Application.Auth;
 
 public record LoginUserCommand(string email, string password) : IApplicationCommand;
 
-class LoginUserCommandHandler : IApplicationCommandHandler<LoginUserCommand>
+public class LoginUserCommandHandler : IApplicationCommandHandler<LoginUserCommand>
 {
     private readonly IUserRepository _users;
     private readonly IPasswordHasher _passwordHasher;
@@ -19,18 +19,19 @@ class LoginUserCommandHandler : IApplicationCommandHandler<LoginUserCommand>
     
     public Task HandleAsync(LoginUserCommand command)
     {
-        UserEmail email = new UserEmail(command.email);
-        var user = _users.GetUserByEmail(email).Result;
+        Console.WriteLine("login: " + command);
+        //UserEmail email = new UserEmail(command.email);
+        // var user = _users.GetUserByEmail(email).Result;
+        //
+        // //try catch
+        //
+        // if (!_passwordHasher.VerifyHashedPassword(user.Password.HashPassword, command.password))
+        // {
+        //     Console.WriteLine("Wrong password");
+        //     return Task.CompletedTask;
+        // }
         
-        //try catch
-
-        if (!_passwordHasher.VerifyHashedPassword(user.Password.HashPassword, command.password))
-        {
-            Console.WriteLine("Wrong password");
-            return Task.CompletedTask;
-        }
-        
-        Console.WriteLine($"Logged in: {user.Email}");
+        //Console.WriteLine($"Logged in: {user.Email}");
         return Task.CompletedTask;
     }
 }
