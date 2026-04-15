@@ -1,10 +1,13 @@
 using Dara.Shared.Contracts;
 using Microsoft.AspNetCore.SignalR;
 
-namespace Dara.Apps.Tests.Server;
+namespace Dara.Apps.Server.API;
 
-public class AppHub : Hub<IAppClient>
+public class AppHub : Hub<IAppClient>, IAppHub
 {
+    //Command Dispatcher
+    
+    
     public override Task OnConnectedAsync()
     {
         Console.WriteLine($"{Context.ConnectionId} connected");
@@ -42,7 +45,4 @@ public class AppHub : Hub<IAppClient>
         
         return base.OnDisconnectedAsync(exception);
     }
-
-    
-    
 }

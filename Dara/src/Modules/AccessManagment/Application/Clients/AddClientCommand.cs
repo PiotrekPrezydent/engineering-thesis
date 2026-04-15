@@ -5,7 +5,7 @@ namespace Dara.Modules.AccessManagment.Application.Clients;
 
 public record AddClientCommand(string name, string token) : IApplicationCommand;
 
-public record AddClientCommandResult(Guid Id) : IApplicationCommandResult;
+public record AddClientCommandResult() : IApplicationCommandResult;
 
 public class AddClientCommandHandler : IApplicationCommandHandler<AddClientCommand,AddClientCommandResult>
 {
@@ -25,6 +25,6 @@ public class AddClientCommandHandler : IApplicationCommandHandler<AddClientComma
         
         await _clientRepository.Add(client);
         
-        return new AddClientCommandResult(client.Id);
+        return new AddClientCommandResult();
     }
 }
