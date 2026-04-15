@@ -1,4 +1,4 @@
-using Dara.Core.Domain.Business;
+using Dara.BuildingBlocks.Domain.Business;
 using Dara.Modules.AccessManagment.Domain.Exceptions;
 
 namespace Dara.Modules.AccessManagment.Domain.User;

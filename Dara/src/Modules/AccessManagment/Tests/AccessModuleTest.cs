@@ -1,4 +1,4 @@
-using Dara.Core.Domain.Commands;
+using Dara.BuildingBlocks.Domain.Commands;
 using Dara.Modules.AccessManagment.Application.Auth;
 
 namespace Dara.Modules.AccessManagment.Tests;

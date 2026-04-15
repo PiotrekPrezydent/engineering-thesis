@@ -1,4 +1,4 @@
-using Dara.Core.Domain.Exceptions;
+using Dara.BuildingBlocks.Domain.Exceptions;
 
 namespace Dara.Modules.AccessManagment.Domain.Exceptions;
 

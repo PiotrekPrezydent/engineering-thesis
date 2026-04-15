@@ -1,4 +1,4 @@
-using Dara.Core.Domain.Events;
+using Dara.BuildingBlocks.Domain.Events;
 
 namespace Dara.Modules.AccessManagment.Domain.Events;
 

@@ -1,4 +1,4 @@
-using Dara.Core.Domain.Commands;
+using Dara.BuildingBlocks.Domain.Commands;
 using Dara.Modules.AccessManagment.Domain.User;
 
 namespace Dara.Modules.AccessManagment.Application.Node;

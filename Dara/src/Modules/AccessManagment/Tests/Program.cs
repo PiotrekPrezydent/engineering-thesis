@@ -1,6 +1,6 @@
 ﻿
-using Dara.Core.Domain.Commands;
-using Dara.Core.Domain.Events;
+using Dara.BuildingBlocks.Domain.Commands;
+using Dara.BuildingBlocks.Domain.Events;
 using Dara.Core.Infrastructure;
 using Dara.Modules.AccessManagment.Application.Auth;
 using Dara.Modules.AccessManagment.Domain.Auth;
