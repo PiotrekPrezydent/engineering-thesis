@@ -1,26 +1,47 @@
+using Dara.BuildingBlocks.Domain.Events;
 using Dara.Modules.AccessManagment.Domain.Devices;
 
 namespace Dara.Modules.AccessManagment.Infrastructure;
 
 public class DeviceRepository : IDeviceRepository
 {
-    public Task<Device> FindByName(DeviceName name)
+    private readonly List<Device> _devices;
+    private readonly IDomainEventDispatcher _domainEventDispatcher;
+    public DeviceRepository(IDomainEventDispatcher domainEventDispatcher)
     {
-        throw new NotImplementedException();
+        _devices = new();
+        _domainEventDispatcher = domainEventDispatcher;
+    }
+    
+    public async Task<Device> FindByName(DeviceName name)
+    {
+        return _devices.First(e => e.Name == name);
     }
 
-    public Task<Device> FindById(Guid id)
+    public async Task<Device> FindById(Guid id)
     {
-        throw new NotImplementedException();
+        return _devices.First(e => e.Id == id);
     }
 
-    public Task Add(Device device)
+    public async Task Add(Device device)
     {
-        throw new NotImplementedException();
+        _devices.Add(device);
+        foreach (var domainEvent in device.DomainEvents)
+        {
+            await _domainEventDispatcher.DispatchAsync(domainEvent);
+        }
+        device.ClearDomainEvents();
     }
 
-    public Task Save(Device device)
+    public async Task Save(Device device)
     {
-        throw new NotImplementedException();
+        var deviceToRemove =  _devices.First(e => e.Id == device.Id);
+        _devices.Remove(deviceToRemove);
+        _devices.Add(device);
+        foreach (var domainEvent in device.DomainEvents)
+        {
+            await _domainEventDispatcher.DispatchAsync(domainEvent);
+        }
+        device.ClearDomainEvents();
     }
 }

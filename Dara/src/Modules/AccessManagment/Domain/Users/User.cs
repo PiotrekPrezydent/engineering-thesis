@@ -1,5 +1,6 @@
 using Dara.BuildingBlocks.Domain.Business;
 using Dara.Modules.AccessManagment.Domain.Clients;
+using Dara.Modules.AccessManagment.Domain.Users.Events;
 
 namespace Dara.Modules.AccessManagment.Domain.Users;
 
@@ -22,6 +23,8 @@ public class User : Entity, IAggregateRoot
         Email = email;
         Nickname = nickname;
         Password = password;
+        
+        _events.Add(new UserCreatedEvent(this));
     }
     
     public void ChangeEmail(UserEmail email)

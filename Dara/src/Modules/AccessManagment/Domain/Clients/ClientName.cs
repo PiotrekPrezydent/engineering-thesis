@@ -11,4 +11,9 @@ public class ClientName : ValueObject
     {
         Name = name;
     }
+    
+    bool IsNameValid(string name)
+    {
+        return !string.IsNullOrWhiteSpace(name);
+    }
 }

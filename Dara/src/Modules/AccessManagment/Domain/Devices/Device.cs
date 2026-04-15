@@ -1,5 +1,6 @@
 using Dara.BuildingBlocks.Domain.Business;
 using Dara.Modules.AccessManagment.Domain.Clients;
+using Dara.Modules.AccessManagment.Domain.Devices.Events;
 
 namespace Dara.Modules.AccessManagment.Domain.Devices;
 
@@ -18,6 +19,8 @@ public class Device : Entity, IAggregateRoot
         Id = Guid.NewGuid();
         Name = name;
         Token = token;
+        
+        _events.Add(new DeviceCreatedEvent(this));
     }
     
     public void AddClient(Client client)

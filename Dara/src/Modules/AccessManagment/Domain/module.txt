@@ -1,5 +1,0 @@
-client represent instance of Dara Client program, one device can have many clients, one user can have many clients.
-
-devicec repsresent instance of device running dara client program (dekstop, mobile, etc.)
-
-user represent registered user that is owner of some clients.

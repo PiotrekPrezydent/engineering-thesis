@@ -11,4 +11,9 @@ public class ClientToken : ValueObject
     {
         Token = token;
     }
+
+    bool IsTokenValid(string token)
+    {
+        return !string.IsNullOrWhiteSpace(token);
+    }
 }
