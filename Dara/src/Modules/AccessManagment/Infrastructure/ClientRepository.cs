@@ -29,7 +29,7 @@ public class ClientRepository : IClientRepository
         _clients.Add(client);
         foreach (var domainEvent in client.DomainEvents)
         {
-            await _domainEventDispatcher.DispatchAsync(domainEvent);
+            await _domainEventDispatcher.DispatchAsync((dynamic)domainEvent);
         }
         client.ClearDomainEvents();
     }

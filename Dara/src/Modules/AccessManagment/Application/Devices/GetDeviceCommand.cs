@@ -5,9 +5,9 @@ namespace Dara.Modules.AccessManagment.Application.Devices;
 
 public record GetDeviceCommand(string Name) : IApplicationCommand;
 
-public record GetDeviceCommandresult(Guid DeviceId) : IApplicationCommandResult;
+public record GetDeviceCommandResult(Guid DeviceId) : IApplicationCommandResult;
 
-public class GetDeviceCommandHandler : IApplicationCommandHandler<GetDeviceCommand, GetDeviceCommandresult>
+public class GetDeviceCommandHandler : IApplicationCommandHandler<GetDeviceCommand, GetDeviceCommandResult>
 {
     private readonly IDeviceRepository _deviceRepository;
 
@@ -16,11 +16,11 @@ public class GetDeviceCommandHandler : IApplicationCommandHandler<GetDeviceComma
         _deviceRepository = deviceRepository;
     }
     
-    public async Task<GetDeviceCommandresult> HandleAsync(GetDeviceCommand command)
+    public async Task<GetDeviceCommandResult> HandleAsync(GetDeviceCommand command)
     {
         DeviceName name = new(command.Name);
         Device device = await _deviceRepository.FindByName(name);
         
-        return new GetDeviceCommandresult(device.Id);
+        return new GetDeviceCommandResult(device.Id);
     }
 }
