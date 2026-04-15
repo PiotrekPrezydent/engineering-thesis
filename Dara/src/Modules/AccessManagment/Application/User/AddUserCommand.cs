@@ -22,7 +22,7 @@ public class AddUserCommandHandler : IApplicationCommandHandler<AddUserCommand, 
         UserNickname nickname = new(command.Nickname);
         UserPassword password = new(command.Password);
 
-        Domain.Users.User user = new(email, nickname, password);
+        AccessManagment.Domain.Users.User user = new(email, nickname, password);
         
         await _userRepository.Add(user);
         
