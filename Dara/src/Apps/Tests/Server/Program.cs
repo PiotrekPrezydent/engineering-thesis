@@ -1,8 +1,6 @@
-using Dara.Apps.Tests.Server.AccessManagment;
 using Dara.BuildingBlocks.Domain.Commands;
 using Dara.BuildingBlocks.Domain.Events;
 using Dara.Core.Infrastructure;
-using Dara.Modules.AccessManagment.Application.Clients;
 
 namespace Dara.Apps.Tests.Server;
 
@@ -16,7 +14,6 @@ public class Program
         builder.Services.AddScoped<IApplicationCommandDispatcher, ApplicationCommandDispatcher>();
         builder.Services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
         
-        builder.Services.AddAccessModule();
 
         builder.Services.AddTransient<TestApp>();
         
@@ -48,8 +45,5 @@ public class TestApp
 
     public void Test()
     {
-        var com = new AddClientCommand("somename", "sometoken");
-        var res = _dispatcher.DispatchAsync<AddClientCommand, AddClientCommandResult>(com).Result;
-        Console.WriteLine(res == null);
     }
 }

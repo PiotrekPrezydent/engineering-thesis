@@ -12,9 +12,6 @@
   
   <ItemGroup>
     <ProjectReference Include="..\..\..\BuildingBlocks\Infrastructure\Dara.BuildingBlocks.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\..\Modules\AccessManagment\Application\Dara.Modules.AccessManagment.Application.csproj" />
-    <ProjectReference Include="..\..\..\Modules\AccessManagment\Domain\Dara.Modules.AccessManagment.Domain.csproj" />
-    <ProjectReference Include="..\..\..\Modules\AccessManagment\Infrastructure\Dara.Modules.AccessManagment.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\Shared\Contracts\Dara.Shared.Contracts.csproj" />
   </ItemGroup>
   

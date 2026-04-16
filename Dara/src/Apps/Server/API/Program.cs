@@ -1,4 +1,4 @@
-using Dara.Apps.Server.API.Initializers;
+using Dara.Modules.RpcGateway.Configuration;
 
 namespace Dara.Apps.Server.API;
 
@@ -7,14 +7,12 @@ public class Program
     public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-        builder.Services.AddSignalR();
-        builder.Services.AddBuildingBlocks();
-        builder.Services.AddAccessManagmentModule();
-        
-        builder.Services.AddSingleton<AppHub>();
+
+        builder.Services.AddRpcGatewayModule();
 
         var app = builder.Build();
-        app.MapHub<AppHub>("/app");
+
+        app.UseGatewayModule();
 
         app.Run();
     }

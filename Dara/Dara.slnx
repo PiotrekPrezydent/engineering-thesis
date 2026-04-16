@@ -17,52 +17,12 @@
   </Folder>
   
   <Folder Name="/Modules/" />
-  <Folder Name="/Modules/AccessManagment/">
-    <Project Path="src/Modules/AccessManagment/Application/Dara.Modules.AccessManagment.Application.csproj" />
-    <Project Path="src/Modules/AccessManagment/Domain/Dara.Modules.AccessManagment.Domain.csproj" />
-    <Project Path="src/Modules/AccessManagment/Infrastructure/Dara.Modules.AccessManagment.Infrastructure.csproj" />
-  </Folder>
-  
-  <Folder Name="/Modules/AuditLogging/">
-    <Project Path="src/Modules/AuditLogging/Application/Dara.Modules.AuditLogging.Application.csproj" />
-    <Project Path="src/Modules/AuditLogging/Domain/Dara.Modules.AuditLogging.Domain.csproj" />
-    <Project Path="src/Modules/AuditLogging/Infrastructure/Dara.Modules.AuditLogging.Infrastructure.csproj" />
-    <Project Path="src/Modules/AuditLogging/Tests/Dara.Modules.AuditLogging.Tests.csproj" />
-  </Folder>
-  
-  <Folder Name="/Modules/ExecutionRouting/">
-    <Project Path="src/Modules/ExecutionRouting/Application/Dara.Modules.ExecutionRouting.Application.csproj" />
-    <Project Path="src/Modules/ExecutionRouting/Domain/Dara.Modules.ExecutionRouting.Domain.csproj" />
-    <Project Path="src/Modules/ExecutionRouting/Infrastructure/Dara.Modules.ExecutionRouting.Infrastructure.csproj" />
-    <Project Path="src/Modules/ExecutionRouting/Tests/Dara.Modules.ExecutionRouting.Tests.csproj" />
-  </Folder>
-  
-  <Folder Name="/Modules/NodeRegistry/">
-    <Project Path="src/Modules/NodeRegistry/Application/Dara.Modules.NodeRegistry.Application.csproj" />
-    <Project Path="src/Modules/NodeRegistry/Domain/Dara.Modules.NodeRegistry.Domain.csproj" />
-    <Project Path="src/Modules/NodeRegistry/Infrastructure/Dara.Modules.NodeRegistry.Infrastructure.csproj" />
-    <Project Path="src/Modules/NodeRegistry/Tests/Dara.Modules.NodeRegistry.Tests.csproj" />
-  </Folder>
-  
-  <Folder Name="/Modules/PluginDistribution/">
-    <Project Path="src/Modules/PluginDistribution/Application/Dara.Modules.PluginDistribution.Application.csproj" />
-    <Project Path="src/Modules/PluginDistribution/Domain/Dara.Modules.PluginDistribution.Domain.csproj" />
-    <Project Path="src/Modules/PluginDistribution/Infrastructure/Dara.Modules.PluginDistribution.Infrastructure.csproj" />
-    <Project Path="src/Modules/PluginDistribution/Tests/Dara.Modules.PluginDistribution.Tests.csproj" />
-  </Folder>
-  
-  <Folder Name="/Modules/TaskPlanning/">
-    <Project Path="src/Modules/TaskPlanning/Application/Dara.Modules.TaskPlanning.Application.csproj" />
-    <Project Path="src/Modules/TaskPlanning/Domain/Dara.Modules.TaskPlanning.Domain.csproj" />
-    <Project Path="src/Modules/TaskPlanning/Infrastructure/Dara.Modules.TaskPlanning.Infrastructure.csproj" />
-    <Project Path="src/Modules/TaskPlanning/Tests/Dara.Modules.TaskPlanning.Tests.csproj" />
-  </Folder>
-  
-  <Folder Name="/Modules/WorkspaceMemory/">
-    <Project Path="src/Modules/WorkspaceMemory/Application/Dara.Modules.WorkspaceMemory.Application.csproj" />
-    <Project Path="src/Modules/WorkspaceMemory/Domain/Dara.Modules.WorkspaceMemory.Domain.csproj" />
-    <Project Path="src/Modules/WorkspaceMemory/Infrastructure/Dara.Modules.WorkspaceMemory.Infrastructure.csproj" />
-    <Project Path="src/Modules/WorkspaceMemory/Tests/Dara.Modules.WorkspaceMemory.Tests.csproj" />
+  <Folder Name="/Modules/RpcGateway/">
+    <Project Path="src/Modules/RpcGateway/Application/Dara.Modules.RpcGateway.Application.csproj" />
+    <Project Path="src/Modules/RpcGateway/Configuration/Dara.Modules.RpcGateway.Configuration.csproj" />
+    <Project Path="src/Modules/RpcGateway/Contracts/Dara.Modules.RpcGateway.Contracts.csproj" />
+    <Project Path="src/Modules/RpcGateway/Domain/Dara.Modules.RpcGateway.Domain.csproj" />
+    <Project Path="src/Modules/RpcGateway/Infrastructure/Dara.Modules.RpcGateway.Infrastructure.csproj" />
   </Folder>
   
   <Folder Name="/Plugins/">

@@ -1,5 +1,5 @@
 namespace Dara.Shared.Contracts;
 
-public interface IAppHub
+public interface IAppHubClient
 {
 }
