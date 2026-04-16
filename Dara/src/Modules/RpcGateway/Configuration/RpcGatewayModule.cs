@@ -8,6 +8,7 @@ using Dara.Modules.RpcGateway.Infrastructure;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Dara.BuildingBlocks.Configuration;
 
 namespace Dara.Modules.RpcGateway.Configuration;
 
@@ -19,17 +20,18 @@ public static class RpcGatewayModule
         services.AddSignalR();
 
         //commands
-        services.AddSingleton<IApplicationCommandHandler<ChangeClientAuthTokenCommand,ChangeClientAuthTokenCommandResult>, ChangeClientAuthTokenCommandHandler>();
-        services.AddSingleton<IApplicationCommandHandler<ChangeClientNameCommand, ChangeClientNameCommandResult>, ChangeClientNameCommandHandler>();
-        services.AddSingleton<IApplicationCommandHandler<ClientConnectedCommand, ClientConnectedCommandResult>, ClientConnectedCommandHandler>();
-        services.AddSingleton<IApplicationCommandHandler<ClientDisconnectedCommand, ClientDisconnectedCommandResult>,ClientDisconnectedCommandHandler>();
+        services.AddCommandHandler<ChangeClientAuthTokenCommandHandler>();
+        services.AddCommandHandler<ChangeClientNameCommandHandler>();
+        services.AddCommandHandler<ClientConnectedCommandHandler>();
+        services.AddCommandHandler<ClientDisconnectedCommandHandler>();
         
         //events
-        services.AddSingleton<IDomainEventHandler<ClientConnectionCreatedEvent>, ClientConnectionCreatedEventHandler>();
-        services.AddSingleton<IDomainEventHandler<ClientConnectionRemovedEvent>, ClientConnectionRemovedEventHandler>();
+        services.AddDomainEventHandler<ClientConnectionCreatedEventHandler>();
+        services.AddDomainEventHandler<ClientConnectionRemovedEventHandler>();
         
         //repository
-        services.AddSingleton<IClientConnectionRepository, ClientConnectionRepository>();
+        services.AddRepository<ClientConnectionRepository>();
+        //services.AddSingleton<IClientConnectionRepository, ClientConnectionRepository>();
         
         return services;
     }
