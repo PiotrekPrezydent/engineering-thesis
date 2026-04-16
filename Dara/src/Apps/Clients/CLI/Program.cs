@@ -1,7 +1,6 @@
 ﻿using Dara.Apps.Clients.CLI.ConsoleCommands;
 using Dara.Shared.Common.Console;
 using Microsoft.AspNetCore.SignalR.Client;
-using TypedSignalR.Client;
 
 namespace Dara.Apps.Clients.CLI;
 

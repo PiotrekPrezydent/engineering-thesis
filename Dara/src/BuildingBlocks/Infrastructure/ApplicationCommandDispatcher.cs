@@ -1,7 +1,9 @@
+using Dara.BuildingBlocks.Application;
+using Dara.BuildingBlocks.Contracts;
 using Dara.BuildingBlocks.Domain.Commands;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Dara.Core.Infrastructure;
+namespace Dara.BuildingBlocks.Infrastructure;
 
 public class ApplicationCommandDispatcher : IApplicationCommandDispatcher
 {

@@ -1,3 +1,5 @@
+using Dara.BuildingBlocks.Contracts;
+
 namespace Dara.BuildingBlocks.Domain.Commands;
 
 public interface IApplicationCommandDispatcher

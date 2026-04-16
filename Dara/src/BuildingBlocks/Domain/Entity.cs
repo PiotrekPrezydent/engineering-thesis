@@ -1,6 +1,6 @@
 using Dara.BuildingBlocks.Domain.Events;
 
-namespace Dara.BuildingBlocks.Domain.Business;
+namespace Dara.BuildingBlocks.Domain;
 
 public abstract class Entity : IEquatable<Entity>
 {

@@ -7,7 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\BuildingBlocks\Domain\Dara.BuildingBlocks.Domain.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Contracts\Dara.BuildingBlocks.Contracts.csproj" />
   </ItemGroup>
+  
 
 </Project>

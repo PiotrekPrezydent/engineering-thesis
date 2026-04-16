@@ -1,4 +1,6 @@
-namespace Dara.BuildingBlocks.Domain.Commands;
+using Dara.BuildingBlocks.Contracts;
+
+namespace Dara.BuildingBlocks.Application;
 
 public interface IApplicationCommandHandler<in TCommand> 
     where TCommand : IApplicationCommand

@@ -1,6 +1,6 @@
 using Dara.BuildingBlocks.Domain.Commands;
 using Dara.BuildingBlocks.Domain.Events;
-using Dara.Core.Infrastructure;
+using Dara.BuildingBlocks.Infrastructure;
 using Dara.Modules.RpcGateway.Configuration;
 
 namespace Dara.Apps.Server.API;

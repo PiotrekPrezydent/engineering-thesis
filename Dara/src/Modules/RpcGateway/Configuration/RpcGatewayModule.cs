@@ -1,5 +1,4 @@
-using Dara.BuildingBlocks.Domain.Commands;
-using Dara.BuildingBlocks.Domain.Events;
+using Dara.BuildingBlocks.Application;
 using Dara.Modules.RpcGateway.Application.Contracts;
 using Dara.Modules.RpcGateway.Application.Domain;
 using Dara.Modules.RpcGateway.Contracts;

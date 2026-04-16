@@ -1,4 +1,4 @@
-using Dara.BuildingBlocks.Domain.Commands;
+using Dara.BuildingBlocks.Application;
 using Dara.Modules.RpcGateway.Contracts;
 using Dara.Modules.RpcGateway.Domain;
 
