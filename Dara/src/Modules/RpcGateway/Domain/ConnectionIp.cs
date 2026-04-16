@@ -1,6 +1,6 @@
 using Dara.BuildingBlocks.Domain.Business;
 
-namespace Dara.Modules.RpcGateway.Domain.Connection;
+namespace Dara.Modules.RpcGateway.Domain;
 
 public class ConnectionIp : ValueObject
 {

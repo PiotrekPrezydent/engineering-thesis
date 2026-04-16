@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <ProjectReference Include="..\Contracts\Dara.Modules.RpcGateway.Contracts.csproj" />
     <ProjectReference Include="..\Domain\Dara.Modules.RpcGateway.Domain.csproj" />
   </ItemGroup>
 

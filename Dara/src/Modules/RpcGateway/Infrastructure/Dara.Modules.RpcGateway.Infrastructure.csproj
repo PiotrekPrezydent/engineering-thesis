@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Shared\Contracts\Dara.Shared.Contracts.csproj" />
+    <ProjectReference Include="..\Contracts\Dara.Modules.RpcGateway.Contracts.csproj" />
     <ProjectReference Include="..\Domain\Dara.Modules.RpcGateway.Domain.csproj" />
   </ItemGroup>
   
