@@ -21,7 +21,6 @@ public class ApplicationCommandDispatcher : IApplicationCommandDispatcher
         var cl = new ConsoleLogger("HANDLING COMMAND");
         var handler = _serviceProvider.GetRequiredService<IApplicationCommandHandler<TCommand>>();
         
-        cl.Start();
         cl.Element("HANDLER", handler);
         cl.Element("COMMAND", command);
         
@@ -37,7 +36,6 @@ public class ApplicationCommandDispatcher : IApplicationCommandDispatcher
         var cl = new ConsoleLogger("HANDLING COMMAND WITH RESULT");
         var handler = _serviceProvider.GetRequiredService<IApplicationCommandHandler<TCommand, TCommandResult>>();
         
-        cl.Start();
         cl.Element("HANDLER", handler);
         cl.Element("COMMAND", command);
         
