@@ -7,6 +7,6 @@ public class ClientCreatedEventHandler : IDomainEventHandler<ClientCreatedEvent>
 {
     public async Task HandleAsync(ClientCreatedEvent domainEvent)
     {
-        Console.WriteLine("client created");
+        //Console.WriteLine($"Client created ID: {domainEvent.Client.Id} NAME: {domainEvent.Client.Name.Name}");
     }
 }

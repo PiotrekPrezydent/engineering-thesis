@@ -3,9 +3,9 @@ using Dara.Modules.AccessManagment.Domain.Clients;
 
 namespace Dara.Modules.AccessManagment.Application.Clients;
 
-public record AddClientCommand(string name, string token) : IApplicationCommand;
+public record AddClientCommand(string Name, string Token) : IApplicationCommand;
 
-public record AddClientCommandResult() : IApplicationCommandResult;
+public record AddClientCommandResult(Guid ClientId) : IApplicationCommandResult;
 
 public class AddClientCommandHandler : IApplicationCommandHandler<AddClientCommand,AddClientCommandResult>
 {
@@ -18,13 +18,13 @@ public class AddClientCommandHandler : IApplicationCommandHandler<AddClientComma
     
     public async Task<AddClientCommandResult> HandleAsync(AddClientCommand command)
     {
-        ClientName name = new(command.name);
-        ClientToken token = new(command.token);
+        ClientName name = new(command.Name);
+        ClientToken token = new(command.Token);
         
         Client client = new(name, token);
         
         await _clientRepository.Add(client);
         
-        return new AddClientCommandResult();
+        return new AddClientCommandResult(client.Id);
     }
 }

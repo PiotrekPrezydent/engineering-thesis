@@ -4,7 +4,7 @@ using Dara.Modules.AccessManagment.Domain.Devices;
 
 namespace Dara.Modules.AccessManagment.Application.Clients;
 
-public record RegisterClientDeviceCommand(Guid clientId, Guid deviceId) : IApplicationCommand;
+public record RegisterClientDeviceCommand(Guid ClientId, Guid DeviceId) : IApplicationCommand;
 
 public record RegisterClientDeviceCommandResult() : IApplicationCommandResult;
 
@@ -21,8 +21,8 @@ public class RegisterClientDeviceCommandHandler : IApplicationCommandHandler<Reg
     
     public async Task<RegisterClientDeviceCommandResult> HandleAsync(RegisterClientDeviceCommand command)
     {
-        var client = await _clientRepository.FindById(command.clientId);
-        var device = await _deviceRepository.FindById(command.deviceId);
+        var client = await _clientRepository.FindById(command.ClientId);
+        var device = await _deviceRepository.FindById(command.DeviceId);
         
         device.AddClient(client);
         await _deviceRepository.Save(device);

@@ -15,8 +15,12 @@ public class DomainEventDispatcher : IDomainEventDispatcher
     public async Task DispatchAsync<TEvent>(TEvent domainEvent) where TEvent : IDomainEvent
     {
         var handlers = _serviceProvider.GetServices<IDomainEventHandler<TEvent>>();
-        
+
         foreach (var handler in handlers)
+        {
+            Console.WriteLine($"HANDLING EVENT: {domainEvent.GetType().Name}");
             await handler.HandleAsync((dynamic)domainEvent);
+        }
+
     }
 }

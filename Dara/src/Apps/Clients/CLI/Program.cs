@@ -7,18 +7,20 @@ namespace Dara.Apps.Clients.CLI;
 
 class Program
 {
-    //public static HubConnection Connection;
+    static HubConnection _connection;
     static async Task Main(string[] args)
     {
-        // string serverUrl = "http://127.0.0.1:5273/auth"; 
-        //     
-        // Connection = new HubConnectionBuilder()
-        //     .WithUrl(serverUrl)
-        //     .WithAutomaticReconnect()
-        //     .Build();
+        string serverUrl = "http://127.0.0.1:5273/app"; 
+            
+        _connection = new HubConnectionBuilder()
+            .WithUrl(serverUrl)
+            .WithAutomaticReconnect()
+            .Build();
+
+        await _connection.StartAsync();
+        
         ConsoleCommandInterpreter cci = new();
         cci.BindObjectCommands(new BasicCommands());
-        
         do
         {
             Console.Write("Type command: ");

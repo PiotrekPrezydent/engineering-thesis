@@ -1,3 +1,6 @@
+using Dara.BuildingBlocks.Domain.Commands;
+using Dara.Modules.AccessManagment.Application.Clients;
+using Dara.Modules.AccessManagment.Application.Devices;
 using Dara.Shared.Contracts;
 using Microsoft.AspNetCore.SignalR;
 
@@ -5,44 +8,89 @@ namespace Dara.Apps.Server.API;
 
 public class AppHub : Hub<IAppClient>, IAppHub
 {
-    //Command Dispatcher
+    private readonly IApplicationCommandDispatcher  _commandDispatcher;
+    private readonly Dictionary<string, Guid> _connectionClientsMap;
+    private readonly Dictionary<string, Guid> _devicesIpMap;
+
+    public AppHub(IApplicationCommandDispatcher commandDispatcher)
+    {
+        _commandDispatcher = commandDispatcher;
+        _connectionClientsMap = new();
+        _devicesIpMap = new();
+        Console.WriteLine($"APP HUB CREATED");
+    }
+    //client name = NoName-Device.Clients.Length+1
+    //device name = NoName-Ip_address
     
-    
-    public override Task OnConnectedAsync()
+    public override async Task OnConnectedAsync()
     {
         Console.WriteLine($"{Context.ConnectionId} connected");
         
         string connectionId = Context.ConnectionId;
         string? userId = Context.UserIdentifier;
-        Console.WriteLine($"1: {connectionId} -- {userId}");
-        
-        var httpContext = Context.GetHttpContext();
-        Console.WriteLine($"2: {httpContext}");
-        
-        if (httpContext != null)
+        Guid clientId;
+        Guid deviceId;
+        try
         {
-            // ip
-            string? ipAddress = httpContext.Connection.RemoteIpAddress?.ToString();
-
-            // B: User-Agent 
-            string? userAgent = httpContext.Request.Headers["User-Agent"].ToString();
-
-            // C: query string
-            string? myCustomParam = httpContext.Request.Query["myParam"].ToString();
-            
-            Console.WriteLine($"3:{ipAddress} - {userAgent}  - {myCustomParam}");
+            var command = new AddClientCommand("Unnamed Client"+connectionId, connectionId);
+            var result = await _commandDispatcher.DispatchAsync<AddClientCommand,AddClientCommandResult>(command);
+            clientId = result.ClientId;
+            //add this client to domain
+            _connectionClientsMap.Add(connectionId, clientId);
         }
-        Console.WriteLine("\n\n");
+        catch (Exception e)
+        {
+            Console.WriteLine("###################################");
+            Console.WriteLine(e);
+            Console.WriteLine("###################################");
+            return;
+        }
         
+        var httpContext = Context.GetHttpContext()!;
+        string ipAddress = httpContext.Connection.RemoteIpAddress!.ToString();
         
-        return base.OnConnectedAsync();
+        if (!_devicesIpMap.TryGetValue(ipAddress, out deviceId))
+        {
+            try
+            {
+                var command = new AddDeviceCommand("Unnamed Device"+connectionId, connectionId);
+                var result = await  _commandDispatcher.DispatchAsync<AddDeviceCommand, AddDeviceCommandResult>(command);
+                deviceId = result.DeviceId;
+                _devicesIpMap.Add(ipAddress, deviceId);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("###################################");
+                Console.WriteLine(e);
+                Console.WriteLine("###################################");
+            }
+        }
+        //add client to device
+        try
+        {
+            var command = new RegisterClientDeviceCommand(clientId, deviceId);
+            var result = await _commandDispatcher.DispatchAsync<RegisterClientDeviceCommand, RegisterClientDeviceCommandResult>(command);
+
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("###################################");
+            Console.WriteLine(e);
+            Console.WriteLine("###################################");
+        }
+        
+        await base.OnConnectedAsync();
     }
 
-    public override Task OnDisconnectedAsync(Exception? exception)
+    public override async Task OnDisconnectedAsync(Exception? exception)
     {
         Console.WriteLine($"{Context.ConnectionId} disconnected");
+        string connectionId = Context.ConnectionId;
+        string? userId = Context.UserIdentifier;
         
+        Guid clientId = _connectionClientsMap[connectionId];
+        //remvoe client from user and device
         
-        return base.OnDisconnectedAsync(exception);
+        await base.OnDisconnectedAsync(exception);
     }
 }

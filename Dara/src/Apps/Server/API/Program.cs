@@ -1,3 +1,5 @@
+using Dara.Apps.Server.API.Initializers;
+
 namespace Dara.Apps.Server.API;
 
 public class Program
@@ -6,19 +8,13 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddSignalR();
+        builder.Services.AddBuildingBlocks();
+        builder.Services.AddAccessManagmentModule();
         
-        //core inra
-        // CoreModule core = new();
-        // core.AddToServices(builder.Services);
-        
-        //access module
-        // AccessManagmentModule mod = new();
-        // mod.AddToServices(builder.Services);
-        
-        //builder.Services.AddTransient<AuthHub>();
+        builder.Services.AddSingleton<AppHub>();
 
         var app = builder.Build();
-        //app.MapHub<AuthHub>("auth");
+        app.MapHub<AppHub>("/app");
 
         app.Run();
     }

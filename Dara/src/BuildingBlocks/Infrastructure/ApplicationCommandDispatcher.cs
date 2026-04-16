@@ -15,6 +15,7 @@ public class ApplicationCommandDispatcher : IApplicationCommandDispatcher
     public async Task DispatchAsync<TCommand>(TCommand command) 
         where TCommand : IApplicationCommand
     {
+        Console.WriteLine($"RUNNING COMMAND: {command}");
         var handler = _serviceProvider.GetRequiredService<IApplicationCommandHandler<TCommand>>();
         await handler.HandleAsync(command);
     }
@@ -23,6 +24,7 @@ public class ApplicationCommandDispatcher : IApplicationCommandDispatcher
         where TCommandResult : IApplicationCommandResult 
         where TCommand : IApplicationCommand
     {
+        Console.WriteLine($"RUNNING COMMAND WITH RESULT: {command}");
         var handler = _serviceProvider.GetRequiredService<IApplicationCommandHandler<TCommand, TCommandResult>>();
         return await handler.HandleAsync(command);
     }

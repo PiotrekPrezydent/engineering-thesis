@@ -5,7 +5,7 @@ namespace Dara.Modules.AccessManagment.Application.Devices;
 
 public record AddDeviceCommand(string Name, string Token) : IApplicationCommand;
 
-public record AddDeviceCommandResult() : IApplicationCommandResult;
+public record AddDeviceCommandResult(Guid DeviceId) : IApplicationCommandResult;
 
 public class AddDeviceCommandHandler : IApplicationCommandHandler<AddDeviceCommand,AddDeviceCommandResult>
 {
@@ -25,6 +25,6 @@ public class AddDeviceCommandHandler : IApplicationCommandHandler<AddDeviceComma
         
         await _deviceRepository.Add(device);
         
-        return new AddDeviceCommandResult();
+        return new AddDeviceCommandResult(device.Id);
     }
 }

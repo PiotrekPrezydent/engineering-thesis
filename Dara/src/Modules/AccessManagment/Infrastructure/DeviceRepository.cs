@@ -9,6 +9,7 @@ public class DeviceRepository : IDeviceRepository
     private readonly IDomainEventDispatcher _domainEventDispatcher;
     public DeviceRepository(IDomainEventDispatcher domainEventDispatcher)
     {
+        Console.WriteLine("CRETED NEW DEVICE REPO!!!");
         _devices = new();
         _domainEventDispatcher = domainEventDispatcher;
     }
@@ -25,6 +26,7 @@ public class DeviceRepository : IDeviceRepository
 
     public async Task Add(Device device)
     {
+        Console.WriteLine($"INFRA: add device: {device.Id} - {device.Name}");
         _devices.Add(device);
         foreach (var domainEvent in device.DomainEvents)
         {
