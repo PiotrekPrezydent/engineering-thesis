@@ -1,6 +1,7 @@
 using Dara.BuildingBlocks.Application;
 using Dara.BuildingBlocks.Contracts;
 using Dara.BuildingBlocks.Domain.Commands;
+using Dara.Shared.Common.Logging;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Dara.BuildingBlocks.Infrastructure;
@@ -17,17 +18,34 @@ public class ApplicationCommandDispatcher : IApplicationCommandDispatcher
     public async Task DispatchAsync<TCommand>(TCommand command) 
         where TCommand : IApplicationCommand
     {
-        Console.WriteLine($"RUNNING COMMAND: {command}");
+        var cl = new ConsoleLogger("HANDLING COMMAND");
         var handler = _serviceProvider.GetRequiredService<IApplicationCommandHandler<TCommand>>();
+        
+        cl.Start();
+        cl.Element("HANDLER", handler);
+        cl.Element("COMMAND", command);
+        
         await handler.HandleAsync(command);
+        
+        cl.End();
     }
 
     public async Task<TCommandResult> DispatchAsync<TCommand, TCommandResult>(TCommand command) 
         where TCommandResult : IApplicationCommandResult 
         where TCommand : IApplicationCommand
     {
-        Console.WriteLine($"RUNNING COMMAND WITH RESULT: {command}");
+        var cl = new ConsoleLogger("HANDLING COMMAND WITH RESULT");
         var handler = _serviceProvider.GetRequiredService<IApplicationCommandHandler<TCommand, TCommandResult>>();
-        return await handler.HandleAsync(command);
+        
+        cl.Start();
+        cl.Element("HANDLER", handler);
+        cl.Element("COMMAND", command);
+        
+        var result = await handler.HandleAsync(command);
+        
+        cl.Element("RESULT", result);
+        cl.End();
+        
+        return result;
     }
 }
