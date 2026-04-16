@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Core\Domain\Dara.Core.Domain.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Domain\Dara.BuildingBlocks.Domain.csproj" />
     <ProjectReference Include="..\Domain\Dara.Modules.AccessManagment.Domain.csproj" />
   </ItemGroup>
 

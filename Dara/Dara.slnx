@@ -1,17 +1,19 @@
 <Solution>
-  <Folder Name="/API/">
-    <Project Path="src/API/Server/Dara.API.Server.csproj" />
+  <Folder Name="/Apps/" />
+  <Folder Name="/Apps/Clients/">
+    <Project Path="src/Apps/Clients/CLI/Dara.Apps.Clients.CLI.csproj" />
   </Folder>
-  
-  <Folder Name="/Clients/">
-    <Project Path="src/Clients/CLI/Dara.Clients.CLI.csproj" />
+  <Folder Name="/Apps/Server/">
+    <Project Path="src/Apps/Server/API/Dara.Apps.Server.API.csproj" />
   </Folder>
-  
-  <Folder Name="/Core/">
-    <Project Path="src/Core/Application/Dara.Core.Application.csproj" />
-    <Project Path="src/Core/Domain/Dara.Core.Domain.csproj" />
-    <Project Path="src/Core/Infrastructure/Dara.Core.Infrastructure.csproj" />
-    <Project Path="src/Core/Shared/Dara.Core.Shared.csproj" />
+  <Folder Name="/Apps/Tests/">
+    <Project Path="src/Apps/Tests/CLI/Dara.Apps.Tests.CLI.csproj" />
+    <Project Path="src/Apps/Tests/Server/Dara.Apps.Tests.Server.csproj" />
+  </Folder>
+  <Folder Name="/BuildingBlocks/">
+    <Project Path="src/BuildingBlocks/Application/Dara.BuildingBlocks.Application.csproj" />
+    <Project Path="src/BuildingBlocks/Domain/Dara.BuildingBlocks.Domain.csproj" />
+    <Project Path="src/BuildingBlocks/Infrastructure/Dara.BuildingBlocks.Infrastructure.csproj" />
   </Folder>
   
   <Folder Name="/Modules/" />
@@ -19,7 +21,6 @@
     <Project Path="src/Modules/AccessManagment/Application/Dara.Modules.AccessManagment.Application.csproj" />
     <Project Path="src/Modules/AccessManagment/Domain/Dara.Modules.AccessManagment.Domain.csproj" />
     <Project Path="src/Modules/AccessManagment/Infrastructure/Dara.Modules.AccessManagment.Infrastructure.csproj" />
-    <Project Path="src/Modules/AccessManagment/Tests/Dara.Modules.AccessManagment.Tests.csproj" />
   </Folder>
   
   <Folder Name="/Modules/AuditLogging/">
@@ -69,9 +70,9 @@
     <Project Path="src/Plugins/ExamplePluginB/Dara.Plugins.ExamplePluginB.csproj" />
     <Project Path="src/Plugins/ExamplePluginC/Dara.Plugins.ExamplePluginC.csproj" />
   </Folder>
-  
-  <Folder Name="/Tests/">
-    <Project Path="src/Tests/CLI/Dara.Tests.CLI.csproj" />
+  <Folder Name="/Shared/">
+    <Project Path="src/Shared/Common/Dara.Shared.Common.csproj" />
+    <Project Path="src/Shared/Contracts/Dara.Shared.Contracts.csproj" />
   </Folder>
   
 </Solution>

@@ -1,53 +1,54 @@
-using Dara.Modules.AccessManagment.Domain.Exceptions;
-using Dara.Modules.AccessManagment.Domain.User;
+using Dara.BuildingBlocks.Domain.Events;
+using Dara.Modules.AccessManagment.Domain.Users;
 
 namespace Dara.Modules.AccessManagment.Infrastructure;
 
 public class UserRepository : IUserRepository
 {
-    private List<User> _users;
+    private readonly List<User> _users;
+    private readonly IDomainEventDispatcher _domainEventDispatcher;
 
-    public UserRepository()
+    public UserRepository(IDomainEventDispatcher domainEventDispatcher)
     {
         _users = new();
+        _domainEventDispatcher = domainEventDispatcher;
     }
-    public Task<User> GetUserByEmail(UserEmail email)
+    
+    public async Task<User> FindByEmail(UserEmail email)
     {
-        User? user = _users.Find(e=>e.Email.Equals(email));
-        if (user == null)
-            throw new UserNotFoundException();
-        
-        return Task.FromResult(user);
+        return _users.First(e => e.Email == email);
     }
 
-    public Task<User> GetUserById(Guid userId)
+    public async Task<User> FindByNickname(UserNickname nickname)
     {
-        User? user = _users.Find(e=>e.Id.Equals(userId));
-        
-        if (user == null)
-            throw new UserNotFoundException();
-        
-        return Task.FromResult(user);
+        return _users.First(e => e.Nickname == nickname);
     }
 
-    public Task Save(User user)
+    public async Task<User> FindById(Guid id)
     {
-        User? repoUser = _users.Find(e=>e.Id.Equals(user.Id));
-        
-        if (user == null)
-            throw new UserNotFoundException();
-
-        _users.Remove(repoUser);
-        
-        _users.Add(user);
-        
-        return Task.CompletedTask;
+        return _users.First(e => e.Id == id);
     }
 
-    public Task Add(User user)
+    public async Task Add(User user)
     {
         _users.Add(user);
+        foreach (var domainEvent in user.DomainEvents)
+        {
+            await _domainEventDispatcher.DispatchAsync(domainEvent);
+        }
+        user.ClearDomainEvents();
+    }
+
+    public async Task Save(User user)
+    {
+        var userToRemove = _users.First(e => e.Id == user.Id);
+        _users.Remove(userToRemove);
+        _users.Add(user);
         
-        return Task.CompletedTask;
+        foreach (var domainEvent in user.DomainEvents)
+        {
+            await _domainEventDispatcher.DispatchAsync(domainEvent);
+        }
+        user.ClearDomainEvents();
     }
 }
