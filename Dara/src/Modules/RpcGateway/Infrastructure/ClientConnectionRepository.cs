@@ -27,24 +27,29 @@ public class ClientConnectionRepository : IClientConnectionRepository
 
     public async Task AddAsync(ClientConnection clientConnection)
     {
+        foreach(var domainEvent in clientConnection.DomainEvents)
+            await _domainEventDispatcher.DispatchAsync((dynamic)domainEvent);
+        
         _clientConnections.Add(clientConnection);
-        //this should be in domain i think
-        await _domainEventDispatcher.DispatchAsync(new ClientConnectionCreatedEvent(clientConnection));
     }
 
     public async Task RemoveAsync(ClientConnection clientConnection)
     {
+        foreach(var domainEvent in clientConnection.DomainEvents)
+            await _domainEventDispatcher.DispatchAsync((dynamic)domainEvent);
+        
         _clientConnections.Remove(clientConnection);
-        //this should be in domain i think
+        
         await _domainEventDispatcher.DispatchAsync(new ClientConnectionRemovedEvent(clientConnection));
     }
 
     public async Task SaveAsync(ClientConnection clientConnection)
     {
+        foreach(var domainEvent in clientConnection.DomainEvents)
+            await _domainEventDispatcher.DispatchAsync((dynamic)domainEvent);
+        
         var removed = await FindByIdAsync(clientConnection.Id);
         _clientConnections.Remove(removed);
         _clientConnections.Add(clientConnection);
-        //this should be in domain i think
-        await _domainEventDispatcher.DispatchAsync(new ClientConnectionCreatedEvent(clientConnection));
     }
 }

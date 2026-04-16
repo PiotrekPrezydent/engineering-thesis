@@ -5,8 +5,8 @@ namespace Dara.Modules.RpcGateway.Application.Domain;
 
 public class ClientConnectionCreatedEventHandler : IDomainEventHandler<ClientConnectionCreatedEvent>
 {
-    public Task HandleAsync(ClientConnectionCreatedEvent domainEvent)
+    public async Task HandleAsync(ClientConnectionCreatedEvent domainEvent)
     {
-        throw new NotImplementedException();
+        Console.WriteLine("CLIENT CREATED");
     }
 }

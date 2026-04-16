@@ -1,12 +1,21 @@
 using Dara.BuildingBlocks.Domain.Commands;
 using Dara.Modules.RpcGateway.Contracts;
+using Dara.Modules.RpcGateway.Domain;
 
 namespace Dara.Modules.RpcGateway.Application.Contracts;
 
 public class ChangeClientNameCommandHandler : IApplicationCommandHandler<ChangeClientNameCommand, ChangeClientNameCommandResult>
 {
-    public Task<ChangeClientNameCommandResult> HandleAsync(ChangeClientNameCommand command)
+    private readonly IClientConnectionRepository _clientConnectionRepository;
+
+    public ChangeClientNameCommandHandler(IClientConnectionRepository clientConnectionRepository)
     {
-        throw new NotImplementedException();
+        _clientConnectionRepository = clientConnectionRepository;
+    }
+
+    public async Task<ChangeClientNameCommandResult> HandleAsync(ChangeClientNameCommand command)
+    {
+        Console.WriteLine("CLIENT CHANGE NAME");
+        return new();
     }
 }
