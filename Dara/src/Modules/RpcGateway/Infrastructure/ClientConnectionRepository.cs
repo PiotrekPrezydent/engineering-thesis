@@ -30,6 +30,8 @@ public class ClientConnectionRepository : IClientConnectionRepository
         foreach(var domainEvent in clientConnection.DomainEvents)
             await _domainEventDispatcher.DispatchAsync((dynamic)domainEvent);
         
+        clientConnection.ClearDomainEvents();
+        
         _clientConnections.Add(clientConnection);
     }
 
@@ -37,6 +39,8 @@ public class ClientConnectionRepository : IClientConnectionRepository
     {
         foreach(var domainEvent in clientConnection.DomainEvents)
             await _domainEventDispatcher.DispatchAsync((dynamic)domainEvent);
+        
+        clientConnection.ClearDomainEvents();
         
         _clientConnections.Remove(clientConnection);
         
@@ -48,7 +52,10 @@ public class ClientConnectionRepository : IClientConnectionRepository
         foreach(var domainEvent in clientConnection.DomainEvents)
             await _domainEventDispatcher.DispatchAsync((dynamic)domainEvent);
         
+        clientConnection.ClearDomainEvents();
+        
         var removed = await FindByIdAsync(clientConnection.Id);
+        
         _clientConnections.Remove(removed);
         _clientConnections.Add(clientConnection);
     }
