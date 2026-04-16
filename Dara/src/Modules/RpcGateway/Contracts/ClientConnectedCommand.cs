@@ -1,5 +1,7 @@
+using Dara.BuildingBlocks.Domain.Commands;
+
 namespace Dara.Modules.RpcGateway.Contracts;
 
-public record ClientConnectedCommand(string ConnectionId, string ConnectionIp);
+public record ClientConnectedCommand(string ConnectionId, string ConnectionIp) : IApplicationCommand;
 
-public record ClientConnectedCommandResult();
+public record ClientConnectedCommandResult() : IApplicationCommandResult;

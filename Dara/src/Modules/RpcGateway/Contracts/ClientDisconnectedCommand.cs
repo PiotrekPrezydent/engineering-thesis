@@ -1,5 +1,7 @@
+using Dara.BuildingBlocks.Domain.Commands;
+
 namespace Dara.Modules.RpcGateway.Contracts;
 
-public record ClientDisconnectedCommand(string ConnectionId);
+public record ClientDisconnectedCommand(string ConnectionId) : IApplicationCommand;
 
-public record ClientDisconnectedCommandResult(string ConnectionId);
+public record ClientDisconnectedCommandResult(string ConnectionId) : IApplicationCommandResult;
