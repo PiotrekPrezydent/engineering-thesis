@@ -1,6 +1,4 @@
 using Dara.BuildingBlocks.Domain.Business;
-using Dara.Modules.RpcGateway.Domain.Client;
-using Dara.Modules.RpcGateway.Domain.Connection;
 
 namespace Dara.Modules.RpcGateway.Domain;
 
@@ -14,8 +12,13 @@ public class ClientConnection : Entity, IAggregateRoot
     
     public ClientAuthToken ClientAuthToken { get; }
 
-    public ClientConnection(ConnectionId connectionId, ClientName clientName, ClientAuthToken clientAuthToken)
+    public ClientConnection(ConnectionId connectionId, ConnectionIp connectionIp, ClientName clientName, ClientAuthToken clientAuthToken)
     {
+        Id = Guid.NewGuid();
         
+        ConnectionId = connectionId;
+        ConnectionIp = connectionIp;
+        ClientName = clientName;
+        ClientAuthToken = clientAuthToken;
     }
 }
