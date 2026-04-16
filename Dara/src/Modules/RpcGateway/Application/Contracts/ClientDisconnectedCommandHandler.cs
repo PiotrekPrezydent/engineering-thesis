@@ -4,7 +4,7 @@ using Dara.Modules.RpcGateway.Domain;
 
 namespace Dara.Modules.RpcGateway.Application.Contracts;
 
-public class ClientDisconnectedCommandHandler : IApplicationCommandHandler<ClientDisconnectedCommand, ClientConnectedCommandResult>
+public class ClientDisconnectedCommandHandler : IApplicationCommandHandler<ClientDisconnectedCommand, ClientDisconnectedCommandResult>
 {
     private readonly IClientConnectionRepository _clientConnectionRepository;
 
@@ -13,7 +13,7 @@ public class ClientDisconnectedCommandHandler : IApplicationCommandHandler<Clien
         _clientConnectionRepository = clientConnectionRepository;
     }
 
-    public async Task<ClientConnectedCommandResult> HandleAsync(ClientDisconnectedCommand command)
+    public async Task<ClientDisconnectedCommandResult> HandleAsync(ClientDisconnectedCommand command)
     {
         ConnectionId conId = new(command.ConnectionId);
         
@@ -21,6 +21,6 @@ public class ClientDisconnectedCommandHandler : IApplicationCommandHandler<Clien
         
         await _clientConnectionRepository.RemoveAsync(client);
 
-        return new();
+        return new(command.ConnectionId);
     }
 }

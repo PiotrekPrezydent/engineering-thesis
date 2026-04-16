@@ -19,6 +19,7 @@
   </ItemGroup>
   
   <ItemGroup>
+    <ProjectReference Include="..\Application\Dara.Modules.RpcGateway.Application.csproj" />
     <ProjectReference Include="..\Infrastructure\Dara.Modules.RpcGateway.Infrastructure.csproj" />
   </ItemGroup>
 
