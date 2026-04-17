@@ -1,4 +1,4 @@
-using Dara.BuildingBlocks.Domain.Commands;
+using Dara.BuildingBlocks.Application;
 using Dara.Modules.RpcGateway.Contracts;
 using Dara.Modules.RpcGateway.Domain;
 
@@ -15,7 +15,6 @@ public class ChangeClientAuthTokenCommandHandler : IApplicationCommandHandler<Ch
 
     public async Task<ChangeClientAuthTokenCommandResult> HandleAsync(ChangeClientAuthTokenCommand command)
     {
-        Console.WriteLine("CLIENT CHANGE TOKEN");
         return new();
     }
 }

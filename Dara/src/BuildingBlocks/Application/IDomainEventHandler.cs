@@ -1,4 +1,6 @@
-namespace Dara.BuildingBlocks.Domain.Events;
+using Dara.BuildingBlocks.Domain.Events;
+
+namespace Dara.BuildingBlocks.Application;
 
 public interface IDomainEventHandler<in TEvent> where TEvent : IDomainEvent
 {

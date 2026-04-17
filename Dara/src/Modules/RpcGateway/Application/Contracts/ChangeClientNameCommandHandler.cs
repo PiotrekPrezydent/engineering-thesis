@@ -1,4 +1,4 @@
-using Dara.BuildingBlocks.Domain.Commands;
+using Dara.BuildingBlocks.Application;
 using Dara.Modules.RpcGateway.Contracts;
 using Dara.Modules.RpcGateway.Domain;
 
@@ -15,7 +15,6 @@ public class ChangeClientNameCommandHandler : IApplicationCommandHandler<ChangeC
 
     public async Task<ChangeClientNameCommandResult> HandleAsync(ChangeClientNameCommand command)
     {
-        Console.WriteLine("CLIENT CHANGE NAME");
         return new();
     }
 }

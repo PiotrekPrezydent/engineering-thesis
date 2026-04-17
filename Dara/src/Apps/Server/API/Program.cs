@@ -1,6 +1,4 @@
-using Dara.BuildingBlocks.Domain.Commands;
-using Dara.BuildingBlocks.Domain.Events;
-using Dara.Core.Infrastructure;
+using Dara.BuildingBlocks.Configuration;
 using Dara.Modules.RpcGateway.Configuration;
 
 namespace Dara.Apps.Server.API;
@@ -11,9 +9,7 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        builder.Services.AddSingleton<IApplicationCommandDispatcher, ApplicationCommandDispatcher>();
-        builder.Services.AddSingleton<IDomainEventDispatcher, DomainEventDispatcher>();
-
+        builder.Services.AddCoreDispatchers();
         builder.Services.AddRpcGatewayModule();
 
         var app = builder.Build();

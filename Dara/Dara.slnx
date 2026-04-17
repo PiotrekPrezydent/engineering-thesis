@@ -12,6 +12,8 @@
   </Folder>
   <Folder Name="/BuildingBlocks/">
     <Project Path="src/BuildingBlocks/Application/Dara.BuildingBlocks.Application.csproj" />
+    <Project Path="src/BuildingBlocks/Configuration/Dara.BuildingBlocks.Configuration.csproj" />
+    <Project Path="src/BuildingBlocks/Contracts/Dara.BuildingBlocks.Contracts.csproj" />
     <Project Path="src/BuildingBlocks/Domain/Dara.BuildingBlocks.Domain.csproj" />
     <Project Path="src/BuildingBlocks/Infrastructure/Dara.BuildingBlocks.Infrastructure.csproj" />
   </Folder>

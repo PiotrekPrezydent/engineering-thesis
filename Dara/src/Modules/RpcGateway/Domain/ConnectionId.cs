@@ -1,4 +1,4 @@
-using Dara.BuildingBlocks.Domain.Business;
+using Dara.BuildingBlocks.Domain;
 
 namespace Dara.Modules.RpcGateway.Domain;
 

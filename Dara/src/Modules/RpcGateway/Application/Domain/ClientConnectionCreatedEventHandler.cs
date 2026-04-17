@@ -1,4 +1,4 @@
-using Dara.BuildingBlocks.Domain.Events;
+using Dara.BuildingBlocks.Application;
 using Dara.Modules.RpcGateway.Domain.Events;
 
 namespace Dara.Modules.RpcGateway.Application.Domain;
@@ -7,6 +7,6 @@ public class ClientConnectionCreatedEventHandler : IDomainEventHandler<ClientCon
 {
     public async Task HandleAsync(ClientConnectionCreatedEvent domainEvent)
     {
-        Console.WriteLine("CLIENT CREATED");
+        
     }
 }

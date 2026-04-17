@@ -1,4 +1,4 @@
-using Dara.BuildingBlocks.Domain.Business;
+using Dara.BuildingBlocks.Domain;
 using Dara.Modules.RpcGateway.Domain.Events;
 
 namespace Dara.Modules.RpcGateway.Domain;
