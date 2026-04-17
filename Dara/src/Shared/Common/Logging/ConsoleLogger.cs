@@ -42,6 +42,7 @@ public class ConsoleLogger
         _globalIntend++;
     }
 
+    //td remove elementname and use elementIndex (start = 0, element ++, end = 0)
     public void Element(string prettyElementName, object elementValue)
     {
         prettyElementName = prettyElementName.ToUpper();
