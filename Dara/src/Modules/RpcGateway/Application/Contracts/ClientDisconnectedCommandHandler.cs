@@ -1,6 +1,7 @@
 using Dara.BuildingBlocks.Application;
 using Dara.Modules.RpcGateway.Contracts;
 using Dara.Modules.RpcGateway.Domain;
+using Dara.Modules.RpcGateway.Domain.Connections;
 
 namespace Dara.Modules.RpcGateway.Application.Contracts;
 

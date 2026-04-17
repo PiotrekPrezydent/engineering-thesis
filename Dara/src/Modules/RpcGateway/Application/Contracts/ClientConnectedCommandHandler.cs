@@ -1,6 +1,8 @@
 using Dara.BuildingBlocks.Application;
 using Dara.Modules.RpcGateway.Contracts;
 using Dara.Modules.RpcGateway.Domain;
+using Dara.Modules.RpcGateway.Domain.Clients;
+using Dara.Modules.RpcGateway.Domain.Connections;
 
 namespace Dara.Modules.RpcGateway.Application.Contracts;
 
@@ -20,7 +22,7 @@ public class ClientConnectedCommandHandler : IApplicationCommandHandler<ClientCo
         ClientName name = new("SAMPEL NAME");
         ClientAuthToken token = new("SAMPLE TOKEN");
         
-        var client = new ClientConnection(conId, conIp, name, token);
+        var client = new Client(conId, conIp, name, token);
         
         await _clientConnectionRepository.AddAsync(client);
 
