@@ -7,6 +7,6 @@ public class ClientConnectionCreatedEventHandler : IDomainEventHandler<ClientCon
 {
     public async Task HandleAsync(ClientConnectionCreatedEvent domainEvent)
     {
-        Console.WriteLine("CLIENT CREATED");
+        
     }
 }

@@ -4,29 +4,50 @@ using Console = System.Console;
 
 public class ConsoleLogger
 {
-    public static string Intend => new ('\t', _intend);
-    private static int _intend = 0;
+    string Intend => new ('\t', _globalIntend);
+    private static int _globalIntend = 0;
     
-    private string _operation;
-    
-    
-    public ConsoleLogger(string operation, bool autoStart = true)
+    string _prefix;
+    string _operation;
+
+    private const string START_OP = "[ START ]";
+    private const string ELEMENT_OP = "  [ELEMENT]";
+    private const string END_OP = "[ _END_ ]";
+
+    public ConsoleLogger(string prefix = "")
     {
-        _operation = operation;
-        
-        if(autoStart)
-            Start();
+        _prefix = prefix;
+        _operation = "";
     }
     
-    public void Start()
+    public ConsoleLogger(object owner)
     {
-        Console.WriteLine($"{Intend}[ {_operation} STARTED ]");
-        _intend++;
+        _prefix = owner.GetType().Name + " => ";
+        _operation = "";
+    }
+    
+    public void Start(string operation)
+    {
+        if (_globalIntend > 0)
+            _globalIntend++;
+        
+        operation = operation.ToUpper();
+        _operation = " { " + _prefix + operation + " } ";
+        
+        string log = "\n";
+
+        log += $"{Intend}{START_OP}{_operation}";
+        
+        Console.WriteLine(log);
+        _globalIntend++;
     }
 
     public void Element(string prettyElementName, object elementValue)
     {
+        prettyElementName = prettyElementName.ToUpper();
         string log = "";
+        
+        log+=ELEMENT_OP + _operation;
         log += $"- {prettyElementName}";
         log += $"\t__TYPE__:{elementValue.GetType().Name}";
         log += $"\t__VALUE_TO_STRING__:{elementValue.ToString()}";
@@ -36,9 +57,17 @@ public class ConsoleLogger
 
     public void End()
     {
-        Console.WriteLine($"{Intend}[ {_operation} ENDED ]" );
-        _intend--;
+        _globalIntend--;
+        
+        string log = "";
+        
+        log += $"{Intend}{END_OP}{_operation}";
+        
+        Console.WriteLine($"{log}\n");
+        
+        _operation = "";
+        
+        if (_globalIntend > 0)
+            _globalIntend--;
     }
-
-
 }

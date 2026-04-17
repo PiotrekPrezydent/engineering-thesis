@@ -15,7 +15,6 @@ public class ChangeClientAuthTokenCommandHandler : IApplicationCommandHandler<Ch
 
     public async Task<ChangeClientAuthTokenCommandResult> HandleAsync(ChangeClientAuthTokenCommand command)
     {
-        Console.WriteLine("CLIENT CHANGE TOKEN");
         return new();
     }
 }

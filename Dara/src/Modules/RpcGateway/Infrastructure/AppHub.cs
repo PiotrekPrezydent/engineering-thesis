@@ -1,5 +1,6 @@
 using Dara.BuildingBlocks.Domain.Commands;
 using Dara.Modules.RpcGateway.Contracts;
+using Dara.Shared.Common.Logging;
 using Dara.Shared.Contracts;
 using Microsoft.AspNetCore.SignalR;
 
@@ -8,15 +9,20 @@ namespace Dara.Modules.RpcGateway.Infrastructure;
 public class AppHub : Hub<IAppHubClient>, IAppHub
 {
     private readonly IApplicationCommandDispatcher _applicationCommandDispatcher;
-    
+    private readonly ConsoleLogger _consoleLogger;
     public AppHub(IApplicationCommandDispatcher applicationCommandDispatcher)
     {
+        _consoleLogger = new ConsoleLogger(this);
+        _consoleLogger.Start("create");
+        
         _applicationCommandDispatcher = applicationCommandDispatcher;
+        
+        _consoleLogger.End();
     }
     
     public override async Task OnConnectedAsync()
     {
-        Console.WriteLine("########## CONNECTED: " + Context.ConnectionId );
+        _consoleLogger.Start("on-connect");
         
         string id = Context.ConnectionId;
         string ip = Context.GetHttpContext()!.Connection.RemoteIpAddress!.ToString();
@@ -24,22 +30,22 @@ public class AppHub : Hub<IAppHubClient>, IAppHub
         var command = new ClientConnectedCommand(id,ip);
         var result = await _applicationCommandDispatcher.DispatchAsync<ClientConnectedCommand,ClientConnectedCommandResult>(command);
         
-        Console.WriteLine(result);
-        
         await base.OnConnectedAsync();
+        
+        _consoleLogger.End();
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        Console.WriteLine("########## DISCONNECTED: " + Context.ConnectionId );
+        _consoleLogger.Start("on-disconnect");
         
         string id = Context.ConnectionId;
         
         var command = new ClientDisconnectedCommand(id);
         var result = await _applicationCommandDispatcher.DispatchAsync<ClientDisconnectedCommand,ClientDisconnectedCommandResult>(command);
         
-        Console.WriteLine(result);
-        
         await base.OnDisconnectedAsync(exception);
+        
+        _consoleLogger.End();
     }
 }

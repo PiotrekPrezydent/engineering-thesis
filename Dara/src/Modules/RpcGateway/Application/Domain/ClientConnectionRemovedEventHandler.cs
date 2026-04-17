@@ -7,6 +7,6 @@ public class ClientConnectionRemovedEventHandler : IDomainEventHandler<ClientCon
 {
     public async Task HandleAsync(ClientConnectionRemovedEvent domainEvent)
     {
-        Console.WriteLine("CLIENT REMOVED");
+
     }
 }

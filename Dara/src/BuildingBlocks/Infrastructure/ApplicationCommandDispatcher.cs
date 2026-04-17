@@ -9,40 +9,49 @@ namespace Dara.BuildingBlocks.Infrastructure;
 public class ApplicationCommandDispatcher : IApplicationCommandDispatcher
 {
     private readonly IServiceProvider _serviceProvider;
+    private readonly ConsoleLogger _consoleLogger;
     
     public ApplicationCommandDispatcher(IServiceProvider serviceProvider)
     {
+        _consoleLogger = new ConsoleLogger(this);
+        _consoleLogger.Start("CREATE");
+        
         _serviceProvider = serviceProvider;
+        
+        _consoleLogger.Element("SERVICE", _serviceProvider);
+        _consoleLogger.End();
     }
     
     public async Task DispatchAsync<TCommand>(TCommand command) 
         where TCommand : IApplicationCommand
     {
-        var cl = new ConsoleLogger("HANDLING COMMAND");
+        _consoleLogger.Start("HANDLING COMMAND");
+        
         var handler = _serviceProvider.GetRequiredService<IApplicationCommandHandler<TCommand>>();
         
-        cl.Element("HANDLER", handler);
-        cl.Element("COMMAND", command);
+        _consoleLogger.Element("HANDLER", handler);
+        _consoleLogger.Element("COMMAND", command);
         
         await handler.HandleAsync(command);
         
-        cl.End();
+        _consoleLogger.End();
     }
 
     public async Task<TCommandResult> DispatchAsync<TCommand, TCommandResult>(TCommand command) 
         where TCommandResult : IApplicationCommandResult 
         where TCommand : IApplicationCommand
     {
-        var cl = new ConsoleLogger("HANDLING COMMAND WITH RESULT");
+        _consoleLogger.Start("HANDLING COMMAND WITH RESULT");
+        
         var handler = _serviceProvider.GetRequiredService<IApplicationCommandHandler<TCommand, TCommandResult>>();
         
-        cl.Element("HANDLER", handler);
-        cl.Element("COMMAND", command);
+        _consoleLogger.Element("HANDLER", handler);
+        _consoleLogger.Element("COMMAND", command);
         
         var result = await handler.HandleAsync(command);
         
-        cl.Element("RESULT", result);
-        cl.End();
+        _consoleLogger.Element("RESULT", result);
+        _consoleLogger.End();
         
         return result;
     }

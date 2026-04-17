@@ -15,7 +15,6 @@ public class ChangeClientNameCommandHandler : IApplicationCommandHandler<ChangeC
 
     public async Task<ChangeClientNameCommandResult> HandleAsync(ChangeClientNameCommand command)
     {
-        Console.WriteLine("CLIENT CHANGE NAME");
         return new();
     }
 }
