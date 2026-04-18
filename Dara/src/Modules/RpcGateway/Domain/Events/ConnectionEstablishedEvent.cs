@@ -1,8 +1,8 @@
-using Dara.BuildingBlocks.Domain.Events;
+using Dara.BuildingBlocks.Domain.Events.Abstractions;
 
 namespace Dara.Modules.RpcGateway.Domain.Events;
 
-public class ConnectionEstablishedEvent : BaseDomainEvent
+public class ConnectionEstablishedEvent : IDomainEvent
 {
     public Connection CreatedConnection { get; }
 

@@ -1,4 +1,5 @@
 using Dara.BuildingBlocks.Domain.Events;
+using Dara.BuildingBlocks.Domain.Events.Abstractions;
 
 namespace Dara.BuildingBlocks.Infrastructure;
 

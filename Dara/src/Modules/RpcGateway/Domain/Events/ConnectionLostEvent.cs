@@ -1,8 +1,9 @@
-using Dara.BuildingBlocks.Domain.Events;
+
+using Dara.BuildingBlocks.Domain.Events.Abstractions;
 
 namespace Dara.Modules.RpcGateway.Domain.Events;
 
-public class ConnectionLostEvent : BaseDomainEvent
+public class ConnectionLostEvent : IDomainEvent
 {
     public Connection LostConnection { get; }
 

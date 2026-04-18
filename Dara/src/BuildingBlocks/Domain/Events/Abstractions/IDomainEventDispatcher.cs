@@ -1,4 +1,4 @@
-namespace Dara.BuildingBlocks.Domain.Events;
+namespace Dara.BuildingBlocks.Domain.Events.Abstractions;
 
 public interface IDomainEventDispatcher
 {
