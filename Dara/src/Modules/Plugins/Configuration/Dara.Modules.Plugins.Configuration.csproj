@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\Configuration\Dara.BuildingBlocks.Configuration.csproj" />
+    <ProjectReference Include="..\Application\Dara.Modules.Plugins.Application.csproj" />
+    <ProjectReference Include="..\Infrastructure\Dara.Modules.Plugins.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>
