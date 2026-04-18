@@ -6,8 +6,8 @@ public interface IConnectionHub
     public Task BroadcastMessageAsync(MessageDto message);
     
     //Brodcast message to specific connections
-    public Task BroadcastMessageAsync(MessageDto message, params string[] connectionIds);
+    public Task BroadcastMessageForConnectionsAsync(MessageDto message, params string[] connectionIds);
 
     //Brodcast message to connections with given Ip
-    public Task BrodcastMessageAsync(MessageDto message, string connectionIp);
+    public Task BrodcastMessageForIpConnectionsAsync(MessageDto message, string connectionIp);
 }

@@ -44,12 +44,12 @@ public class AppHub : Hub<IAppHubClient>, IAppHub
         await Clients.All.ReceiveMessageAsync(message);
     }
 
-    public async Task BroadcastMessageAsync(MessageDto message, params string[] connectionIds)
+    public async Task BroadcastMessageForConnectionsAsync(MessageDto message, params string[] connectionIds)
     {
         await Clients.Clients(connectionIds).ReceiveMessageAsync(message);
     }
 
-    public async Task BrodcastMessageAsync(MessageDto message, string connectionIp)
+    public async Task BrodcastMessageForIpConnectionsAsync(MessageDto message, string connectionIp)
     {
         var command = new GetIpConnectionsCommand(connectionIp);
         var result = await _applicationCommandDispatcher.DispatchAsync<GetIpConnectionsCommand, GetIpConnectionsCommandResult>(command);
