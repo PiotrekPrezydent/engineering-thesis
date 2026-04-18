@@ -9,7 +9,7 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        builder.Services.AddCoreDispatchers();
+        builder.Services.AddBuildingBlocksInfraDispatchers();
         builder.Services.AddRpcGatewayModule();
 
         var app = builder.Build();

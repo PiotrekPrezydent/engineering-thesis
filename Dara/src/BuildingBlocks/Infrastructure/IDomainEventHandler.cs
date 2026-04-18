@@ -1,6 +1,6 @@
 using Dara.BuildingBlocks.Domain.Events;
 
-namespace Dara.BuildingBlocks.Application;
+namespace Dara.BuildingBlocks.Infrastructure;
 
 public interface IDomainEventHandler<in TEvent> where TEvent : IDomainEvent
 {

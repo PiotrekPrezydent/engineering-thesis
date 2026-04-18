@@ -1,14 +1,10 @@
-using Dara.BuildingBlocks.Application;
-using Dara.Modules.RpcGateway.Application.Contracts;
-using Dara.Modules.RpcGateway.Application.Domain;
-using Dara.Modules.RpcGateway.Contracts;
-using Dara.Modules.RpcGateway.Domain;
-using Dara.Modules.RpcGateway.Domain.Events;
 using Dara.Modules.RpcGateway.Infrastructure;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Dara.BuildingBlocks.Configuration;
+using Dara.Modules.RpcGateway.Application;
+using Dara.Modules.RpcGateway.Infrastructure.Domain;
 
 namespace Dara.Modules.RpcGateway.Configuration;
 
@@ -16,22 +12,20 @@ public static class RpcGatewayModule
 {
     public static IServiceCollection AddRpcGatewayModule(this IServiceCollection services)
     {
-        //signalR (HubsLogic)
+        //signalR (Hubs Logic)
         services.AddSignalR();
-
+        
         //commands
-        services.AddCommandHandler<ChangeClientAuthTokenCommandHandler>();
-        services.AddCommandHandler<ChangeClientNameCommandHandler>();
-        services.AddCommandHandler<ClientConnectedCommandHandler>();
-        services.AddCommandHandler<ClientDisconnectedCommandHandler>();
+        services.AddCommandHandler<GetIpConnectionsCommandHandler>();
+        services.AddCommandHandler<SetConnectionEstablishedCommandHandler>();
+        services.AddCommandHandler<SetConnectionLostCommandHandler>();
         
         //events
-        services.AddDomainEventHandler<ClientConnectionCreatedEventHandler>();
-        services.AddDomainEventHandler<ClientConnectionRemovedEventHandler>();
+        services.AddDomainEventHandler<ConnectionEstablishedEventHandler>();
+        services.AddDomainEventHandler<ConnectionLostEventHandler>();
         
         //repository
-        services.AddRepository<ClientConnectionRepository>();
-        //services.AddSingleton<IClientConnectionRepository, ClientConnectionRepository>();
+        services.AddRepository<ConnectionRepository>();
         
         return services;
     }
