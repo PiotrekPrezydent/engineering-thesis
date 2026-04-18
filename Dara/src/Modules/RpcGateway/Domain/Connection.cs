@@ -16,7 +16,16 @@ public class Connection : Entity, IAggregateRoot
         
         ConnectionId = connectionId;
         ConnectionIp = connectionIp;
-        
+    }
+
+    //here we can add validation if needed
+    public void BecomeEstablished()
+    {
         _events.Add(new ConnectionEstablishedEvent(this));
+    }
+
+    public void BecomeLost()
+    {
+        _events.Add(new ConnectionLostEvent(this));
     }
 }

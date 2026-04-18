@@ -1,20 +1,24 @@
 using Dara.BuildingBlocks.Application;
 using Dara.Modules.RpcGateway.Contracts;
-
-//td: change add Handler to file name, add module contracts using
+using Dara.Modules.RpcGateway.Domain;
 
 namespace Dara.Modules.RpcGateway.Application;
 
-class GetIpConnectionsCommandHandler : IApplicationCommandHandler<GetIpConnectionsCommand, GetIpConnectionsCommandResult>
+public class GetIpConnectionsCommandHandler : IApplicationCommandHandler<GetIpConnectionsCommand, GetIpConnectionsCommandResult>
 {
-    public GetIpConnectionsCommandHandler()
+    private readonly IConnectionRepository _connectionRepository;
+    
+    public GetIpConnectionsCommandHandler(IConnectionRepository connectionRepository)
     {
+        _connectionRepository = connectionRepository;
     }
     
     public async Task<GetIpConnectionsCommandResult> HandleAsync(GetIpConnectionsCommand command)
     {
-        List<string> result = new();
+        ConnectionIp ip = new(command.Ip); //create as object for validation check if added later
+
+        var result = await _connectionRepository.GetAllWithIpAsync(ip);
         
-        return new(result);
+        return new(result.Select(e=>e.ConnectionId.Value));
     }
 }

@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\Infrastructure\Dara.BuildingBlocks.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\Shared\Common\Dara.Shared.Common.csproj" />
     <ProjectReference Include="..\..\..\Shared\Contracts\Dara.Shared.Contracts.csproj" />
     <ProjectReference Include="..\Contracts\Dara.Modules.RpcGateway.Contracts.csproj" />

@@ -49,8 +49,11 @@ public class AppHub : Hub<IAppHubClient>, IAppHub
         await Clients.Clients(connectionIds).ReceiveMessageAsync(message);
     }
 
-    public Task BrodcastMessageAsync(MessageDto message, string connectionIp)
+    public async Task BrodcastMessageAsync(MessageDto message, string connectionIp)
     {
-        throw new NotImplementedException();
+        var command = new GetIpConnectionsCommand(connectionIp);
+        var result = await _applicationCommandDispatcher.DispatchAsync<GetIpConnectionsCommand, GetIpConnectionsCommandResult>(command);
+        
+        await Clients.Clients(result.ConnectionIds).ReceiveMessageAsync(message);
     }
 }
