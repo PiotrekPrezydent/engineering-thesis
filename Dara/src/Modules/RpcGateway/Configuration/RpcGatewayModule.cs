@@ -1,9 +1,3 @@
-using Dara.BuildingBlocks.Application;
-using Dara.Modules.RpcGateway.Application.Contracts;
-using Dara.Modules.RpcGateway.Application.Domain;
-using Dara.Modules.RpcGateway.Contracts;
-using Dara.Modules.RpcGateway.Domain;
-using Dara.Modules.RpcGateway.Domain.Events;
 using Dara.Modules.RpcGateway.Infrastructure;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Builder;
@@ -16,22 +10,22 @@ public static class RpcGatewayModule
 {
     public static IServiceCollection AddRpcGatewayModule(this IServiceCollection services)
     {
-        //signalR (HubsLogic)
-        services.AddSignalR();
-
-        //commands
-        services.AddCommandHandler<ChangeClientAuthTokenCommandHandler>();
-        services.AddCommandHandler<ChangeClientNameCommandHandler>();
-        services.AddCommandHandler<ClientConnectedCommandHandler>();
-        services.AddCommandHandler<ClientDisconnectedCommandHandler>();
-        
-        //events
-        services.AddDomainEventHandler<ClientConnectionCreatedEventHandler>();
-        services.AddDomainEventHandler<ClientConnectionRemovedEventHandler>();
-        
-        //repository
-        services.AddRepository<ClientConnectionRepository>();
-        //services.AddSingleton<IClientConnectionRepository, ClientConnectionRepository>();
+        // //signalR (HubsLogic)
+        // services.AddSignalR();
+        //
+        // //commands
+        // services.AddCommandHandler<ChangeClientAuthTokenCommandHandler>();
+        // services.AddCommandHandler<ChangeClientNameCommandHandler>();
+        // services.AddCommandHandler<ClientConnectedCommandHandler>();
+        // services.AddCommandHandler<ClientDisconnectedCommandHandler>();
+        //
+        // //events
+        // services.AddDomainEventHandler<ClientConnectionCreatedEventHandler>();
+        // services.AddDomainEventHandler<ClientConnectionRemovedEventHandler>();
+        //
+        // //repository
+        // services.AddRepository<ClientConnectionRepository>();
+        // //services.AddSingleton<IClientConnectionRepository, ClientConnectionRepository>();
         
         return services;
     }

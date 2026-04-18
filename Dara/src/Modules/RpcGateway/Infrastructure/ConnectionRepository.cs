@@ -1,5 +1,5 @@
 using Dara.BuildingBlocks.Domain.Events;
-using Dara.Modules.RpcGateway.Domain.Connections;
+using Dara.Modules.RpcGateway.Domain;
 using Dara.Shared.Common.Logging;
 
 namespace Dara.Modules.RpcGateway.Infrastructure;

@@ -1,6 +1,6 @@
 using Dara.BuildingBlocks.Domain;
 
-namespace Dara.Modules.RpcGateway.Domain.Connections;
+namespace Dara.Modules.RpcGateway.Domain;
 
 public interface IConnectionRepository : IRepository<Connection>
 {
