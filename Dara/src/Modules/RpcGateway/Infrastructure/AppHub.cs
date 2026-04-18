@@ -2,6 +2,7 @@ using Dara.BuildingBlocks.Domain.Commands;
 using Dara.Modules.RpcGateway.Contracts;
 using Dara.Shared.Common.Logging;
 using Dara.Shared.Contracts;
+using Dara.Shared.Contracts.Communication;
 using Dara.Shared.Contracts.Connection;
 using Microsoft.AspNetCore.SignalR;
 
@@ -55,5 +56,55 @@ public class AppHub : Hub<IAppHubClient>, IAppHub
         var result = await _applicationCommandDispatcher.DispatchAsync<GetIpConnectionsCommand, GetIpConnectionsCommandResult>(command);
         
         await Clients.Clients(result.ConnectionIds).ReceiveMessageAsync(message);
+    }
+
+    public Task<ResponseDto> TryBecomeClientAsync(RegisterClientRequest request)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<ResponseDto> TryExitClientAsync(LeaveClientRequest request)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<ResponseDto> TryChangeClientNameAsync(ChangeClientNameRequest request)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<ResponseDto> TryChangeClientAuthTokenAsync(ChangeClientAuthTokenRequest request)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task SendMessageToClientAsync(ClientDto client, MessageDto message)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<ResponseDto> TryJoinGroupAsync(JoinGroupRequest request)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<ResponseDto> TryLeaveGroupAsync(LeaveGroupRequest request)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<ResponseDto> TryCreateGroupAsync(CreateGroupRequest request)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<ResponseDto> TryChangeGroupNameAsync(ChangeGroupNameRequest request)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<ResponseDto> TryChangeGroupCodeAsync(ChangeGroupCodeRequest request)
+    {
+        throw new NotImplementedException();
     }
 }
