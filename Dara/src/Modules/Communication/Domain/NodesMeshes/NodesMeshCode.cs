@@ -1,6 +1,6 @@
 using Dara.BuildingBlocks.Domain;
 
-namespace Dara.Modules.Communication.Domain.NodesMeshs;
+namespace Dara.Modules.Communication.Domain.NodesMeshes;
 
 public class NodesMeshCode : ValueObject
 {

@@ -2,7 +2,7 @@ using Dara.BuildingBlocks.Domain;
 using Dara.BuildingBlocks.Domain.Events;
 using Dara.Modules.Communication.Domain.Clients;
 using Dara.Modules.Communication.Domain.Nodes.Events;
-using Dara.Modules.Communication.Domain.NodesMeshs;
+using Dara.Modules.Communication.Domain.NodesMeshes;
 
 namespace Dara.Modules.Communication.Domain.Nodes;
 

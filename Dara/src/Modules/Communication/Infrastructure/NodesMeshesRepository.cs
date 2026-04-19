@@ -1,7 +1,7 @@
 using Dara.BuildingBlocks.Domain.Events.Abstractions;
 using Dara.Modules.Communication.Domain.Clients;
 using Dara.Modules.Communication.Domain.Nodes;
-using Dara.Modules.Communication.Domain.NodesMeshs;
+using Dara.Modules.Communication.Domain.NodesMeshes;
 
 namespace Dara.Modules.Communication.Infrastructure;
 

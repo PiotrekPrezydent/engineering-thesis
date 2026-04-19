@@ -1,7 +1,7 @@
 using Dara.BuildingBlocks.Domain.Events.Abstractions;
 using Dara.Modules.Communication.Domain.Nodes;
 
-namespace Dara.Modules.Communication.Domain.NodesMeshs.Events;
+namespace Dara.Modules.Communication.Domain.NodesMeshes.Events;
 
 class NodesMeshMemberAddedEvent : IDomainEvent
 {

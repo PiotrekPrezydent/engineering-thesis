@@ -1,5 +1,3 @@
-using Dara.BuildingBlocks.Contracts;
-
 namespace Dara.BuildingBlocks.Application;
 
 public interface IApplicationCommandHandler<in TCommand> 

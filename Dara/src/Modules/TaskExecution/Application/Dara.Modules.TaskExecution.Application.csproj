@@ -3,7 +3,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\BuildingBlocks\Application\Dara.BuildingBlocks.Application.csproj" />
     <ProjectReference Include="..\Domain\Dara.Modules.TaskExecution.Domain.csproj" />
-    <ProjectReference Include="..\Contracts\Dara.Modules.TaskExecution.Contracts.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

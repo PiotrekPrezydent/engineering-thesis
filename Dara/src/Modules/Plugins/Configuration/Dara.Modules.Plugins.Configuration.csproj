@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\BuildingBlocks\Configuration\Dara.BuildingBlocks.Configuration.csproj" />
     <ProjectReference Include="..\Application\Dara.Modules.Plugins.Application.csproj" />
     <ProjectReference Include="..\Infrastructure\Dara.Modules.Plugins.Infrastructure.csproj" />
   </ItemGroup>

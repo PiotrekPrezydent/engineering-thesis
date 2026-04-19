@@ -1,9 +1,9 @@
 using Dara.BuildingBlocks.Domain;
 using Dara.BuildingBlocks.Domain.Events;
 using Dara.Modules.Communication.Domain.Nodes;
-using Dara.Modules.Communication.Domain.NodesMeshs.Events;
+using Dara.Modules.Communication.Domain.NodesMeshes.Events;
 
-namespace Dara.Modules.Communication.Domain.NodesMeshs;
+namespace Dara.Modules.Communication.Domain.NodesMeshes;
 
 public class NodesMesh : Entity, IAggregateRoot
 {

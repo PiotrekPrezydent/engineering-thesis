@@ -1,6 +1,4 @@
 using Dara.BuildingBlocks.Application;
-using Dara.BuildingBlocks.Contracts;
-using Dara.BuildingBlocks.Domain.Commands;
 using Dara.Shared.Common.Logging;
 using Microsoft.Extensions.DependencyInjection;
 

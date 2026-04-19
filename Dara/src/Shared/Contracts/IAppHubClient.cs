@@ -1,6 +1,5 @@
-using Dara.Shared.Contracts.Communication;
-using Dara.Shared.Contracts.Connection;
+using Dara.Shared.Contracts.Clients;
 
 namespace Dara.Shared.Contracts;
 
-public interface IAppHubClient : IConnectionHubClient, ICommunicationHubClient;
+public interface IAppHubClient : IGuestClient, INodeClient, INodeMeshClient;

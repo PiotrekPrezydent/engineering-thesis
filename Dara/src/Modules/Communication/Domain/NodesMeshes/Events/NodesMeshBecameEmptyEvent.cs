@@ -1,6 +1,6 @@
 using Dara.BuildingBlocks.Domain.Events.Abstractions;
 
-namespace Dara.Modules.Communication.Domain.NodesMeshs.Events;
+namespace Dara.Modules.Communication.Domain.NodesMeshes.Events;
 
 class NodesMeshBecameEmptyEvent : IDomainEvent
 {

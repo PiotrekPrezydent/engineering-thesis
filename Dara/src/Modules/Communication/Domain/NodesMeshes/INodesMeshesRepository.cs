@@ -1,7 +1,7 @@
 using Dara.BuildingBlocks.Domain;
 using Dara.Modules.Communication.Domain.Nodes;
 
-namespace Dara.Modules.Communication.Domain.NodesMeshs;
+namespace Dara.Modules.Communication.Domain.NodesMeshes;
 
 public interface INodesMeshesRepository : IRepository<NodesMesh>
 {
