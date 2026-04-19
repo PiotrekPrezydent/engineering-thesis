@@ -1,5 +1,7 @@
 using Dara.BuildingBlocks.Domain.Commands;
+using Dara.BuildingBlocks.Domain.Exceptions;
 using Dara.Modules.RpcGateway.Contracts;
+using Dara.Modules.RpcGateway.Domain;
 using Dara.Shared.Common.Logging;
 using Dara.Shared.Contracts;
 using Dara.Shared.Contracts.Communication;
@@ -24,8 +26,20 @@ public class AppHub : Hub<IAppHubClient>, IAppHub
         string id = Context.ConnectionId;
         string ip = Context.GetHttpContext()!.Connection.RemoteIpAddress!.ToString();
 
-        var command = new SetConnectionEstablishedCommand(id,ip);
-        var result = await _applicationCommandDispatcher.DispatchAsync<SetConnectionEstablishedCommand, SetConnectionEstablishedCommandResult>(command);
+        try
+        {
+            var command = new SetConnectionEstablishedCommand(id,ip);
+            var result = await _applicationCommandDispatcher.DispatchAsync<SetConnectionEstablishedCommand, SetConnectionEstablishedCommandResult>(command);
+            
+        }
+        catch (BaseDomainException ex)
+        {
+            ex.PrintBuildedMessage();
+            
+            return;
+        }
+
+
         
         await base.OnConnectedAsync();
     }
@@ -34,9 +48,20 @@ public class AppHub : Hub<IAppHubClient>, IAppHub
     {
         string id = Context.ConnectionId;
 
-        var command = new SetConnectionLostCommand(id);
-        var result = await _applicationCommandDispatcher.DispatchAsync<SetConnectionLostCommand, SetConnectionLostCommandResult>(command);
-        
+        try
+        {
+            var command = new SetConnectionLostCommand(id);
+            var result = await _applicationCommandDispatcher
+                .DispatchAsync<SetConnectionLostCommand, SetConnectionLostCommandResult>(command);
+        }
+        catch (BaseDomainException ex)
+        {
+            ex.PrintBuildedMessage();
+
+            return;
+        }
+
+
         await base.OnDisconnectedAsync(exception);
     }
 

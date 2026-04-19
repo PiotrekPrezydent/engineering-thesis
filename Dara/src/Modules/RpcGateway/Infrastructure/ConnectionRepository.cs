@@ -1,5 +1,6 @@
 using Dara.BuildingBlocks.Domain.Events;
 using Dara.BuildingBlocks.Domain.Events.Abstractions;
+using Dara.BuildingBlocks.Domain.Exceptions;
 using Dara.Modules.RpcGateway.Domain;
 using Dara.Shared.Common.Logging;
 
@@ -24,7 +25,7 @@ public class ConnectionRepository : IConnectionRepository
         var connection = _connections.First(x => x.Id == guid);
         
         if(connection == null)
-            throw new NullReferenceException("Connection not found");
+            throw new EntityNotFoundInRepositoryException<ConnectionRepository,Connection>(this, guid);
         
         return connection;
     }
@@ -34,7 +35,7 @@ public class ConnectionRepository : IConnectionRepository
         var connection = _connections.First(x => x.ConnectionId == connectionId);
         
         if(connection == null)
-            throw new NullReferenceException("Connection not found");
+            throw new EntityNotFoundInRepositoryException<ConnectionRepository,Connection>(this, connectionId);
         
         return connection;
     }

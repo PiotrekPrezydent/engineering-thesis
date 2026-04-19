@@ -29,6 +29,20 @@ public class Group : Entity, IAggregateRoot
         _members = new();
     }
     
+    public void ChangeName(GroupName newName)
+    {
+        Name = newName;
+        
+        _events.Add(new EntityValueObjectChangedEvent<Group, GroupName>(this, Name));
+    }
+    
+    public void ChangeCode(GroupCode newCode)
+    {
+        Code = newCode;
+        
+        _events.Add(new EntityValueObjectChangedEvent<Group, GroupCode>(this, Code));
+    }
+    
     public void AddMember(Client newMember)
     {
         _members.Add(newMember);
@@ -47,19 +61,5 @@ public class Group : Entity, IAggregateRoot
         }
         
         _events.Add(new GroupMemberRemovedEvent(this, groupMember));
-    }
-    
-    public void ChangeName(GroupName newName)
-    {
-        Name = newName;
-        
-        _events.Add(new EntityValueObjectChangedEvent<Group, GroupName>(this, Name));
-    }
-    
-    public void ChangeCode(GroupCode newCode)
-    {
-        Code = newCode;
-        
-        _events.Add(new EntityValueObjectChangedEvent<Group, GroupCode>(this, Code));
     }
 }
