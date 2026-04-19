@@ -1,64 +1,40 @@
 using Dara.BuildingBlocks.Domain;
-using Dara.BuildingBlocks.Domain.Events;
-using Dara.Modules.Communication.Domain.Clients.Events;
-using Dara.Modules.Communication.Domain.Groups;
+using Dara.Modules.Communication.Domain.Nodes;
 
 namespace Dara.Modules.Communication.Domain.Clients;
 
+//represent connection to server
 public class Client : Entity, IAggregateRoot
 {
-    public ClientName Name { get; private set; }
+    public ClientConnectionId ClientConnectionId { get; private set; }
     
-    public ClientAuthToken AuthToken { get; private set; }
+    public ClientConnectionIp ClientConnectionIp { get; private set; }
     
-    public ClientConnection Connection { get; }
-
-    public Group CurrentGroup { get; private set; }
-
-    public Client(ClientName name, ClientAuthToken authToken, ClientConnection connection)
+    public Node? RegisteredNode { get; private set; }
+    
+    public Client(ClientConnectionId clientConnectionId, ClientConnectionIp clientConnectionIp)
     {
         Id = Guid.NewGuid();
         
-        Name = name;
-        AuthToken = authToken;
-        Connection = connection;
+        ClientConnectionId = clientConnectionId;
+        ClientConnectionIp = clientConnectionIp;
 
-        CurrentGroup = null;
-    }
-
-    public void ChangeName(ClientName newName)
-    {
-        Name = newName;
-        
-        _events.Add(new EntityValueObjectChangedEvent<Client,ClientName>(this, Name));
+        RegisteredNode = null;
     }
 
-    public void ChangeAuthToken(ClientAuthToken newAuthToken)
+    public void RegisterNode(Node node)
     {
-        AuthToken = newAuthToken;
+        if(RegisteredNode != null)
+            throw new InvalidOperationException("Client is already registered");
         
-        _events.Add(new EntityValueObjectChangedEvent<Client,ClientAuthToken>(this, AuthToken));
-    }
-    
-    public void JoinGroup(Group group)
-    {
-        if(CurrentGroup != null)
-            throw new InvalidOperationException("Cannot join a group more than once");
-        
-        CurrentGroup = group;
-        
-        _events.Add(new ClientJoinedGroupEvent(this, CurrentGroup));
+        RegisteredNode = node;
     }
 
-    public void LeaveGroup(Group group)
+    public void DeregisterNode()
     {
-        if(CurrentGroup == null)
-            throw new InvalidOperationException("Client dont have a group");
+        if(RegisteredNode == null)
+            throw new InvalidOperationException("Client is not registered");
         
-        CurrentGroup = null;
-        
-        _events.Add(new ClientLeftGroupEvent(this, group));
+        RegisteredNode = null;
     }
-    
-    
 }
