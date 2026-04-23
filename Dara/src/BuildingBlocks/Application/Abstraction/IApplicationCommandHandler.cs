@@ -1,10 +1,10 @@
-namespace Dara.BuildingBlocks.Application;
+namespace Dara.BuildingBlocks.Application.Abstraction;
 
-public interface IApplicationCommandHandler<in TCommand> 
-    where TCommand : IApplicationCommand
-{
-    Task HandleAsync(TCommand command);
-}
+// public interface IApplicationCommandHandler<in TCommand> 
+//     where TCommand : IApplicationCommand
+// {
+//     Task<CommandResult> HandleAsync(TCommand command);
+// }
 
 public interface IApplicationCommandHandler<in TCommand, TCommandResult> 
     where TCommand : IApplicationCommand 

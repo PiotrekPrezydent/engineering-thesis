@@ -1,4 +1,4 @@
-using Dara.BuildingBlocks.Application;
+using Dara.BuildingBlocks.Application.Abstraction;
 using Dara.BuildingBlocks.Domain;
 using Dara.BuildingBlocks.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,7 +15,7 @@ public static class ServiceCollectionAddExtensions
         var interfaceType = handlerType.GetInterfaces().FirstOrDefault(i => 
             i.IsGenericType && 
             i.GetGenericTypeDefinition() == typeof(IApplicationCommandHandler<,>));
-
+    
         if (interfaceType == null)
         {
             throw new ArgumentException($"Type {handlerType.Name} do not implement IApplicationCommandHandler<,>!");

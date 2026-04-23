@@ -1,4 +1,5 @@
 using Dara.BuildingBlocks.Application;
+using Dara.BuildingBlocks.Application.Abstraction;
 using Dara.Shared.Common.Logging;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -20,22 +21,32 @@ public class ApplicationCommandDispatcher : IApplicationCommandDispatcher
         _consoleLogger.End();
     }
     
-    public async Task DispatchAsync<TCommand>(TCommand command) 
-        where TCommand : IApplicationCommand
-    {
-        _consoleLogger.Start("HANDLING COMMAND");
-        
-        var handler = _serviceProvider.GetRequiredService<IApplicationCommandHandler<TCommand>>();
-        
-        _consoleLogger.Element("HANDLER", handler);
-        _consoleLogger.Element("COMMAND", command);
-        
-        await handler.HandleAsync(command);
-        
-        _consoleLogger.End();
-    }
+    // public async Task<CommandResult> DispatchAsync<TCommand>(TCommand command) where TCommand : IApplicationCommand
+    // {
+    //     _consoleLogger.Start("HANDLING COMMAND");
+    //     
+    //     var handler = _serviceProvider.GetRequiredService<IApplicationCommandHandler<TCommand>>();
+    //     
+    //     _consoleLogger.Element("HANDLER", handler);
+    //     _consoleLogger.Element("COMMAND", command);
+    //     try
+    //     {
+    //         var result = await handler.HandleAsync(command);
+    //         _consoleLogger.Element("RESULT", result);
+    //         _consoleLogger.End();
+    //     
+    //         return result;
+    //     }
+    //     catch (Exception e)
+    //     {
+    //         Console.WriteLine("CATCHED IN DISPATCHER: {0}", e);
+    //     }
+    //
+    //
+    //     return null;
+    // }
 
-    public async Task<TCommandResult> DispatchAsync<TCommand, TCommandResult>(TCommand command) 
+    public async Task<CommandResult> DispatchAsync<TCommand, TCommandResult>(TCommand command) 
         where TCommandResult : IApplicationCommandResult 
         where TCommand : IApplicationCommand
     {
@@ -45,12 +56,24 @@ public class ApplicationCommandDispatcher : IApplicationCommandDispatcher
         
         _consoleLogger.Element("HANDLER", handler);
         _consoleLogger.Element("COMMAND", command);
+        CommandResult cr = new();
+        try
+        {
+            var result = await handler.HandleAsync(command);
+            
+            _consoleLogger.Element("HANDLER-RESULT", result);
+            
+            cr.SetExpectedResult(result);
+        }
+        catch (Exception ex)
+        {
+            cr.SetException(ex);
+        }
+        _consoleLogger.Element("COMMAND-RESULT", cr);
         
-        var result = await handler.HandleAsync(command);
-        
-        _consoleLogger.Element("RESULT", result);
+
         _consoleLogger.End();
         
-        return result;
+        return cr;
     }
 }

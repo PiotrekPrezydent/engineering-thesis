@@ -1,4 +1,3 @@
-using Dara.Shared.Contracts.Abstractions;
 using Dara.Shared.Contracts.Common;
 
 namespace Dara.Shared.Contracts.Interactions;

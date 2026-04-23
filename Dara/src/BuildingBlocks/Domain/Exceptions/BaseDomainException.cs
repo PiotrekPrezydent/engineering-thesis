@@ -1,6 +1,3 @@
-using System.Net.Mime;
-using System.Runtime.InteropServices.Marshalling;
-
 namespace Dara.BuildingBlocks.Domain.Exceptions;
 
 public abstract class BaseDomainException : Exception

@@ -1,4 +1,5 @@
 using Dara.BuildingBlocks.Application;
+using Dara.BuildingBlocks.Application.Abstraction;
 using Dara.BuildingBlocks.Domain.Exceptions;
 using Dara.Modules.Communication.Application.Clients;
 using Dara.Shared.Common.Logging;
@@ -22,16 +23,13 @@ public partial class AppHub : Hub<IAppHubClient>, IAppHub
     {
         string id = Context.ConnectionId;
         string ip = Context.GetHttpContext()!.Connection.RemoteIpAddress!.ToString();
+        
+        var command = new CreateClientCommand(id,ip);
+        var result = await _applicationCommandDispatcher.DispatchAsync<CreateClientCommand, CreateClientCommandResult>(command);
 
-        try
+        if (result.Status == CommandResultStatus.Success)
         {
-            var command = new CreateClientCommand();
-            var result = await _applicationCommandDispatcher.DispatchAsync<CreateClientCommand, CreateClientCommandResult>(command);
-            
-        }
-        catch (BaseDomainException ex)
-        {
-            ex.PrintBuildedMessage();
+            Console.WriteLine("Success");
         }
         
         await base.OnConnectedAsync();
@@ -39,17 +37,17 @@ public partial class AppHub : Hub<IAppHubClient>, IAppHub
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        string id = Context.ConnectionId;
-
-        try
-        {
-            var command = new DeleteClientCommand();
-            var result = await _applicationCommandDispatcher.DispatchAsync<DeleteClientCommand, DeleteClientCommandResult>(command);
-        }
-        catch (BaseDomainException ex)
-        {
-            ex.PrintBuildedMessage();
-        }
+        // string id = Context.ConnectionId;
+        //
+        // try
+        // {
+        //     var command = new DeleteClientCommand();
+        //     var result = await _applicationCommandDispatcher.DispatchAsync<DeleteClientCommand, DeleteClientCommandResult>(command);
+        // }
+        // catch (BaseDomainException ex)
+        // {
+        //     ex.PrintBuildedMessage();
+        // }
         
         await base.OnDisconnectedAsync(exception);
     }

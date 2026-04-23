@@ -11,7 +11,7 @@ public class ClientConnectionId : ValueObject
     {
         if(!IsValid(connectionId))
             throw new ValueObjectIsNotValidException<ClientConnectionId>(this, nameof(connectionId), connectionId, "ConnectionId is invalid");
-        
+        throw new ValueObjectIsNotValidException<ClientConnectionId>(this, nameof(connectionId), connectionId, "ConnectionId is invalid");
         Value = connectionId;
     }
 
