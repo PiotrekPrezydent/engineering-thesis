@@ -22,13 +22,13 @@ public class DomainEventDispatcher : IDomainEventDispatcher
     
     public async Task DispatchAsync<TEvent>(TEvent domainEvent) where TEvent : IDomainEvent
     {
-        var handler = _serviceProvider.GetRequiredService<IDomainEventHandler<TEvent>>();
+        //var handler = _serviceProvider.GetRequiredService<IDomainEventHandler<TEvent>>();
         
         _consoleLogger.Start("HANDLING DOMAIN EVENT");
-        _consoleLogger.Element(handler);
+        //_consoleLogger.Element(handler);
         _consoleLogger.Element(domainEvent);
         
-        await handler.HandleAsync((dynamic)domainEvent);
+        //await handler.HandleAsync((dynamic)domainEvent);
         
         _consoleLogger.End();
 

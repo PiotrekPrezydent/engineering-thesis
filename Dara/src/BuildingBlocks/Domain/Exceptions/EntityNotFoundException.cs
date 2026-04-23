@@ -4,12 +4,12 @@ public class EntityNotFoundInRepositoryException<TRepo,TEntity> : BaseDomainExce
 {
     private TRepo _repository;
     private object _searchCriteria;
-    public EntityNotFoundInRepositoryException(TRepo repository, object searchCriteria, string message = "Type: ") : base(message)
+    public EntityNotFoundInRepositoryException(TRepo repository, object searchCriteria, string message = nameof(EntityNotFoundInRepositoryException<TRepo,TEntity>)) : base(message)
     {
         _repository = repository;
         _searchCriteria = searchCriteria;
-        message += $"{typeof(TEntity).Name}, could not be found in {typeof(TRepo).Name} repository using {_searchCriteria} of type {_searchCriteria.GetType().Name}";
-        message += _searchCriteria + " of type " + _searchCriteria.GetType().Name;
+        // message += $"{typeof(TEntity).Name}, could not be found in {typeof(TRepo).Name} repository using {_searchCriteria} of type {_searchCriteria.GetType().Name}";
+        // message += _searchCriteria + " of type " + _searchCriteria.GetType().Name;
         
     }
 

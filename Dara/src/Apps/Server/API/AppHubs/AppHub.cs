@@ -20,6 +20,7 @@ public partial class AppHub : Hub<IAppHubClient>, IAppHub
     
     public override async Task OnConnectedAsync()
     {
+        Console.WriteLine("Connected: " + Context.ConnectionId);
         string id = Context.ConnectionId;
         string ip = Context.GetHttpContext()!.Connection.RemoteIpAddress!.ToString();
         
@@ -38,6 +39,7 @@ public partial class AppHub : Hub<IAppHubClient>, IAppHub
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
+        Console.WriteLine("Disconnected: " + Context.ConnectionId);
         string id = Context.ConnectionId;
         var command = new DeleteClientByConnectionIdCommand(id);
         var result = await _applicationCommandDispatcher.DispatchAsync<DeleteClientCommand, DeleteClientCommandResult>(command);

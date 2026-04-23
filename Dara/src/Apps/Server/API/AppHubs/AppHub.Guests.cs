@@ -24,6 +24,8 @@ public partial class AppHub : IGuestInteractions
         else
         {
             Console.WriteLine("FAILURE ENABLE");
+            Exception ex = result.ResultedException;
+            Console.WriteLine(ex.Message);
             response.SetException(new Exception("FAILURE ENABLE"));
         }
 
