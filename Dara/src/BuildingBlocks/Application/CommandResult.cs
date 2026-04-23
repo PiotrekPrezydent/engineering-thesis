@@ -17,6 +17,7 @@ public class CommandResult : IApplicationCommand
     public CommandResult()
     {
         Status = CommandResultStatus.Pending;
+        
         ResultedException = null;
         ExpectedResult = null;
         

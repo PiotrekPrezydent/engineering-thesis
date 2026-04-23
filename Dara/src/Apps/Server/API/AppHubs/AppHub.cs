@@ -1,6 +1,5 @@
 using Dara.BuildingBlocks.Application;
 using Dara.BuildingBlocks.Application.Abstraction;
-using Dara.BuildingBlocks.Domain.Exceptions;
 using Dara.Modules.Communication.Application.Clients;
 using Dara.Shared.Common.Logging;
 using Dara.Shared.Contracts;
@@ -25,11 +24,13 @@ public partial class AppHub : Hub<IAppHubClient>, IAppHub
         string ip = Context.GetHttpContext()!.Connection.RemoteIpAddress!.ToString();
         
         var command = new CreateClientCommand(id,ip);
+        
         var result = await _applicationCommandDispatcher.DispatchAsync<CreateClientCommand, CreateClientCommandResult>(command);
 
-        if (result.Status == CommandResultStatus.Success)
+        if (result.Status != CommandResultStatus.Success)
         {
-            Console.WriteLine("Success");
+            var ex = result.ResultedException;
+            throw ex;
         }
         
         await base.OnConnectedAsync();
@@ -37,17 +38,15 @@ public partial class AppHub : Hub<IAppHubClient>, IAppHub
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        // string id = Context.ConnectionId;
-        //
-        // try
-        // {
-        //     var command = new DeleteClientCommand();
-        //     var result = await _applicationCommandDispatcher.DispatchAsync<DeleteClientCommand, DeleteClientCommandResult>(command);
-        // }
-        // catch (BaseDomainException ex)
-        // {
-        //     ex.PrintBuildedMessage();
-        // }
+        string id = Context.ConnectionId;
+        var command = new DeleteClientByConnectionIdCommand(id);
+        var result = await _applicationCommandDispatcher.DispatchAsync<DeleteClientCommand, DeleteClientCommandResult>(command);
+        
+        if (result.Status != CommandResultStatus.Success)
+        {
+            var ex = result.ResultedException;
+            throw ex;
+        }
         
         await base.OnDisconnectedAsync(exception);
     }

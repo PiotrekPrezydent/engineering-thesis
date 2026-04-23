@@ -17,7 +17,7 @@ public class ApplicationCommandDispatcher : IApplicationCommandDispatcher
         
         _serviceProvider = serviceProvider;
         
-        _consoleLogger.Element("SERVICE", _serviceProvider);
+        _consoleLogger.Element(_serviceProvider);
         _consoleLogger.End();
     }
     
@@ -54,14 +54,14 @@ public class ApplicationCommandDispatcher : IApplicationCommandDispatcher
         
         var handler = _serviceProvider.GetRequiredService<IApplicationCommandHandler<TCommand, TCommandResult>>();
         
-        _consoleLogger.Element("HANDLER", handler);
-        _consoleLogger.Element("COMMAND", command);
+        _consoleLogger.Element(handler);
+        _consoleLogger.Element(command);
         CommandResult cr = new();
         try
         {
             var result = await handler.HandleAsync(command);
             
-            _consoleLogger.Element("HANDLER-RESULT", result);
+            _consoleLogger.Element(result);
             
             cr.SetExpectedResult(result);
         }
@@ -69,7 +69,7 @@ public class ApplicationCommandDispatcher : IApplicationCommandDispatcher
         {
             cr.SetException(ex);
         }
-        _consoleLogger.Element("COMMAND-RESULT", cr);
+        _consoleLogger.Element(cr);
         
 
         _consoleLogger.End();

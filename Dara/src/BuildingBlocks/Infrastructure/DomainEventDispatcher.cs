@@ -16,7 +16,7 @@ public class DomainEventDispatcher : IDomainEventDispatcher
         
         _serviceProvider = serviceProvider;
         
-        _consoleLogger.Element("SERVICE", _serviceProvider);
+        _consoleLogger.Element(_serviceProvider);
         _consoleLogger.End();
     }
     
@@ -25,8 +25,8 @@ public class DomainEventDispatcher : IDomainEventDispatcher
         var handler = _serviceProvider.GetRequiredService<IDomainEventHandler<TEvent>>();
         
         _consoleLogger.Start("HANDLING DOMAIN EVENT");
-        _consoleLogger.Element("HANDLER", handler);
-        _consoleLogger.Element("EVENT", domainEvent);
+        _consoleLogger.Element(handler);
+        _consoleLogger.Element(domainEvent);
         
         await handler.HandleAsync((dynamic)domainEvent);
         

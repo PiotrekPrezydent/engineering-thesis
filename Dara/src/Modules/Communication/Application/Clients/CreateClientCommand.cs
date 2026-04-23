@@ -5,7 +5,7 @@ namespace Dara.Modules.Communication.Application.Clients;
 
 public record CreateClientCommand(string ConnectionId, string ConnectionIp) : IApplicationCommand;
 
-public record CreateClientCommandResult() : IApplicationCommandResult;
+public record CreateClientCommandResult(Guid CreatedClientId) : IApplicationCommandResult;
 
 public class CreateClientCommandHandler : IApplicationCommandHandler<CreateClientCommand, CreateClientCommandResult>
 {
@@ -24,6 +24,6 @@ public class CreateClientCommandHandler : IApplicationCommandHandler<CreateClien
         
         await _clientsRepository.AddAsync(client);
         
-        return new();
+        return new(client.Id);
     }
 }

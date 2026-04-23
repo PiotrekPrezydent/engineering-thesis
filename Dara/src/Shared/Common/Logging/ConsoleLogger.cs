@@ -9,6 +9,7 @@ public class ConsoleLogger
     
     string _prefix;
     string _operation;
+    int _elements;
 
     private const string START_OP = "[ START ]";
     private const string ELEMENT_OP = "  [ELEMENT]";
@@ -24,6 +25,7 @@ public class ConsoleLogger
     {
         _prefix = owner.GetType().Name + " => ";
         _operation = "";
+        _elements = 0;
     }
     
     public void Start(string operation)
@@ -41,15 +43,13 @@ public class ConsoleLogger
         Console.WriteLine(log);
         _globalIntend++;
     }
-
-    //td remove elementname and use elementIndex (start = 0, element ++, end = 0)
-    public void Element(string prettyElementName, object elementValue)
+    
+    public void Element(object elementValue)
     {
-        prettyElementName = prettyElementName.ToUpper();
         string log = "";
         
         log+=ELEMENT_OP + _operation;
-        log += $"- {prettyElementName}";
+        log += $"({_elements++}.)";
         log += $"\t__TYPE__:{elementValue.GetType().Name}";
         log += $"\t__VALUE_TO_STRING__:{elementValue.ToString()}";
         
@@ -67,6 +67,7 @@ public class ConsoleLogger
         Console.WriteLine($"{log}\n");
         
         _operation = "";
+        _elements = 0;
         
         if (_globalIntend > 0)
             _globalIntend--;
