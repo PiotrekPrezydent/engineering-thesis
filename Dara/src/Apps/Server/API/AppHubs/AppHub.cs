@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Dara.Apps.Server.API.AppHubs;
 
-public partial class AppHub : Hub<IAppHubClient>
+public partial class AppHub : Hub<IAppHubClient>, IAppHub
 {
     private readonly IApplicationCommandDispatcher _applicationCommandDispatcher;
     private readonly ConsoleLogger _consoleLogger;
@@ -32,11 +32,7 @@ public partial class AppHub : Hub<IAppHubClient>
         catch (BaseDomainException ex)
         {
             ex.PrintBuildedMessage();
-            
-            return;
         }
-
-
         
         await base.OnConnectedAsync();
     }
@@ -53,10 +49,9 @@ public partial class AppHub : Hub<IAppHubClient>
         catch (BaseDomainException ex)
         {
             ex.PrintBuildedMessage();
-
-            return;
         }
         
         await base.OnDisconnectedAsync(exception);
     }
+    
 }

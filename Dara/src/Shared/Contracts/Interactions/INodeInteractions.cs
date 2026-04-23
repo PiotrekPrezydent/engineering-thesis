@@ -1,15 +1,18 @@
+using Dara.Shared.Contracts.Abstractions;
+using Dara.Shared.Contracts.Common;
+
 namespace Dara.Shared.Contracts.Interactions;
 
 //define every use case for Node
 public interface INodeInteractions
 {
-    public Task ChangeNodeNameAsync();
+    public Task<AppResponse> ChangeNodeNameAsync();
 
-    public Task ChangeNodeAuthTokenAsync();
+    public Task<AppResponse> ChangeNodeAuthTokenAsync();
 
-    public Task CreateMeshAsync();
+    public Task<AppResponse> CreateMeshAsync();
 
-    public Task JoinMeshAsync();
+    public Task<AppResponse> JoinMeshAsync();
     
-    public Task LeaveMeshAsync();
+    public Task<AppResponse> LeaveMeshAsync();
 }

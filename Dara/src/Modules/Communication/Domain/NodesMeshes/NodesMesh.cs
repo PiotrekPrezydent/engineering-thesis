@@ -27,6 +27,8 @@ public class NodesMesh : Entity, IAggregateRoot
         GroupCreator = creator;
 
         _members = new();
+        
+        _events.Add(new EntityCreatedEvent<NodesMesh>(this, this));
     }
     
     public void ChangeName(NodesMeshName newName)

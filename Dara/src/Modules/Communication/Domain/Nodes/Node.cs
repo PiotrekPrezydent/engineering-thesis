@@ -27,6 +27,8 @@ public class Node : Entity, IAggregateRoot
         NodeOwner = nodeOwner;
 
         CurrentNodesMesh = null;
+        
+        _events.Add(new EntityCreatedEvent<Node>(this, this));
     }
 
     public void ChangeName(NodeName newName)

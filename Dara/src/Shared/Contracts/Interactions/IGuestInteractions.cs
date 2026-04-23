@@ -1,9 +1,12 @@
+using Dara.Shared.Contracts.Abstractions;
+using Dara.Shared.Contracts.Common;
+
 namespace Dara.Shared.Contracts.Interactions;
 
 //define every use case fore connections
 public interface IGuestInteractions
 {
-    public Task RegisterClientNodeAsync();
+    public Task<AppResponse> EnableClientNodeAsync(NodeDto node);
     
-    public Task DeregisterClientNodeAsync();
+    public Task<AppResponse> DisableClientNodeAsync();
 }

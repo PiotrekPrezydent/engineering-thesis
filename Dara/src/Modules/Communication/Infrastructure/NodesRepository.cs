@@ -1,4 +1,6 @@
+using Dara.BuildingBlocks.Domain.Events;
 using Dara.BuildingBlocks.Domain.Events.Abstractions;
+using Dara.BuildingBlocks.Domain.Exceptions;
 using Dara.Modules.Communication.Domain.Clients;
 using Dara.Modules.Communication.Domain.Nodes;
 
@@ -14,38 +16,67 @@ public class NodesRepository : INodesReposiotory
         _domainEventDispatcher = domainEventDispatcher;
         _nodes = new();
     }
-    public Task<Node> GetByGuidAsync(Guid guid)
+    public async Task<Node> GetByGuidAsync(Guid guid)
     {
-        throw new NotImplementedException();
+        var node = _nodes.FirstOrDefault(x => x.Id == guid, null);
+        
+        if (node == null)
+            throw new EntityNotFoundInRepositoryException<NodesRepository, Node>(this, guid);
+
+        return node;
     }
 
-    public Task<IEnumerable<Node>> GetAllAsync()
+    public async Task<IEnumerable<Node>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        return _nodes.AsEnumerable();
     }
 
-    public Task AddAsync(Node aggregateRoot)
+    public async Task AddAsync(Node aggregateRoot)
     {
-        throw new NotImplementedException();
+        foreach (var domainEvent in aggregateRoot.DomainEvents)
+            await _domainEventDispatcher.DispatchAsync((dynamic)domainEvent);
+
+        _nodes.Add(aggregateRoot);
     }
 
-    public Task RemoveAsync(Node aggregateRoot)
+    public async Task RemoveAsync(Node aggregateRoot)
     {
-        throw new NotImplementedException();
+        foreach (var domainEvent in aggregateRoot.DomainEvents)
+            await _domainEventDispatcher.DispatchAsync((dynamic)domainEvent);
+        
+        await _domainEventDispatcher.DispatchAsync(new EntityRemovedEvent<Node>(this, aggregateRoot));
+        
+        _nodes.Remove(aggregateRoot);
     }
 
-    public Task<Node> GetByNodeClientOwnerAsync(Client nodeClientOwner)
+    public async Task<Node> GetByNodeClientOwnerAsync(Client nodeClientOwner)
     {
-        throw new NotImplementedException();
+        var node = _nodes.FirstOrDefault(x => x.NodeOwner == nodeClientOwner, null);
+        
+        if (node == null)
+            throw new EntityNotFoundInRepositoryException<NodesRepository, Node>(this, nodeClientOwner);
+
+        return node;
     }
 
-    public Task<Node> GetByNameAsync(NodeName nodeName)
+    public async Task<Node> GetByNameAsync(NodeName nodeName)
     {
-        throw new NotImplementedException();
+        var node = _nodes.FirstOrDefault(x => x.Name == nodeName, null);
+        
+        if (node == null)
+            throw new EntityNotFoundInRepositoryException<NodesRepository, Node>(this, nodeName);
+
+        return node;
     }
 
-    public Task SaveAsync(Node node)
+    public async Task SaveAsync(Node node)
     {
-        throw new NotImplementedException();
+        var nd = _nodes.FirstOrDefault(e => e == node, null);
+        
+        if(nd == null)
+            throw new EntityNotFoundInRepositoryException<NodesRepository,Node>(this, node);
+        
+        foreach (var domainEvent in nd.DomainEvents)
+            await _domainEventDispatcher.DispatchAsync((dynamic)domainEvent);
     }
 }

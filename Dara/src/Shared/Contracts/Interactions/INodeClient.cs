@@ -1,4 +1,4 @@
-namespace Dara.Shared.Contracts.Clients;
+namespace Dara.Shared.Contracts.Interactions;
 
 public interface INodeClient
 {

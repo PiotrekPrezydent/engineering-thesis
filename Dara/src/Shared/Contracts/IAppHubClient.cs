@@ -1,4 +1,4 @@
-using Dara.Shared.Contracts.Clients;
+using Dara.Shared.Contracts.Interactions;
 
 namespace Dara.Shared.Contracts;
 

@@ -1,4 +1,6 @@
+using Dara.BuildingBlocks.Domain.Events;
 using Dara.BuildingBlocks.Domain.Events.Abstractions;
+using Dara.BuildingBlocks.Domain.Exceptions;
 using Dara.Modules.Communication.Domain.Clients;
 using Dara.Modules.Communication.Domain.Nodes;
 
@@ -15,38 +17,61 @@ public class ClientsRepository : IClientsRepository
         _clients = new();
     }
     
-    public Task<Client> GetByGuidAsync(Guid guid)
+    public async Task<Client> GetByGuidAsync(Guid guid)
     {
-        throw new NotImplementedException();
+        var client = _clients.FirstOrDefault(e => e.Id == guid, null);
+        
+        if(client == null)
+            throw new EntityNotFoundInRepositoryException<ClientsRepository,Client>(this, guid);
+        
+        return client;
     }
 
-    public Task<IEnumerable<Client>> GetAllAsync()
+    public async Task<IEnumerable<Client>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        return _clients.AsEnumerable();
     }
 
-    public Task AddAsync(Client aggregateRoot)
+    public async Task AddAsync(Client aggregateRoot)
     {
-        throw new NotImplementedException();
+        foreach (var domainEvent in aggregateRoot.DomainEvents)
+            await _domainEventDispatcher.DispatchAsync((dynamic)domainEvent);
+
+        _clients.Add(aggregateRoot);
     }
 
-    public Task RemoveAsync(Client aggregateRoot)
+    public async Task RemoveAsync(Client aggregateRoot)
     {
-        throw new NotImplementedException();
+        foreach (var domainEvent in aggregateRoot.DomainEvents)
+            await _domainEventDispatcher.DispatchAsync((dynamic)domainEvent);
+        
+        await _domainEventDispatcher.DispatchAsync(new EntityRemovedEvent<Client>(this, aggregateRoot));
+        
+        _clients.Remove(aggregateRoot);
     }
 
-    public Task<Client> GetByClientConnectionIdAsync(ClientConnectionId clientConnectionId)
+    public async Task<Client> GetByClientConnectionIdAsync(ClientConnectionId clientConnectionId)
     {
-        throw new NotImplementedException();
+        var client = _clients.FirstOrDefault(e => e.ClientConnectionId == clientConnectionId, null);
+        
+        if(client == null)
+            throw new EntityNotFoundInRepositoryException<ClientsRepository,Client>(this, clientConnectionId);
+        
+        return client;
     }
 
-    public Task<Client> GetByClientNode(Node node)
+    public async Task<Client> GetByClientNode(Node node)
     {
-        throw new NotImplementedException();
+        var client = _clients.FirstOrDefault(e => e.ClientNode == node, null);
+        
+        if(client == null)
+            throw new EntityNotFoundInRepositoryException<ClientsRepository,Client>(this, node);
+        
+        return client;
     }
 
-    public Task<IEnumerable<Client>> GetAllWithClientConnectionIpAsync(ClientConnectionIp clientConnectionIp)
+    public async Task<IEnumerable<Client>> GetAllWithClientConnectionIpAsync(ClientConnectionIp clientConnectionIp)
     {
-        throw new NotImplementedException();
+        return _clients.Where(e => e.ClientConnectionIp == clientConnectionIp).AsEnumerable();
     }
 }

@@ -1,4 +1,5 @@
 using Dara.BuildingBlocks.Domain;
+using Dara.BuildingBlocks.Domain.Events;
 using Dara.Modules.Communication.Domain.Nodes;
 
 namespace Dara.Modules.Communication.Domain.Clients;
@@ -10,7 +11,7 @@ public class Client : Entity, IAggregateRoot
     
     public ClientConnectionIp ClientConnectionIp { get; private set; }
     
-    public Node? RegisteredNode { get; private set; }
+    public Node? ClientNode { get; private set; }
     
     public Client(ClientConnectionId clientConnectionId, ClientConnectionIp clientConnectionIp)
     {
@@ -19,22 +20,24 @@ public class Client : Entity, IAggregateRoot
         ClientConnectionId = clientConnectionId;
         ClientConnectionIp = clientConnectionIp;
 
-        RegisteredNode = null;
+        ClientNode = null;
+        
+        _events.Add(new EntityCreatedEvent<Client>(this,this));
     }
 
-    public void RegisterNode(Node node)
+    public void EnableNode(Node node)
     {
-        if(RegisteredNode != null)
-            throw new InvalidOperationException("Client is already registered");
+        if(ClientNode != null)
+            throw new InvalidOperationException("Client is already enabled");
         
-        RegisteredNode = node;
+        ClientNode = node;
     }
 
-    public void DeregisterNode()
+    public void DisableNode()
     {
-        if(RegisteredNode == null)
-            throw new InvalidOperationException("Client is not registered");
+        if(ClientNode == null)
+            throw new InvalidOperationException("Client is not enabled");
         
-        RegisteredNode = null;
+        ClientNode = null;
     }
 }
