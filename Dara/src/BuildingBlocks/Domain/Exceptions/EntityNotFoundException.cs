@@ -8,15 +8,14 @@ public class EntityNotFoundInRepositoryException<TRepo,TEntity> : BaseDomainExce
     {
         _repository = repository;
         _searchCriteria = searchCriteria;
-        // message += $"{typeof(TEntity).Name}, could not be found in {typeof(TRepo).Name} repository using {_searchCriteria} of type {_searchCriteria.GetType().Name}";
-        // message += _searchCriteria + " of type " + _searchCriteria.GetType().Name;
+
         
     }
 
     protected override string DomainExcetpionState()
     {
         string ret = "";
-
+        ret += $"{typeof(TEntity).Name}, could not be found in {typeof(TRepo).Name} repository using {_searchCriteria} of type {_searchCriteria.GetType().Name}\n\n";
         ret += $"REPO_TYPE:\t[ {_repository.GetType().Name }]\n";
         ret += $"SEARCH_TYPE:\t[ {_searchCriteria.GetType().Name} ]\n";
         ret += $"SAERCH_VAL:\t[ {_searchCriteria} ]\n";

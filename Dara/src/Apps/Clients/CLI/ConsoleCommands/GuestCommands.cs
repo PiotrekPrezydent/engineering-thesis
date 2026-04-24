@@ -13,6 +13,7 @@ public class GuestCommands : IGuestClient
     public GuestCommands(HubConnection connecction)
     {
         _proxy = connecction.CreateHubProxy<IGuestInteractions>();
+        connecction.Register<IGuestClient>(this);
     }
     
     public async Task ReceiveConnectionIpAsync()
@@ -36,15 +37,19 @@ public class GuestCommands : IGuestClient
         Console.WriteLine("enable start");
         NodeDto dto = new(name, authToken);
         var response = await _proxy.EnableClientNodeAsync(dto);
-        Console.WriteLine("enable: " + response);
+        
+        Console.WriteLine($"Response from client: {response.Status}, {response.StatusS}");
+        
     }
     
     [ConsoleCommand("disablenode", "disable", "disa")]
-    async Task DisableNode(string name, string authToken)
+    async Task DisableNode()
     {
         Console.WriteLine("disable start");
 
         var response = await _proxy.DisableClientNodeAsync();
+        
+        
         Console.WriteLine("disable: " + response);
     }
 }

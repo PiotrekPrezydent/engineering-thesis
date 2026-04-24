@@ -29,8 +29,8 @@ public class CreateNodeCommandHandler : IApplicationCommandHandler<CreateNodeCom
 
         Node node = new Node(name, token, client);
         client.EnableNode(node);
-        
-        await _nodesReposiotory.SaveAsync(node);
+
+        await _nodesReposiotory.AddAsync(node);
         
         return new(node.Id);
     }
