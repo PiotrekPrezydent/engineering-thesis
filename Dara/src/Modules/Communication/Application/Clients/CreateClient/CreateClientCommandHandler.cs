@@ -1,25 +1,33 @@
 using Dara.BuildingBlocks.Application.Abstraction;
 using Dara.Modules.Communication.Domain.Clients;
+using Dara.Modules.Communication.Domain.Connections;
 
 namespace Dara.Modules.Communication.Application.Clients.CreateClient;
 
 public class CreateClientCommandHandler : IApplicationCommandHandler<CreateClientCommand, CreateClientCommandResult>
 {
-    private readonly IClientsRepository _clientsRepository;
-    public CreateClientCommandHandler(IClientsRepository clientsRepository)
+    IConnectionRepository _connectionRepository;
+    IClientRepository _clientRepository;
+    
+    public CreateClientCommandHandler(IConnectionRepository connectionRepository, IClientRepository clientRepository)
     {
-        _clientsRepository = clientsRepository;
+        _connectionRepository = connectionRepository;
+        _clientRepository = clientRepository;
     }
-
+    
     public async Task<CreateClientCommandResult> HandleAsync(CreateClientCommand command)
     {
-        ClientConnectionId id = new(command.ConnectionId);
-        ClientConnectionIp ip = new(command.ConnectionIp);
+        ConnectionId id = new(command.ConnectionId);
         
-        Domain.Clients.Client client = new(id, ip);
+        Connection connection = await _connectionRepository.GetByIdAsync(id);
+
+        ClientName name = new ClientName(command.ClientName);
+        ClientAuthToken token = new ClientAuthToken(command.ClientAuthToken);
         
-        await _clientsRepository.AddAsync(client);
+        Client client = connection.StartClient(name, token);
         
-        return new(client.Id);
+        await _clientRepository.AddAsync(client);
+        
+        return new();
     }
 }

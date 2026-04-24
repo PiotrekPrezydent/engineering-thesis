@@ -22,9 +22,9 @@
     <Project Path="src/Modules/Configuration/Dara.Modules.Configuration.csproj" />
   </Folder>
   <Folder Name="/Modules/Communication/">
-    <Project Path="src/Modules/Communication/Application/Dara.Modules.Communication.Application.csproj" />
-    <Project Path="src/Modules/Communication/Domain/Dara.Modules.Communication.Domain.csproj" />
-    <Project Path="src/Modules/Communication/Infrastructure/Dara.Modules.Communication.Infrastructure.csproj" />
+    <Project Path="src\Modules\Communication\Application\Dara.Modules.Communication.Application.csproj" />
+    <Project Path="src\Modules\Communication\Domain\Dara.Modules.Communication.Domain.csproj" />
+    <Project Path="src\Modules\Communication\Infrastructure\Dara.Modules.Communication.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/Modules/Plugins/">
     <Project Path="src/Modules/Plugins/Application/Dara.Modules.Plugins.Application.csproj" />

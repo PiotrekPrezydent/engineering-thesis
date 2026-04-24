@@ -1,43 +1,50 @@
-using Dara.BuildingBlocks.Domain;
-using Dara.BuildingBlocks.Domain.Events;
-using Dara.Modules.Communication.Domain.Nodes;
+using Dara.BuildingBlocks.Domain.Models;
+using Dara.BuildingBlocks.Domain.Models.Abstraction;
+using Dara.Modules.Communication.Domain.Clients.Events;
+using Dara.Modules.Communication.Domain.Connections;
 
 namespace Dara.Modules.Communication.Domain.Clients;
 
-//represent connection to server
-public class Client : Entity, IAggregateRoot
+public class Client : Entity, IAggregateRoot<ClientId>
 {
-    public ClientConnectionId ClientConnectionId { get; private set; }
+    public ClientId Id { get; private set; }
     
-    public ClientConnectionIp ClientConnectionIp { get; private set; }
+    private ConnectionId _connectionId;
+    private ClientName _name;
+    private ClientAuthToken _authToken;
     
-    public Node? ClientNode { get; private set; }
-    
-    public Client(ClientConnectionId clientConnectionId, ClientConnectionIp clientConnectionIp)
+    Client(ClientId id, ConnectionId connectionId, ClientName name, ClientAuthToken authToken)
     {
-        Id = Guid.NewGuid();
+        Id = id;
         
-        ClientConnectionId = clientConnectionId;
-        ClientConnectionIp = clientConnectionIp;
-
-        ClientNode = null;
+        _connectionId = connectionId;
+        _name = name;
+        _authToken = authToken;
         
-        _events.Add(new EntityCreatedEvent<Client>(this,this));
+        AddDomainEvent(new ClientCreatedDomainEvent(Id));
     }
 
-    public void EnableNode(Node node)
+    internal static Client Create(ClientId clientId, ConnectionId connectionId, ClientName name, ClientAuthToken authToken)
     {
-        if(ClientNode != null)
-            throw new InvalidOperationException("Client is already enabled");
-        
-        ClientNode = node;
+        return new Client(clientId, connectionId, name, authToken);
     }
 
-    public void DisableNode()
+    public void Delete()
     {
-        if(ClientNode == null)
-            throw new InvalidOperationException("Client is not enabled");
+        AddDomainEvent(new ClientDeletedDomainEvent(Id));
+    }
+
+    public void ChangeName(ClientName newName)
+    {
+        _name = newName;
         
-        ClientNode = null;
+        AddDomainEvent(new ClientNameChangedDomainEvent(Id, newName));
+    }
+
+    public void ChangeAuthToken(ClientAuthToken newAuthToken)
+    {
+        _authToken = newAuthToken;
+        
+        AddDomainEvent(new ClientAuthTokenChangedDomainEvent(Id, newAuthToken));
     }
 }

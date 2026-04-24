@@ -1,7 +1,9 @@
-using Dara.Modules.Communication.Application.Clients;
-using Dara.Modules.Communication.Application.Nodes;
-using Dara.Modules.Communication.Application.Nodes.CreateNode;
-using Dara.Modules.Communication.Application.Nodes.DeleteNode;
+using Dara.Modules.Communication.Application.Clients.CreateClient;
+using Dara.Modules.Communication.Application.Clients.DeleteClient;
+using Dara.Modules.Communication.Application.Connections.CreateConnection;
+using Dara.Modules.Communication.Application.Connections.DeleteConnection;
+using Dara.Modules.Communication.Domain.Clients;
+using Dara.Modules.Communication.Domain.Connections;
 using Dara.Modules.Communication.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,36 +14,21 @@ public static class CommunicationModule
     public static IServiceCollection AddCommunicationModule(this IServiceCollection services)
     {
         //repository
-        services.AddRepository<ClientsRepository>();
-        services.AddRepository<NodesRepository>();
-        services.AddRepository<NodesMeshesRepository>();
+        services.AddSingleton<IConnectionRepository,ConnectionRepository>();
+        services.AddSingleton<IClientRepository, ClientRepository>();
         
         //commands
-        // services.AddCommandHandler<CreateClientCommandHandler>();
-        //  services.AddCommandHandler<DeleteClientCommandHandler>();
-        //  services.AddCommandHandler<GetClientCommandHandler>();
-        //  services.AddCommandHandler<GetClientsCommandHandler>();
-        
-         // services.AddCommandHandler<CreateNodeCommandHandler>();
-         // services.AddCommandHandler<DeleteNodeCommandHandler>();
-         // services.AddCommandHandler<GetNodeCommandHandler>();
-         // services.AddCommandHandler<GetNodesCommandHandler>();
-         // services.AddCommandHandler<ChangeNodeNameCommandHandler>();
-         // services.AddCommandHandler<ChangeNodeAuthTokenCommandHandler>();
-        
-         // services.AddCommandHandler<CreateNodesMeshCommandHandler>();
-         // services.AddCommandHandler<DeleteNodesMeshCommandHandler>();
-         // services.AddCommandHandler<GetNodesMeshCommandHandler>();
-         // services.AddCommandHandler<GetNodesMeshesCommandHandler>();
-         // services.AddCommandHandler<ChangeNodesMeshNameCommandHandler>();
-         // services.AddCommandHandler<ChangeNodesMeshCodeCommandHandler>();
-         // services.AddCommandHandler<AddNodeToNodesMeshCommandHandler>();
-         // services.AddCommandHandler<RemoveNodeFromNodesMeshCommandHandler>();
+        services.AddCommandHandler<CreateConnectionCommandHandler>();
+        services.AddCommandHandler<DeleteConnectionCommandHandler>();
+        services.AddCommandHandler<CreateClientCommandHandler>();
+        services.AddCommandHandler<DeleteClientCommandHandler>();
         
         
         //events
-         // services.AddDomainEventHandler<ConnectionEstablishedEventHandler>();
-         // services.AddDomainEventHandler<ConnectionLostEventHandler>();
+        services.AddDomainEventHandler<ConnectionCreatedEventHandler>();
+        services.AddDomainEventHandler<ConnectionDeletedEventHandler>();
+        services.AddDomainEventHandler<ClientCreatedEventHandler>();
+        services.AddDomainEventHandler<ClientDeletedEventHandler>();
         
         return services;
     } 

@@ -1,5 +1,6 @@
 using Dara.BuildingBlocks.Application;
 using Dara.BuildingBlocks.Application.Abstraction;
+using Dara.BuildingBlocks.Infrastructure.Commands;
 using Dara.Modules.Communication.Application.Clients;
 using Dara.Shared.Common.Logging;
 using Dara.Shared.Contracts;
