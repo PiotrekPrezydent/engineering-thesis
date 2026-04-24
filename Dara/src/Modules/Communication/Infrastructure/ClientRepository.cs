@@ -16,7 +16,7 @@ public class ClientRepository : IClientRepository
     
     public async Task <Client> GetByIdAsync(ClientId id)
     {
-        return _clients.FirstOrDefault(c => c.Id == id);
+        return _clients.FirstOrDefault(c => c.Id.Value == id.Value);
     }
 
     public async Task <IEnumerable<Client>> GetAllAsync()

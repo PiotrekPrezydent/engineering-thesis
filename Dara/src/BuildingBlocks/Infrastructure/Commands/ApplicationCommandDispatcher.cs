@@ -27,14 +27,14 @@ public class ApplicationCommandDispatcher : IApplicationCommandDispatcher
     {
         var handler = _serviceProvider.GetRequiredService<IApplicationCommandHandler<TCommand, TCommandResult>>();
         
-        _consoleLogger.Element(handler);
-        _consoleLogger.Element(command);
+        // _consoleLogger.Element(handler);
+        // _consoleLogger.Element(command);
         CommandResult cr = new();
         try
         {
             var result = await handler.HandleAsync(command);
             
-            _consoleLogger.Element(result);
+            //_consoleLogger.Element(result);
             
             cr.SetExpectedResult(result);
         }
@@ -42,10 +42,10 @@ public class ApplicationCommandDispatcher : IApplicationCommandDispatcher
         {
             cr.SetException(ex);
         }
-        _consoleLogger.Element(cr);
-        
-
-        _consoleLogger.End();
+        // _consoleLogger.Element(cr);
+        //
+        //
+        // _consoleLogger.End();
         
         return cr;
     }

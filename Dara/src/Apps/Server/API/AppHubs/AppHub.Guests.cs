@@ -1,8 +1,6 @@
 using Dara.BuildingBlocks.Application;
-using Dara.BuildingBlocks.Domain.Exceptions;
-using Dara.Modules.Communication.Application.Nodes;
-using Dara.Modules.Communication.Application.Nodes.CreateNode;
-using Dara.Modules.Communication.Application.Nodes.DeleteNode;
+using Dara.Modules.Communication.Application.Clients.CreateClient;
+using Dara.Modules.Communication.Application.Clients.DeleteClient;
 using Dara.Shared.Contracts.Common;
 using Dara.Shared.Contracts.Interactions;
 
@@ -14,10 +12,11 @@ public partial class AppHub : IGuestInteractions
     {
         AppResponse response = new();
         response.StatusS = "TESTINGDWADWA";
+        
         var id = Context.ConnectionId;
-        var command = new CreateNodeCommand(id, nodeDto.Name, nodeDto.AuthCode);
-
-        var result = await _applicationCommandDispatcher.DispatchAsync<CreateNodeCommand, CreateNodeCommandResult>(command);
+        
+        var command = new CreateClientCommand(id, nodeDto.Name, nodeDto.AuthCode);
+        var result = await _applicationCommandDispatcher.DispatchAsync<CreateClientCommand, CreateClientCommandResult>(command);
 
         if (result.Status == CommandResultStatus.Success)
         {
@@ -29,6 +28,7 @@ public partial class AppHub : IGuestInteractions
         else
         {
             Console.WriteLine("FAILURE ENABLE");
+            Console.WriteLine(result.ResultedException.Message);
             response.SetException();
             //response.SetException(new Exception("TESTERROR"));
         }
@@ -37,22 +37,14 @@ public partial class AppHub : IGuestInteractions
         return response;
     }
 
-    public async Task<string> TestCommand()
-    {
-        string result = "START";
-        result = "TEST SERVER";
-        
-        return result;
-    }
-
     public async Task<AppResponse> DisableClientNodeAsync()
     {
         AppResponse response = new();
         
         var id = Context.ConnectionId;
-        var command = new DeleteNodeCommand(id);
+        var command = new DeleteClientCommand(id);
         
-        var result = await _applicationCommandDispatcher.DispatchAsync<DeleteNodeCommand, DeleteNodeCommandResult>(command);
+        var result = await _applicationCommandDispatcher.DispatchAsync<DeleteClientCommand, DeleteClientCommandResult>(command);
         
         if (result.Status == CommandResultStatus.Success)
         {

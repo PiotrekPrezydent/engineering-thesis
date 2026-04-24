@@ -10,13 +10,14 @@ public class ConnectionRepository : IConnectionRepository
 
     public ConnectionRepository(IDomainEventDispatcher domainEventDispatcher)
     {
+        Console.WriteLine("NEW CONNECTION REPO");
         _domainEventDispatcher = domainEventDispatcher;
         _connections = new();
     }
     
     public async Task<Connection> GetByIdAsync(ConnectionId id)
     {
-        return _connections.FirstOrDefault(c => c.Id == id);
+        return _connections.FirstOrDefault(c => c.Id.Value == id.Value);
     }
 
     public async Task<IEnumerable<Connection>> GetAllAsync()
