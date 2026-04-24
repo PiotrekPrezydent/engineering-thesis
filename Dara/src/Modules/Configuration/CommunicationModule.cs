@@ -1,5 +1,7 @@
 using Dara.Modules.Communication.Application.Clients;
 using Dara.Modules.Communication.Application.Nodes;
+using Dara.Modules.Communication.Application.Nodes.CreateNode;
+using Dara.Modules.Communication.Application.Nodes.DeleteNode;
 using Dara.Modules.Communication.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,13 +17,13 @@ public static class CommunicationModule
         services.AddRepository<NodesMeshesRepository>();
         
         //commands
-        services.AddCommandHandler<CreateClientCommandHandler>();
-         services.AddCommandHandler<DeleteClientCommandHandler>();
-         services.AddCommandHandler<GetClientCommandHandler>();
-         services.AddCommandHandler<GetClientsCommandHandler>();
+        // services.AddCommandHandler<CreateClientCommandHandler>();
+        //  services.AddCommandHandler<DeleteClientCommandHandler>();
+        //  services.AddCommandHandler<GetClientCommandHandler>();
+        //  services.AddCommandHandler<GetClientsCommandHandler>();
         
-         services.AddCommandHandler<CreateNodeCommandHandler>();
-         services.AddCommandHandler<DeleteNodeCommandHandler>();
+         // services.AddCommandHandler<CreateNodeCommandHandler>();
+         // services.AddCommandHandler<DeleteNodeCommandHandler>();
          // services.AddCommandHandler<GetNodeCommandHandler>();
          // services.AddCommandHandler<GetNodesCommandHandler>();
          // services.AddCommandHandler<ChangeNodeNameCommandHandler>();

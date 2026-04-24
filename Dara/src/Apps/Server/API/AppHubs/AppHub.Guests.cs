@@ -1,6 +1,8 @@
 using Dara.BuildingBlocks.Application;
 using Dara.BuildingBlocks.Domain.Exceptions;
 using Dara.Modules.Communication.Application.Nodes;
+using Dara.Modules.Communication.Application.Nodes.CreateNode;
+using Dara.Modules.Communication.Application.Nodes.DeleteNode;
 using Dara.Shared.Contracts.Common;
 using Dara.Shared.Contracts.Interactions;
 

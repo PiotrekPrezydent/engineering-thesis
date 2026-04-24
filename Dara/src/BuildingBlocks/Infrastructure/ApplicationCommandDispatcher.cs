@@ -21,37 +21,10 @@ public class ApplicationCommandDispatcher : IApplicationCommandDispatcher
         _consoleLogger.End();
     }
     
-    // public async Task<CommandResult> DispatchAsync<TCommand>(TCommand command) where TCommand : IApplicationCommand
-    // {
-    //     _consoleLogger.Start("HANDLING COMMAND");
-    //     
-    //     var handler = _serviceProvider.GetRequiredService<IApplicationCommandHandler<TCommand>>();
-    //     
-    //     _consoleLogger.Element("HANDLER", handler);
-    //     _consoleLogger.Element("COMMAND", command);
-    //     try
-    //     {
-    //         var result = await handler.HandleAsync(command);
-    //         _consoleLogger.Element("RESULT", result);
-    //         _consoleLogger.End();
-    //     
-    //         return result;
-    //     }
-    //     catch (Exception e)
-    //     {
-    //         Console.WriteLine("CATCHED IN DISPATCHER: {0}", e);
-    //     }
-    //
-    //
-    //     return null;
-    // }
-
     public async Task<CommandResult> DispatchAsync<TCommand, TCommandResult>(TCommand command) 
         where TCommandResult : IApplicationCommandResult 
         where TCommand : IApplicationCommand
     {
-        _consoleLogger.Start("HANDLING COMMAND WITH RESULT");
-        
         var handler = _serviceProvider.GetRequiredService<IApplicationCommandHandler<TCommand, TCommandResult>>();
         
         _consoleLogger.Element(handler);
