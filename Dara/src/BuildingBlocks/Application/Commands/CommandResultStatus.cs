@@ -1,4 +1,4 @@
-namespace Dara.BuildingBlocks.Application
+namespace Dara.BuildingBlocks.Application.Commands
 {
     public enum CommandResultStatus
     {

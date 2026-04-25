@@ -1,6 +1,6 @@
-using Dara.BuildingBlocks.Application.Abstraction;
+using Dara.BuildingBlocks.Application.Commands;
 
 namespace Dara.Modules.Connections.Application.Clients.ChangeClientAuthToken
 {
-    public record ChangeClientAuthTokenCommandResult() : IApplicationCommandResult;
+    public record ChangeClientAuthTokenCommandResult() : IModuleCommandResult;
 }

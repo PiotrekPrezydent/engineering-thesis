@@ -1,3 +1,5 @@
+using Dara.BuildingBlocks.Application.Commands;
+
 namespace Dara.BuildingBlocks.Application.Exceptions
 {
     public class CommandResultStatusException : Exception

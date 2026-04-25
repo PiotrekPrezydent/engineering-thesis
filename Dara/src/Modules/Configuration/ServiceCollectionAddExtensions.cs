@@ -1,4 +1,5 @@
-using Dara.BuildingBlocks.Application.Abstraction;
+using Dara.BuildingBlocks.Application.Commands;
+using Dara.BuildingBlocks.Application.Domain;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Dara.Modules.Configuration
@@ -12,7 +13,7 @@ namespace Dara.Modules.Configuration
         
             var interfaceType = handlerType.GetInterfaces().FirstOrDefault(i => 
                 i.IsGenericType && 
-                i.GetGenericTypeDefinition() == typeof(IApplicationCommandHandler<,>));
+                i.GetGenericTypeDefinition() == typeof(IModuleCommandHandler<,>));
     
             if (interfaceType == null)
             {

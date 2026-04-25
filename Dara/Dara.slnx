@@ -19,9 +19,7 @@
     <Project Path="src/BuildingBlocks/Integration/Dara.BuildingBlocks.Integration.csproj" />
   </Folder>
   
-  <Folder Name="/Modules/">
-    <Project Path="src/Modules/Configuration/Dara.Modules.Configuration.csproj" />
-  </Folder>
+  <Folder Name="/Modules/" />
   <Folder Name="/Modules/Connections/">
     <Project Path="src/Modules/Connections/Application/Dara.Modules.Connections.Application.csproj" />
     <Project Path="src/Modules/Connections/Domain/Dara.Modules.Connections.Domain.csproj" />

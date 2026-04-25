@@ -1,10 +1,10 @@
-using Dara.BuildingBlocks.Application.Abstraction;
+using Dara.BuildingBlocks.Application.Commands;
 using Dara.Modules.Connections.Domain.Clients;
 using Dara.Modules.Connections.Domain.Connections;
 
 namespace Dara.Modules.Connections.Application.Clients.DeleteClient
 {
-    public class DeleteClientCommandHandler : IApplicationCommandHandler<DeleteClientCommand, DeleteClientCommandResult>
+    public class DeleteClientCommandHandler : IModuleCommandHandler<DeleteClientCommand, DeleteClientCommandResult>
     {
         IClientRepository _clientRepository;
         IConnectionRepository _connectionRepository;

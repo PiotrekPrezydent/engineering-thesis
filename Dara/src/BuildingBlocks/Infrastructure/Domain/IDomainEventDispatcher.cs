@@ -1,6 +1,6 @@
 using Dara.BuildingBlocks.Domain.Events.Abstraction;
 
-namespace Dara.BuildingBlocks.Infrastructure.Events
+namespace Dara.BuildingBlocks.Infrastructure.Domain
 {
     public interface IDomainEventDispatcher
     {

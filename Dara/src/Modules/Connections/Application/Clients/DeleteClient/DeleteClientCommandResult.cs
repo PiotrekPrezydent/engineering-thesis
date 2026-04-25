@@ -1,6 +1,6 @@
-using Dara.BuildingBlocks.Application.Abstraction;
+using Dara.BuildingBlocks.Application.Commands;
 
 namespace Dara.Modules.Connections.Application.Clients.DeleteClient
 {
-    public record DeleteClientCommandResult() : IApplicationCommandResult;
+    public record DeleteClientCommandResult() : IModuleCommandResult;
 }

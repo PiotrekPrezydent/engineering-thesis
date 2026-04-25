@@ -1,6 +1,6 @@
-using Dara.BuildingBlocks.Application.Abstraction;
+using Dara.BuildingBlocks.Application.Commands;
 
 namespace Dara.Modules.Connections.Application.Clients.CreateClient
 {
-    public record CreateClientCommandResult(Guid ClientId) : IApplicationCommandResult;
+    public record CreateClientCommandResult(Guid ClientId) : IModuleCommandResult;
 }

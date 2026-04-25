@@ -1,9 +1,9 @@
-using Dara.BuildingBlocks.Application.Abstraction;
+using Dara.BuildingBlocks.Application.Commands;
 using Dara.Modules.Connections.Domain.Clients;
 
 namespace Dara.Modules.Connections.Application.Clients.ChangeClientName
 {
-    public class ChangeClientNameCommandHandler : IApplicationCommandHandler<ChangeClientNameCommand, ChangeClientNameCommandResult>
+    public class ChangeClientNameCommandHandler : IModuleCommandHandler<ChangeClientNameCommand, ChangeClientNameCommandResult>
     {
         IClientRepository _clientRepository;
         public ChangeClientNameCommandHandler(IClientRepository clientRepository)

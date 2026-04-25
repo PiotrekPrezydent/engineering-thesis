@@ -1,6 +1,6 @@
-using Dara.BuildingBlocks.Application.Abstraction;
+using Dara.BuildingBlocks.Application.Commands;
 
 namespace Dara.Modules.Connections.Application.Clients.ChangeClientName
 {
-    public record ChangeClientNameCommandResult() : IApplicationCommandResult;
+    public record ChangeClientNameCommandResult() : IModuleCommandResult;
 }

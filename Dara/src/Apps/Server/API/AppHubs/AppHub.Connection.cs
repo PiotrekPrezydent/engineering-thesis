@@ -1,4 +1,5 @@
 using Dara.BuildingBlocks.Application;
+using Dara.BuildingBlocks.Application.Commands;
 using Dara.Modules.Connections.Application.Clients.CreateClient;
 using Dara.Modules.Connections.Application.Clients.DeleteClient;
 using Dara.Modules.Connections.Application.Clients.GetClient;

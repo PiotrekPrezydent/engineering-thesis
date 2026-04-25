@@ -1,9 +1,9 @@
-using Dara.BuildingBlocks.Application.Abstraction;
+using Dara.BuildingBlocks.Application.Commands;
 using Dara.Modules.Connections.Domain.Connections;
 
 namespace Dara.Modules.Connections.Application.Connections.CreateConnection
 {
-    public class CreateConnectionCommandHandler : IApplicationCommandHandler<CreateConnectionCommand, CreateConnectionCommandResult>
+    public class CreateConnectionCommandHandler : IModuleCommandHandler<CreateConnectionCommand, CreateConnectionCommandResult>
     {
         IConnectionRepository _connectionRepository;
     

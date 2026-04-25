@@ -1,8 +1,8 @@
-using Dara.BuildingBlocks.Application.Abstraction;
+using Dara.BuildingBlocks.Application.Domain;
 using Dara.Modules.Connections.Domain.Clients;
 using Dara.Modules.Connections.Domain.Clients.Events;
 
-namespace Dara.Modules.Connections.Application.Clients.DeleteClient
+namespace Dara.Modules.Connections.Application.Domain
 {
     public class ClientDeletedEventHandler : IDomainEventHandler<ClientDeletedDomainEvent>
     {

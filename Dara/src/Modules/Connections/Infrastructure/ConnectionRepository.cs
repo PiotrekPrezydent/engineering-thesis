@@ -1,4 +1,4 @@
-using Dara.BuildingBlocks.Infrastructure.Events;
+using Dara.BuildingBlocks.Infrastructure.Domain;
 using Dara.Modules.Connections.Domain.Connections;
 using Dara.Modules.Connections.Domain.Connections.Events;
 

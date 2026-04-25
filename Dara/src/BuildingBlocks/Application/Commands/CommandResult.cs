@@ -1,11 +1,10 @@
-using Dara.BuildingBlocks.Application.Abstraction;
 using Dara.BuildingBlocks.Application.Exceptions;
 
-namespace Dara.BuildingBlocks.Application
+namespace Dara.BuildingBlocks.Application.Commands
 {
-    public class CommandResult : IApplicationCommand
+    public class CommandResult : IModuleCommand
     {
-        public IApplicationCommandResult? ExpectedResult { get; private set; }
+        public IModuleCommandResult? ExpectedResult { get; private set; }
 
         public CommandResultStatus Status { get; private set; }
 
@@ -25,7 +24,7 @@ namespace Dara.BuildingBlocks.Application
             UpdatedAt = DateTime.UtcNow;
         }
 
-        public void SetExpectedResult(IApplicationCommandResult expectedResult)
+        public void SetExpectedResult(IModuleCommandResult expectedResult)
         {
             if(Status != CommandResultStatus.Pending)
                 throw new CommandResultStatusException(Status, CommandResultStatus.Success);
@@ -59,7 +58,7 @@ namespace Dara.BuildingBlocks.Application
             UpdatedAt = DateTime.UtcNow;
         }
 
-        public T GetResult<T>() where T : IApplicationCommandResult
+        public T GetResult<T>() where T : IModuleCommandResult
         {
             if (Status != CommandResultStatus.Success)
                 throw new ArgumentException("Cannot take result after failing");

@@ -1,4 +1,5 @@
 using Dara.BuildingBlocks.Application;
+using Dara.BuildingBlocks.Application.Commands;
 using Dara.Modules.Connections.Application.Clients.ChangeClientAuthToken;
 using Dara.Modules.Connections.Application.Clients.ChangeClientName;
 using Dara.Shared.Contracts.Clients;

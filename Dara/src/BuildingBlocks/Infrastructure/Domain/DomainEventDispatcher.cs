@@ -1,8 +1,8 @@
-using Dara.BuildingBlocks.Application.Abstraction;
+using Dara.BuildingBlocks.Application.Domain;
 using Dara.BuildingBlocks.Domain.Events.Abstraction;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Dara.BuildingBlocks.Infrastructure.Events
+namespace Dara.BuildingBlocks.Infrastructure.Domain
 {
     public class DomainEventDispatcher : IDomainEventDispatcher
     {

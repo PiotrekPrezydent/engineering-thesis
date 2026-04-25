@@ -1,6 +1,5 @@
-using Dara.BuildingBlocks.Application.Abstraction;
 using Dara.BuildingBlocks.Infrastructure.Commands;
-using Dara.BuildingBlocks.Infrastructure.Events;
+using Dara.BuildingBlocks.Infrastructure.Domain;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Dara.Modules.Configuration

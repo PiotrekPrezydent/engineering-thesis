@@ -13,8 +13,14 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\..\BuildingBlocks\Infrastructure\Dara.BuildingBlocks.Infrastructure.csproj" />
-      <ProjectReference Include="..\..\..\Modules\Configuration\Dara.Modules.Configuration.csproj" />
       <ProjectReference Include="..\..\..\Shared\Contracts\Dara.Shared.Contracts.csproj" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\Modules\Connections\Application\Dara.Modules.Connections.Application.csproj" />
+        <ProjectReference Include="..\..\..\Modules\Connections\Domain\Dara.Modules.Connections.Domain.csproj" />
+        <ProjectReference Include="..\..\..\Modules\Connections\Infrastructure\Dara.Modules.Connections.Infrastructure.csproj" />
+        <ProjectReference Include="..\..\..\Modules\Connections\Integration\Dara.Modules.Connections.Integration.csproj" />
     </ItemGroup>
     
 

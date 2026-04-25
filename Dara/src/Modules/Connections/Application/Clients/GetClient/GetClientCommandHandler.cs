@@ -1,10 +1,10 @@
-using Dara.BuildingBlocks.Application.Abstraction;
+using Dara.BuildingBlocks.Application.Commands;
 using Dara.Modules.Connections.Domain.Clients;
 using Dara.Modules.Connections.Domain.Connections;
 
 namespace Dara.Modules.Connections.Application.Clients.GetClient
 {
-    public class GetClientCommandHandler : IApplicationCommandHandler<GetClientCommand, GetClientCommandResult>
+    public class GetClientCommandHandler : IModuleCommandHandler<GetClientCommand, GetClientCommandResult>
     {
         private IConnectionRepository _connectionRepository;
     

@@ -8,5 +8,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Domain\Dara.BuildingBlocks.Domain.csproj" />
+      <ProjectReference Include="..\Integration\Dara.BuildingBlocks.Integration.csproj" />
     </ItemGroup>
 </Project>

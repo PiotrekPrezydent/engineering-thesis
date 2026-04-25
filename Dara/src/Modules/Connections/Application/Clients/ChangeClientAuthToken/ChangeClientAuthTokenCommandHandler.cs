@@ -1,9 +1,9 @@
-using Dara.BuildingBlocks.Application.Abstraction;
+using Dara.BuildingBlocks.Application.Commands;
 using Dara.Modules.Connections.Domain.Clients;
 
 namespace Dara.Modules.Connections.Application.Clients.ChangeClientAuthToken
 {
-    public class ChangeClientAuthTokenCommandHandler : IApplicationCommandHandler<ChangeClientAuthTokenCommand, ChangeClientAuthTokenCommandResult>
+    public class ChangeClientAuthTokenCommandHandler : IModuleCommandHandler<ChangeClientAuthTokenCommand, ChangeClientAuthTokenCommandResult>
     {
         IClientRepository _clientRepository;
     

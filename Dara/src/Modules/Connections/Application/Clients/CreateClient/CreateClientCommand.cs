@@ -1,6 +1,6 @@
-using Dara.BuildingBlocks.Application.Abstraction;
+using Dara.BuildingBlocks.Application.Commands;
 
 namespace Dara.Modules.Connections.Application.Clients.CreateClient
 {
-    public record CreateClientCommand(string ConnectionId, string ClientName, string ClientAuthToken) : IApplicationCommand;
+    public record CreateClientCommand(string ConnectionId, string ClientName, string ClientAuthToken) : IModuleCommand;
 }

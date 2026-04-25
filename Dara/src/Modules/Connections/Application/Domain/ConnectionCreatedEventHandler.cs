@@ -1,7 +1,7 @@
-using Dara.BuildingBlocks.Application.Abstraction;
+using Dara.BuildingBlocks.Application.Domain;
 using Dara.Modules.Connections.Domain.Connections.Events;
 
-namespace Dara.Modules.Connections.Application.Connections.CreateConnection
+namespace Dara.Modules.Connections.Application.Domain
 {
     public class ConnectionCreatedEventHandler : IDomainEventHandler<ConnectionCreatedDomainEvent>
     {

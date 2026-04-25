@@ -1,9 +1,9 @@
-using Dara.BuildingBlocks.Application.Abstraction;
+using Dara.BuildingBlocks.Application.Domain;
 using Dara.Modules.Connections.Domain.Clients;
 using Dara.Modules.Connections.Domain.Connections;
 using Dara.Modules.Connections.Domain.Connections.Events;
 
-namespace Dara.Modules.Connections.Application.Connections.DeleteConnection
+namespace Dara.Modules.Connections.Application.Domain
 {
     public class ConnectionDeletedEventHandler : IDomainEventHandler<ConnectionDeletedDomainEvent>
     {

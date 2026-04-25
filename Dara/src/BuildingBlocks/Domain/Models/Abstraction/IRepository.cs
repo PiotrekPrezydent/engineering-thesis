@@ -1,6 +1,7 @@
 namespace Dara.BuildingBlocks.Domain.Models.Abstraction
 {
-    public interface IRepository <TAggregateRoot,TId> where TAggregateRoot : IAggregateRoot<TId> where TId : IEntityId
+    public interface IRepository <TAggregateRoot,TId> : IRepository
+        where TAggregateRoot : IAggregateRoot<TId> where TId : IEntityId
     {
         public Task<TAggregateRoot> GetByIdAsync(TId id);
     
@@ -12,4 +13,6 @@ namespace Dara.BuildingBlocks.Domain.Models.Abstraction
     
         public Task SaveAsync(TAggregateRoot aggregateRoot);
     }
+
+    public interface IRepository;
 }

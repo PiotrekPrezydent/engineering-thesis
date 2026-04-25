@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\BuildingBlocks\Integration\Dara.BuildingBlocks.Integration.csproj" />
+    </ItemGroup>
+
 </Project>

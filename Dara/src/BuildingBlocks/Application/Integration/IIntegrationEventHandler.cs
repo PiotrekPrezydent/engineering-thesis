@@ -1,4 +1,6 @@
-namespace Dara.BuildingBlocks.Integration;
+using Dara.BuildingBlocks.Integration;
+
+namespace Dara.BuildingBlocks.Application.Integration;
 
 public interface IIntegrationEventHandler<in TEvent> : IIntegrationEventHandler where TEvent : IIntegrationEvent
 {

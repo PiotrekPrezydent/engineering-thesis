@@ -1,6 +1,6 @@
-using Dara.BuildingBlocks.Application.Abstraction;
+using Dara.BuildingBlocks.Application.Commands;
 
 namespace Dara.Modules.Connections.Application.Connections.CreateConnection
 {
-    public record CreateConnectionCommand(string ConnectionId, string ConnectionIp) : IApplicationCommand;
+    public record CreateConnectionCommand(string ConnectionId, string ConnectionIp) : IModuleCommand;
 }

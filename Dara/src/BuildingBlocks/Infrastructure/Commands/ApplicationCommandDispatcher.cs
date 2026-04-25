@@ -1,5 +1,5 @@
 using Dara.BuildingBlocks.Application;
-using Dara.BuildingBlocks.Application.Abstraction;
+using Dara.BuildingBlocks.Application.Commands;
 using Dara.Shared.Common.Logging;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,10 +15,10 @@ namespace Dara.BuildingBlocks.Infrastructure.Commands
         }
     
         public async Task<CommandResult> DispatchAsync<TCommand, TCommandResult>(TCommand command) 
-            where TCommandResult : IApplicationCommandResult 
-            where TCommand : IApplicationCommand
+            where TCommandResult : IModuleCommandResult 
+            where TCommand : IModuleCommand
         {
-            var handler = _serviceProvider.GetRequiredService<IApplicationCommandHandler<TCommand, TCommandResult>>();
+            var handler = _serviceProvider.GetRequiredService<IModuleCommandHandler<TCommand, TCommandResult>>();
         
             Guid id = Guid.NewGuid();
             Console.WriteLine($"\n\n{id} - Called command Handler: {handler.GetType().Name} with command: {typeof(TCommand).Name}");

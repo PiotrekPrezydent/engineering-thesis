@@ -1,5 +1,5 @@
 using Dara.BuildingBlocks.Application;
-using Dara.BuildingBlocks.Application.Abstraction;
+using Dara.BuildingBlocks.Application.Commands;
 
 namespace Dara.BuildingBlocks.Infrastructure.Commands
 {
@@ -8,7 +8,7 @@ namespace Dara.BuildingBlocks.Infrastructure.Commands
         //Task<CommandResult> DispatchAsync<TCommand>(TCommand command) where TCommand : IApplicationCommand;
 
         Task<CommandResult> DispatchAsync<TCommand, TCommandResult>(TCommand command)
-            where TCommand : IApplicationCommand
-            where TCommandResult : IApplicationCommandResult;
+            where TCommand : IModuleCommand
+            where TCommandResult : IModuleCommandResult;
     }
 }

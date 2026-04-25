@@ -1,4 +1,5 @@
 using Dara.BuildingBlocks.Application;
+using Dara.BuildingBlocks.Application.Commands;
 using Dara.BuildingBlocks.Infrastructure.Commands;
 using Dara.Modules.Connections.Application.Connections.CreateConnection;
 using Dara.Modules.Connections.Application.Connections.DeleteConnection;

@@ -1,6 +1,6 @@
-using Dara.BuildingBlocks.Application.Abstraction;
+using Dara.BuildingBlocks.Application.Commands;
 
 namespace Dara.Modules.Connections.Application.Connections.DeleteConnection
 {
-    public record DeleteConnectionCommandResult() : IApplicationCommandResult;
+    public record DeleteConnectionCommandResult() : IModuleCommandResult;
 }

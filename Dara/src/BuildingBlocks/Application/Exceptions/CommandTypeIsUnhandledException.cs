@@ -1,5 +1,3 @@
-using Dara.BuildingBlocks.Application.Abstraction;
-
 namespace Dara.BuildingBlocks.Application.Exceptions
 {
     public class CommandTypeIsUnhandledException : Exception
