@@ -11,6 +11,5 @@ public class ClientCreatedEventHandler : IDomainEventHandler<ClientCreatedDomain
     
     public async Task HandleAsync(ClientCreatedDomainEvent domainEvent)
     {
-        Console.WriteLine($"EVENT HANDLER WORKING FOR: {GetType().Name}");
     }
 }

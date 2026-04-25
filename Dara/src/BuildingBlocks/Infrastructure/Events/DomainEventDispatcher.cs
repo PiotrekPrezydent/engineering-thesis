@@ -1,6 +1,5 @@
 using Dara.BuildingBlocks.Application.Abstraction;
 using Dara.BuildingBlocks.Domain.Events.Abstraction;
-using Dara.Shared.Common.Logging;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Dara.BuildingBlocks.Infrastructure.Events;
@@ -8,30 +7,28 @@ namespace Dara.BuildingBlocks.Infrastructure.Events;
 public class DomainEventDispatcher : IDomainEventDispatcher
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly ConsoleLogger _consoleLogger;
     
     public DomainEventDispatcher(IServiceProvider serviceProvider)
     {
-        _consoleLogger = new ConsoleLogger(this);
-        _consoleLogger.Start("CREATE");
-        
         _serviceProvider = serviceProvider;
-        
-        _consoleLogger.Element(_serviceProvider);
-        _consoleLogger.End();
     }
     
     public async Task DispatchAsync<TEvent>(TEvent domainEvent) where TEvent : IDomainEvent
     {
         var handler = _serviceProvider.GetRequiredService<IDomainEventHandler<TEvent>>();
         
-        //_consoleLogger.Start("HANDLING DOMAIN EVENT");
-        //_consoleLogger.Element(handler);
-        //_consoleLogger.Element(domainEvent);
-        
-        await handler.HandleAsync((dynamic)domainEvent);
-        
-        //_consoleLogger.End();
+        Guid id = Guid.NewGuid();
+        Console.WriteLine($"\n\t{id} - Called event Handler: {handler.GetType().Name} with event: {typeof(TEvent).Name}");
+        Console.WriteLine($"\n\t{id} - Event value: {domainEvent}");
 
+        try
+        {
+            await handler.HandleAsync((dynamic)domainEvent);
+            Console.WriteLine($"\n\t{id} - handling finished, dynamic event: {(dynamic)domainEvent.GetType().Name})");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"\n\t{id} - Got Exception: {ex.GetType()} : {ex.Message}");
+        }
     }
 }

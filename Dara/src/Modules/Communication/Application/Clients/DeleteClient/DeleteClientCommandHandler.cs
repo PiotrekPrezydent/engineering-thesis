@@ -6,27 +6,24 @@ namespace Dara.Modules.Communication.Application.Clients.DeleteClient;
 
 public class DeleteClientCommandHandler : IApplicationCommandHandler<DeleteClientCommand, DeleteClientCommandResult>
 {
-    IConnectionRepository _connectionRepository;
     IClientRepository _clientRepository;
+    IConnectionRepository _connectionRepository;
     
-    public DeleteClientCommandHandler(IConnectionRepository connectionRepository, IClientRepository clientRepository)
+    public DeleteClientCommandHandler(IClientRepository clientRepository, IConnectionRepository connectionRepository)
     {
-        _connectionRepository = connectionRepository;
         _clientRepository = clientRepository;
+        _connectionRepository = connectionRepository;
     }
     
     public async Task<DeleteClientCommandResult> HandleAsync(DeleteClientCommand command)
     {
-        ConnectionId id = new ConnectionId(command.ConnectionId);
-        
+        ConnectionId id = new(command.ConnectionId);
         Connection connection = await _connectionRepository.GetByIdAsync(id);
-        Client client = connection.ConnectionClient;
-        
-        client.Delete();
 
-        await _clientRepository.RemoveAsync(client);
+        connection.TryGetClient(out Client client);
+        connection.RemoveClient();
         
-        connection.StopClient(); // this provides event
+        await _clientRepository.SaveAsync(client);
         
         return new();
     }

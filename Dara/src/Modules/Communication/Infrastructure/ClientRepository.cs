@@ -1,5 +1,6 @@
 using Dara.BuildingBlocks.Infrastructure.Events;
 using Dara.Modules.Communication.Domain.Clients;
+using Dara.Modules.Communication.Domain.Clients.Events;
 
 namespace Dara.Modules.Communication.Infrastructure;
 
@@ -29,21 +30,32 @@ public class ClientRepository : IClientRepository
         foreach (var domainEvent in aggregateRoot.DomainEvents)
             await _domainEventDispatcher.DispatchAsync((dynamic)domainEvent);
         
+        aggregateRoot.ClearDomainEvents();
+        
         _clients.Add(aggregateRoot);
     }
 
     public async Task RemoveAsync(Client aggregateRoot)
     {
-        foreach (var domainEvent in aggregateRoot.DomainEvents)
-            await _domainEventDispatcher.DispatchAsync((dynamic)domainEvent);
-        
         _clients.Remove(aggregateRoot);
     }
 
     public async Task SaveAsync(Client aggregateRoot)
     {
+        bool isDeleted = false;
+        
         foreach (var domainEvent in aggregateRoot.DomainEvents)
+        {
+            if ((dynamic)domainEvent is ClientDeletedDomainEvent)
+                isDeleted = true;
+            
             await _domainEventDispatcher.DispatchAsync((dynamic)domainEvent);
+        }
+        
+        aggregateRoot.ClearDomainEvents();
+        
+        if (isDeleted)
+            return;
         
         int index = _clients.IndexOf(aggregateRoot);
         _clients[index] = aggregateRoot;

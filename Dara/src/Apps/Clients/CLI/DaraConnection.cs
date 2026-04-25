@@ -39,7 +39,7 @@ public class DaraConnection
         Console.WriteLine($"Connected to {_serverUrl}");
     }
 
-    [ConsoleCommand("disconnect", "disc")]
+    [ConsoleCommand("disconnect", "dis")]
     async Task Disconnect()
     {
         Console.WriteLine($"Disconnecting from {_serverUrl}...");

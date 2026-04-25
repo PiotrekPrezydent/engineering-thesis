@@ -24,10 +24,10 @@ public class CreateClientCommandHandler : IApplicationCommandHandler<CreateClien
         ClientName name = new ClientName(command.ClientName);
         ClientAuthToken token = new ClientAuthToken(command.ClientAuthToken);
         
-        Client client = connection.StartClient(name, token);
+        Client client = connection.CreateClient(name, token);
         
         await _clientRepository.AddAsync(client);
         
-        return new();
+        return new(client.Id.Value);
     }
 }

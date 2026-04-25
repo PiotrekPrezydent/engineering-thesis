@@ -12,11 +12,13 @@ class Program
 
         BasicCommands bc = new();
         DaraConnection con = new();
-        GuestCommands gc = new(con.Connection);
+        ConnectionCommands cc = new(con.Connection);
+        ActiveConnectionCommands acc = new(con.Connection);
         
         ci.BindObjectCommands(bc);
         ci.BindObjectCommands(con);
-        ci.BindObjectCommands(gc);
+        ci.BindObjectCommands(cc);
+        ci.BindObjectCommands(acc);
         
         do
         {

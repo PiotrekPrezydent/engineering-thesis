@@ -18,9 +18,9 @@ public class DeleteConnectionCommandHandler : IApplicationCommandHandler<DeleteC
 
         Connection connection = await _connectionRepository.GetByIdAsync(connectionId);
         
-        connection.Delete();
+        connection.Delete(); //true deletion is in event handler
         
-        await _connectionRepository.RemoveAsync(connection);
+        await _connectionRepository.SaveAsync(connection);
         
         return new();
     }

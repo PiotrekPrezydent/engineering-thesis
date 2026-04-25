@@ -11,6 +11,5 @@ public class ClientAuthTokenChangedEventHandler : IDomainEventHandler<ClientAuth
     
     public async Task HandleAsync(ClientAuthTokenChangedDomainEvent domainEvent)
     {
-        Console.WriteLine($"EVENT HANDLER WORKING FOR: {GetType().Name}");
     }
 }

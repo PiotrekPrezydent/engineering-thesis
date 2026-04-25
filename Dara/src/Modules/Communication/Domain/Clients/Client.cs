@@ -29,7 +29,7 @@ public class Client : Entity, IAggregateRoot<ClientId>
         return new Client(clientId, connectionId, name, authToken);
     }
 
-    public void Delete()
+    internal void Delete()
     {
         AddDomainEvent(new ClientDeletedDomainEvent(Id));
     }

@@ -11,6 +11,5 @@ public class ConnectionCreatedEventHandler : IDomainEventHandler<ConnectionCreat
     
     public async Task HandleAsync(ConnectionCreatedDomainEvent domainEvent)
     {
-        Console.WriteLine($"EVENT HANDLER WORKING FOR: {GetType().Name}");
     }
 }

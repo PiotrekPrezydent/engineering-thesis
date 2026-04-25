@@ -11,15 +11,15 @@ public class Connection : Entity, IAggregateRoot<ConnectionId>
     
     private ConnectionIp _connectionIp;
     
-    public Client? ConnectionClient;
+    private Client? _connectionClient;
     
-    private Connection(ConnectionId id, ConnectionIp connectionIp)
+    Connection(ConnectionId id, ConnectionIp connectionIp)
     {
         Id = id;
         
         _connectionIp = connectionIp;
 
-        ConnectionClient = null;
+        _connectionClient = null;
         
         AddDomainEvent(new ConnectionCreatedDomainEvent(Id));
     }
@@ -34,23 +34,31 @@ public class Connection : Entity, IAggregateRoot<ConnectionId>
         AddDomainEvent(new ConnectionDeletedDomainEvent(Id));
     }
 
-    public Client StartClient(ClientName clientName, ClientAuthToken token)
+    public Client CreateClient(ClientName clientName, ClientAuthToken token)
     {
-        if(ConnectionClient != null)
-            throw new InvalidOperationException("Connection client is already started");
+        if(_connectionClient != null)
+            throw new InvalidOperationException("Connection have client already!");
         
         Client client = Client.Create(new ClientId(Guid.NewGuid()), Id, clientName, token);
-        ConnectionClient = client;
+        _connectionClient = client;
         
-        return ConnectionClient;
+        return _connectionClient;
     }
 
-    public void StopClient()
+    public void RemoveClient()
     {
-        if(ConnectionClient == null)
-            throw new InvalidOperationException("Connection client is not started");
+        if(_connectionClient == null)
+            throw new InvalidOperationException("Connection dont have a client");
         
-        ConnectionClient.Delete();
-        ConnectionClient = null;
+        _connectionClient.Delete();
+        
+        _connectionClient = null;
+    }
+
+    public bool TryGetClient(out Client client)
+    {
+        client = _connectionClient;
+        
+        return client != null;
     }
 }

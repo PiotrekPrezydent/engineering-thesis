@@ -11,6 +11,5 @@ public class ClientNameChangedEventHandler : IDomainEventHandler<ClientNameChang
     
     public async Task HandleAsync(ClientNameChangedDomainEvent domainEvent)
     {
-        Console.WriteLine($"EVENT HANDLER WORKING FOR: {GetType().Name}");
     }
 }

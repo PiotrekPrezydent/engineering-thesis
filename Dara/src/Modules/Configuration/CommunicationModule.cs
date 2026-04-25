@@ -1,5 +1,8 @@
+using Dara.Modules.Communication.Application.Clients.ChangeClientAuthToken;
+using Dara.Modules.Communication.Application.Clients.ChangeClientName;
 using Dara.Modules.Communication.Application.Clients.CreateClient;
 using Dara.Modules.Communication.Application.Clients.DeleteClient;
+using Dara.Modules.Communication.Application.Clients.GetClient;
 using Dara.Modules.Communication.Application.Connections.CreateConnection;
 using Dara.Modules.Communication.Application.Connections.DeleteConnection;
 using Dara.Modules.Communication.Domain.Clients;
@@ -20,15 +23,22 @@ public static class CommunicationModule
         //commands
         services.AddCommandHandler<CreateConnectionCommandHandler>();
         services.AddCommandHandler<DeleteConnectionCommandHandler>();
+        
         services.AddCommandHandler<CreateClientCommandHandler>();
         services.AddCommandHandler<DeleteClientCommandHandler>();
+        services.AddCommandHandler<GetClientCommandHandler>();
+        services.AddCommandHandler<ChangeClientNameCommandHandler>();
+        services.AddCommandHandler<ChangeClientAuthTokenCommandHandler>();
         
         
         //events
         services.AddDomainEventHandler<ConnectionCreatedEventHandler>();
         services.AddDomainEventHandler<ConnectionDeletedEventHandler>();
+        
         services.AddDomainEventHandler<ClientCreatedEventHandler>();
         services.AddDomainEventHandler<ClientDeletedEventHandler>();
+        services.AddDomainEventHandler<ClientNameChangedEventHandler>();
+        services.AddDomainEventHandler<ClientAuthTokenChangedEventHandler>();
         
         return services;
     } 
