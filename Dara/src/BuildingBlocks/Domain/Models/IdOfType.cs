@@ -1,13 +1,14 @@
 using Dara.BuildingBlocks.Domain.Models.Abstraction;
 
-namespace Dara.BuildingBlocks.Domain.Models;
-
-public abstract class IdOfType<T> : IEntityId
+namespace Dara.BuildingBlocks.Domain.Models
 {
-    public T Value { get; }
-    
-    public IdOfType(T value)
+    public abstract class IdOfType<T> : IEntityId
     {
-        Value = value;
+        public T Value { get; }
+    
+        public IdOfType(T value)
+        {
+            Value = value;
+        }
     }
 }

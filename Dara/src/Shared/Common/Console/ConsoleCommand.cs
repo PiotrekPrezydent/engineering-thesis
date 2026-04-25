@@ -1,11 +1,12 @@
-namespace Dara.Shared.Common.Console;
-
-public class ConsoleCommand : Attribute
+namespace Dara.Shared.Common.Console
 {
-    public string[] CommandNames;
-    
-    public ConsoleCommand(params string[] commandNames)
+    public class ConsoleCommand : Attribute
     {
-        CommandNames = commandNames;
+        public string[] CommandNames;
+    
+        public ConsoleCommand(params string[] commandNames)
+        {
+            CommandNames = commandNames;
+        }
     }
 }

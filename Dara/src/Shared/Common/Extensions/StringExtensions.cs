@@ -1,18 +1,19 @@
-namespace Dara.Shared.Common.Extensions;
-
-public static class StringExtensions
+namespace Dara.Shared.Common.Extensions
 {
-    public static string EnsureText(this string? value)
+    public static class StringExtensions
     {
-        if (value == null)
-            return "NULL-STRING";
+        public static string EnsureText(this string? value)
+        {
+            if (value == null)
+                return "NULL-STRING";
         
-        if(value.Length == 0)
-            return "EMPTY-STRING";
+            if(value.Length == 0)
+                return "EMPTY-STRING";
         
-        if(string.IsNullOrWhiteSpace(value))
-            return "WHITESPACE-WHITESPACE";
+            if(string.IsNullOrWhiteSpace(value))
+                return "WHITESPACE-WHITESPACE";
         
-        return value;
+            return value;
+        }
     }
 }

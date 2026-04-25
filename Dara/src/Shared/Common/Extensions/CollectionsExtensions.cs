@@ -1,20 +1,21 @@
-namespace Dara.Shared.Common.Extensions;
-
-public static class CollectionsExtensions
+namespace Dara.Shared.Common.Extensions
 {
-    public static string ElementsToString<T>(this IEnumerable<T> enumerable)
+    public static class CollectionsExtensions
     {
-        return string.Join(Environment.NewLine, enumerable);
-    }
-
-    public static IEnumerable<KeyValuePair<Type, object>> ValuesWithType<T>(this IEnumerable<T> enumerable)
-    {
-        List<KeyValuePair<Type, object>> result = new();
-        foreach (var element in enumerable)
+        public static string ElementsToString<T>(this IEnumerable<T> enumerable)
         {
-            result.Add(new(element.GetType(), element));
+            return string.Join(Environment.NewLine, enumerable);
         }
 
-        return result;
+        public static IEnumerable<KeyValuePair<Type, object>> ValuesWithType<T>(this IEnumerable<T> enumerable)
+        {
+            List<KeyValuePair<Type, object>> result = new();
+            foreach (var element in enumerable)
+            {
+                result.Add(new(element.GetType(), element));
+            }
+
+            return result;
+        }
     }
 }

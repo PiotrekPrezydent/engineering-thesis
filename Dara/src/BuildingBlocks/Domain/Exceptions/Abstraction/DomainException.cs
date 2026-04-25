@@ -1,42 +1,43 @@
-namespace Dara.BuildingBlocks.Domain.Exceptions.Abstraction;
-
-public abstract class DomainException : Exception
+namespace Dara.BuildingBlocks.Domain.Exceptions.Abstraction
 {
-    public string ModuleName => TargetSite!.Module.Assembly.GetName().Name!;
+    public abstract class DomainException : Exception
+    {
+        public string ModuleName => TargetSite!.Module.Assembly.GetName().Name!;
 
-    protected string _wall => new string(':', 128);
+        protected string _wall => new string(':', 128);
     
-    protected abstract string DomainExcetpionState();
+        protected abstract string DomainExcetpionState();
 
-    public DomainException(string message) : base(message)
-    {
+        public DomainException(string message) : base(message)
+        {
         
-    }
+        }
 
-    public override string Message => GetBuildedMessage();
+        public override string Message => GetBuildedMessage();
 
-    public void PrintBuildedMessage()
-    {
-        Console.WriteLine(GetBuildedMessage());
-    }
+        public void PrintBuildedMessage()
+        {
+            Console.WriteLine(GetBuildedMessage());
+        }
     
-    public string GetBuildedMessage()
-    {
-        string ret = "\n\n\n";
+        public string GetBuildedMessage()
+        {
+            string ret = "\n\n\n";
         
-        ret += _wall + "\n\n";
-        ret += $"Readed Domain Exception\n\n";
+            ret += _wall + "\n\n";
+            ret += $"Readed Domain Exception\n\n";
         
-        ret += $"MODULE:\t[ {ModuleName} ]\n";
-        ret += $"TYPE:\t[ {GetType()} ]\n\n";
+            ret += $"MODULE:\t[ {ModuleName} ]\n";
+            ret += $"TYPE:\t[ {GetType()} ]\n\n";
         
-        ret += $"{Message}\n\n";
+            ret += $"{Message}\n\n";
         
-        ret += DomainExcetpionState() + "\n";
+            ret += DomainExcetpionState() + "\n";
         
-        ret += $"{_wall}\n\n";
+            ret += $"{_wall}\n\n";
         
         
-        return ret;
+            return ret;
+        }
     }
 }

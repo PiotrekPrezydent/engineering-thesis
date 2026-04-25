@@ -1,6 +1,7 @@
-namespace Dara.BuildingBlocks.Domain.Models.Abstraction;
-
-public interface IEntityId
+namespace Dara.BuildingBlocks.Domain.Models.Abstraction
 {
+    public interface IEntityId
+    {
     
+    }
 }

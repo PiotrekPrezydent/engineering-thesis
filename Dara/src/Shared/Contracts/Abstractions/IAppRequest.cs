@@ -1,6 +1,7 @@
-namespace Dara.Shared.Contracts.Abstractions;
-
-public interface IAppRequest
+namespace Dara.Shared.Contracts.Abstractions
 {
+    public interface IAppRequest
+    {
     
+    }
 }

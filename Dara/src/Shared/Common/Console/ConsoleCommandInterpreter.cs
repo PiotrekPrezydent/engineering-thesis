@@ -1,59 +1,60 @@
 using System.Reflection;
 using Dara.Shared.Common.Extensions;
 
-namespace Dara.Shared.Common.Console;
-
-public class ConsoleCommandInterpreter
+namespace Dara.Shared.Common.Console
 {
-    private Dictionary<string, Func<string[], Task>> _handlers;
-
-    public ConsoleCommandInterpreter()
+    public class ConsoleCommandInterpreter
     {
-        _handlers = new();
-    }
+        private Dictionary<string, Func<string[], Task>> _handlers;
 
-    public void BindObjectCommands(object commandsObject)
-    {
-        var commandObjectType = commandsObject.GetType();
-        var commandMethods = commandObjectType.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
-            .Where(m => m.CustomAttributes.Any(a => a.AttributeType == typeof(ConsoleCommand)));
-        
-        foreach (var commandMethod in commandMethods)
+        public ConsoleCommandInterpreter()
         {
-            ConsoleCommand command = commandMethod.GetCustomAttribute(typeof(ConsoleCommand)) as ConsoleCommand;
-            foreach (var name in command.CommandNames)
-                _handlers.Add(name, args => SafeExecute(commandMethod,commandsObject, args));
+            _handlers = new();
         }
-    }
-    
-    public async Task HandleAsync(string consoleLine)
-    {
-        var split = consoleLine.Split(' ');
 
-        string commandName = split[0];
-        string[] commandArgs = split.Skip(1).ToArray();
+        public void BindObjectCommands(object commandsObject)
+        {
+            var commandObjectType = commandsObject.GetType();
+            var commandMethods = commandObjectType.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
+                .Where(m => m.CustomAttributes.Any(a => a.AttributeType == typeof(ConsoleCommand)));
         
-        if (_handlers.TryGetValue(commandName, out var handler))
-            await handler(commandArgs);
-        else
-            System.Console.WriteLine($"Command {commandName} not found");
-    }
-    
-    //this should be awaiting invoke
-    async Task SafeExecute(MethodInfo method, object instance, params object[] args)
-    {
-        if (method.CanBeCalledWithArgs(args))
-        {
-            Task t = (Task)method.Invoke(instance, args);
-            await t;
+            foreach (var commandMethod in commandMethods)
+            {
+                ConsoleCommand command = commandMethod.GetCustomAttribute(typeof(ConsoleCommand)) as ConsoleCommand;
+                foreach (var name in command.CommandNames)
+                    _handlers.Add(name, args => SafeExecute(commandMethod,commandsObject, args));
+            }
         }
-        else
+    
+        public async Task HandleAsync(string consoleLine)
         {
-            var providenArgs = args.ValuesWithType().ElementsToString().EnsureText();
-            var expectedArgs = method.MethodParametersAsDictionary().ElementsToString().EnsureText();
+            var split = consoleLine.Split(' ');
+
+            string commandName = split[0];
+            string[] commandArgs = split.Skip(1).ToArray();
+        
+            if (_handlers.TryGetValue(commandName, out var handler))
+                await handler(commandArgs);
+            else
+                System.Console.WriteLine($"Command {commandName} not found");
+        }
+    
+        //this should be awaiting invoke
+        async Task SafeExecute(MethodInfo method, object instance, params object[] args)
+        {
+            if (method.CanBeCalledWithArgs(args))
+            {
+                Task t = (Task)method.Invoke(instance, args);
+                await t;
+            }
+            else
+            {
+                var providenArgs = args.ValuesWithType().ElementsToString().EnsureText();
+                var expectedArgs = method.MethodParametersAsDictionary().ElementsToString().EnsureText();
             
-            System.Console.WriteLine($"wrong parameters for method: {method.Name}\nExpected:\n{expectedArgs}\nBut provided\n{providenArgs}");
-        }
+                System.Console.WriteLine($"wrong parameters for method: {method.Name}\nExpected:\n{expectedArgs}\nBut provided\n{providenArgs}");
+            }
         
+        }
     }
 }

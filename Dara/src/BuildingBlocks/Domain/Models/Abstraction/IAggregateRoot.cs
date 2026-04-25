@@ -1,6 +1,7 @@
-namespace Dara.BuildingBlocks.Domain.Models.Abstraction;
-
-public interface IAggregateRoot<TId> where TId : IEntityId 
+namespace Dara.BuildingBlocks.Domain.Models.Abstraction
 {
-    TId Id { get; }
+    public interface IAggregateRoot<TId> where TId : IEntityId 
+    {
+        TId Id { get; }
+    }
 }

@@ -1,12 +1,13 @@
 using Dara.Shared.Contracts.Clients;
 using Dara.Shared.Contracts.Common;
 
-namespace Dara.Shared.Contracts.Interactions;
-
-//define every use case fore connections
-public interface IConnectionInteractions
+namespace Dara.Shared.Contracts.Interactions
 {
-    public Task<AppResponse> ActiveClientAsync(ClientActivationDto client);
+    //define every use case fore connections
+    public interface IConnectionInteractions
+    {
+        public Task<AppResponse> ActiveClientAsync(ClientActivationDto client);
     
-    public Task<AppResponse> DeactiveClientAsync();
+        public Task<AppResponse> DeactiveClientAsync();
+    }
 }

@@ -2,35 +2,36 @@
 using Dara.Shared.Common.Console;
 using Microsoft.AspNetCore.SignalR.Client;
 
-namespace Dara.Apps.Clients.CLI;
-
-class Program
+namespace Dara.Apps.Clients.CLI
 {
-    static async Task Main(string[] args)
+    class Program
     {
-        ConsoleCommandInterpreter ci = new();
-
-        BasicCommands bc = new();
-        DaraConnection con = new();
-        ConnectionCommands cc = new(con.Connection);
-        ActiveConnectionCommands acc = new(con.Connection);
-        
-        ci.BindObjectCommands(bc);
-        ci.BindObjectCommands(con);
-        ci.BindObjectCommands(cc);
-        ci.BindObjectCommands(acc);
-        
-        do
+        static async Task Main(string[] args)
         {
-            Console.Write("Type command: ");
-            string? read = Console.ReadLine();
+            ConsoleCommandInterpreter ci = new();
+
+            BasicCommands bc = new();
+            DaraConnection con = new();
+            ConnectionCommands cc = new(con.Connection);
+            ClientCommands acc = new(con.Connection);
+        
+            ci.BindObjectCommands(bc);
+            ci.BindObjectCommands(con);
+            ci.BindObjectCommands(cc);
+            ci.BindObjectCommands(acc);
+        
+            do
+            {
+                Console.Write("Type command: ");
+                string? read = Console.ReadLine();
             
-            if (string.IsNullOrWhiteSpace(read))
-                continue;
+                if (string.IsNullOrWhiteSpace(read))
+                    continue;
             
-            await ci.HandleAsync(read);
+                await ci.HandleAsync(read);
             
-        } while(true);
-    }
+            } while(true);
+        }
     
+    }
 }

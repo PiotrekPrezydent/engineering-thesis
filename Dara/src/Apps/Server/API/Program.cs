@@ -1,23 +1,24 @@
 using Dara.Apps.Server.API.AppHubs;
 using Dara.Modules.Configuration;
 
-namespace Dara.Apps.Server.API;
-
-public class Program
+namespace Dara.Apps.Server.API
 {
-    public static async Task Main(string[] args)
+    public class Program
     {
-        var builder = WebApplication.CreateBuilder(args);
-        builder.Services.AddSignalR();
+        public static async Task Main(string[] args)
+        {
+            var builder = WebApplication.CreateBuilder(args);
+            builder.Services.AddSignalR();
 
-        builder.Services.AddBuildingBlocksInfraDispatchers();
-        builder.Services.AddCommunicationModule();
+            builder.Services.AddBuildingBlocksInfraDispatchers();
+            builder.Services.AddCommunicationModule();
 
-        var app = builder.Build();
+            var app = builder.Build();
         
-        app.MapHub<AppHub>("/app");
+            app.MapHub<AppHub>("/app");
 
-        app.Run();
+            app.Run();
+        }
     }
 }
 

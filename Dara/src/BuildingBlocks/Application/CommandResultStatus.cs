@@ -1,9 +1,10 @@
-namespace Dara.BuildingBlocks.Application;
-
-public enum CommandResultStatus
+namespace Dara.BuildingBlocks.Application
 {
-    Success,
-    Pending,
-    Exception,
-    Failure
+    public enum CommandResultStatus
+    {
+        Success,
+        Pending,
+        Exception,
+        Failure
+    }
 }

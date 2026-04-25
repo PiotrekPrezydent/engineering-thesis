@@ -14,9 +14,9 @@
       <ProjectReference Include="..\..\BuildingBlocks\Application\Dara.BuildingBlocks.Application.csproj" />
         <ProjectReference Include="..\..\BuildingBlocks\Domain\Dara.BuildingBlocks.Domain.csproj" />
       <ProjectReference Include="..\..\BuildingBlocks\Infrastructure\Dara.BuildingBlocks.Infrastructure.csproj" />
-      <ProjectReference Include="..\Communication\Application\Dara.Modules.Communication.Application.csproj" />
-      <ProjectReference Include="..\Communication\Domain\Dara.Modules.Communication.Domain.csproj" />
-      <ProjectReference Include="..\Communication\Infrastructure\Dara.Modules.Communication.Infrastructure.csproj" />
+      <ProjectReference Include="..\Connections\Application\Dara.Modules.Connections.Application.csproj" />
+      <ProjectReference Include="..\Connections\Domain\Dara.Modules.Connections.Domain.csproj" />
+      <ProjectReference Include="..\Connections\Infrastructure\Dara.Modules.Connections.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

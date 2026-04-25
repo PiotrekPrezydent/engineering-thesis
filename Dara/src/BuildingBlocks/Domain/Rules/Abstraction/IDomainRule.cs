@@ -1,8 +1,9 @@
-namespace Dara.BuildingBlocks.Domain.Rules.Abstraction;
-
-public interface IDomainRule
+namespace Dara.BuildingBlocks.Domain.Rules.Abstraction
 {
-    public bool IsBroken();
+    public interface IDomainRule
+    {
+        public bool IsBroken();
 
-    public string Message { get; }
+        public string Message { get; }
+    }
 }

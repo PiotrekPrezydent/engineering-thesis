@@ -1,33 +1,34 @@
 using Dara.Shared.Contracts.Abstractions;
 
-namespace Dara.Shared.Contracts.Common;
-
-public class AppResponse : IAppResponse
+namespace Dara.Shared.Contracts.Common
 {
-    public AppResponseStatus Status { get; set; } = AppResponseStatus.Pending;
+    public class AppResponse : IAppResponse
+    {
+        public AppResponseStatus Status { get; set; } = AppResponseStatus.Pending;
     
-    public string ResponseMessage { get; set; } = string.Empty;
+        public string ResponseMessage { get; set; } = string.Empty;
 
-    public AppResponse()
-    {
+        public AppResponse()
+        {
         
-    }
+        }
     
-    public void SetExpectedResponse(string responseMessage)
-    {
-        if(Status != AppResponseStatus.Pending)
-            throw new ArgumentException("Cannot set expected response to a non-pending status");
+        public void SetExpectedResponse(string responseMessage)
+        {
+            if(Status != AppResponseStatus.Pending)
+                throw new ArgumentException("Cannot set expected response to a non-pending status");
         
-        Status = AppResponseStatus.Success;
-        ResponseMessage = responseMessage;
-    }
+            Status = AppResponseStatus.Success;
+            ResponseMessage = responseMessage;
+        }
 
-    public void SetException(string exceptionMessage)
-    {
-        if(Status != AppResponseStatus.Pending)
-            throw new ArgumentException("Cannot set exception to a non-pending status");
+        public void SetException(string exceptionMessage)
+        {
+            if(Status != AppResponseStatus.Pending)
+                throw new ArgumentException("Cannot set exception to a non-pending status");
         
-        Status = AppResponseStatus.Failure;
-        ResponseMessage = exceptionMessage;
+            Status = AppResponseStatus.Failure;
+            ResponseMessage = exceptionMessage;
+        }
     }
 }

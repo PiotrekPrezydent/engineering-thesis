@@ -5,31 +5,31 @@ using Dara.Shared.Contracts.Interactions;
 using Microsoft.AspNetCore.SignalR.Client;
 using TypedSignalR.Client;
 
-namespace Dara.Apps.Clients.CLI.ConsoleCommands;
-
-public class ConnectionCommands : IConnectionClient
+namespace Dara.Apps.Clients.CLI.ConsoleCommands
 {
-    private readonly IConnectionInteractions _proxy;
-    
-    public ConnectionCommands(HubConnection connection)
+    public class ConnectionCommands
     {
-        _proxy = connection.CreateHubProxy<IConnectionInteractions>();
-        connection.Register<IConnectionClient>(this);
-    }
+        private readonly IConnectionInteractions _proxy;
     
-    [ConsoleCommand("activate", "act")]
-    async Task ActivateClient(string name, string authToken)
-    {
-        ClientActivationDto dto = new(name, authToken);
-        var response = await _proxy.ActiveClientAsync(dto);
+        public ConnectionCommands(HubConnection connection)
+        {
+            _proxy = connection.CreateHubProxy<IConnectionInteractions>();
+        }
+    
+        [ConsoleCommand("activate", "act")]
+        async Task ActivateClient(string name, string authToken)
+        {
+            ClientActivationDto dto = new(name, authToken);
+            var response = await _proxy.ActiveClientAsync(dto);
         
-        Console.WriteLine($"Response from client: {response.Status} ::: {response.ResponseMessage}");
-    }
+            Console.WriteLine($"Response from client: {response.Status} ::: {response.ResponseMessage}");
+        }
     
-    [ConsoleCommand("deactivate", "dea")]
-    async Task DeactivateClient()
-    {
-        var response = await _proxy.DeactiveClientAsync();
-        Console.WriteLine($"Response from client: {response.Status} ::: {response.ResponseMessage}");
+        [ConsoleCommand("deactivate", "dea")]
+        async Task DeactivateClient()
+        {
+            var response = await _proxy.DeactiveClientAsync();
+            Console.WriteLine($"Response from client: {response.Status} ::: {response.ResponseMessage}");
+        }
     }
 }

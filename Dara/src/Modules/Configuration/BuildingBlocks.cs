@@ -3,15 +3,16 @@ using Dara.BuildingBlocks.Infrastructure.Commands;
 using Dara.BuildingBlocks.Infrastructure.Events;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Dara.Modules.Configuration;
-
-public static class BuildingBlocks
+namespace Dara.Modules.Configuration
 {
-    public static IServiceCollection AddBuildingBlocksInfraDispatchers(this IServiceCollection services)
+    public static class BuildingBlocks
     {
-        services.AddSingleton<IApplicationCommandDispatcher, ApplicationCommandDispatcher>();
-        services.AddSingleton<IDomainEventDispatcher, DomainEventDispatcher>();
+        public static IServiceCollection AddBuildingBlocksInfraDispatchers(this IServiceCollection services)
+        {
+            services.AddSingleton<IApplicationCommandDispatcher, ApplicationCommandDispatcher>();
+            services.AddSingleton<IDomainEventDispatcher, DomainEventDispatcher>();
         
-        return services;
+            return services;
+        }
     }
 }

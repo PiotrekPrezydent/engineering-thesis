@@ -1,13 +1,14 @@
 using Dara.BuildingBlocks.Application;
 using Dara.BuildingBlocks.Application.Abstraction;
 
-namespace Dara.BuildingBlocks.Infrastructure.Commands;
-
-public interface IApplicationCommandDispatcher
+namespace Dara.BuildingBlocks.Infrastructure.Commands
 {
-    //Task<CommandResult> DispatchAsync<TCommand>(TCommand command) where TCommand : IApplicationCommand;
+    public interface IApplicationCommandDispatcher
+    {
+        //Task<CommandResult> DispatchAsync<TCommand>(TCommand command) where TCommand : IApplicationCommand;
 
-    Task<CommandResult> DispatchAsync<TCommand, TCommandResult>(TCommand command)
-        where TCommand : IApplicationCommand
-        where TCommandResult : IApplicationCommandResult;
+        Task<CommandResult> DispatchAsync<TCommand, TCommandResult>(TCommand command)
+            where TCommand : IApplicationCommand
+            where TCommandResult : IApplicationCommandResult;
+    }
 }

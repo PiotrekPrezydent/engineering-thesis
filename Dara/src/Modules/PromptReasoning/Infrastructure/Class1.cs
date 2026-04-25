@@ -1,6 +1,7 @@
-﻿namespace Dara.Modules.PromptReasoning.Infrastructure;
-
-public class Class1
+﻿namespace Dara.Modules.PromptReasoning.Infrastructure
 {
+    public class Class1
+    {
 
+    }
 }

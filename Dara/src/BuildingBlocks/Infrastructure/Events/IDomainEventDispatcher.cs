@@ -1,8 +1,9 @@
 using Dara.BuildingBlocks.Domain.Events.Abstraction;
 
-namespace Dara.BuildingBlocks.Infrastructure.Events;
-
-public interface IDomainEventDispatcher
+namespace Dara.BuildingBlocks.Infrastructure.Events
 {
-    Task DispatchAsync<TEvent>(TEvent domainEvent) where TEvent : IDomainEvent;
+    public interface IDomainEventDispatcher
+    {
+        Task DispatchAsync<TEvent>(TEvent domainEvent) where TEvent : IDomainEvent;
+    }
 }

@@ -1,3 +1,4 @@
-namespace Dara.BuildingBlocks.Application.Abstraction;
-
-public interface IApplicationCommand;
+namespace Dara.BuildingBlocks.Application.Abstraction
+{
+    public interface IApplicationCommand;
+}

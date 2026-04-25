@@ -2,48 +2,49 @@ using Dara.BuildingBlocks.Application.Abstraction;
 using Dara.BuildingBlocks.Infrastructure.Commands;
 using Dara.BuildingBlocks.Infrastructure.Events;
 
-namespace Dara.Apps.Tests.Server;
-
-public class Program
+namespace Dara.Apps.Tests.Server
 {
-    public static void Main(string[] args)
+    public class Program
     {
-        var builder = WebApplication.CreateBuilder(args);
-        builder.Services.AddSignalR();
-        
-        builder.Services.AddScoped<IApplicationCommandDispatcher, ApplicationCommandDispatcher>();
-        builder.Services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
-        
-
-        builder.Services.AddTransient<TestApp>();
-        
-        
-        var app = builder.Build();
-        using (var scope = app.Services.CreateScope())
+        public static void Main(string[] args)
         {
-            var test = scope.ServiceProvider.GetRequiredService<TestApp>();
-            test.Test();    
+            var builder = WebApplication.CreateBuilder(args);
+            builder.Services.AddSignalR();
+        
+            builder.Services.AddScoped<IApplicationCommandDispatcher, ApplicationCommandDispatcher>();
+            builder.Services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
+        
+
+            builder.Services.AddTransient<TestApp>();
+        
+        
+            var app = builder.Build();
+            using (var scope = app.Services.CreateScope())
+            {
+                var test = scope.ServiceProvider.GetRequiredService<TestApp>();
+                test.Test();    
+            }
+        
+            //app.MapHub<AppHub>("/app");
+
+            //app.MapGet("/", () => "Hello World!");
+        
+
+            app.Run();
         }
-        
-        //app.MapHub<AppHub>("/app");
-
-        //app.MapGet("/", () => "Hello World!");
-        
-
-        app.Run();
     }
-}
 
-public class TestApp
-{
-    private IApplicationCommandDispatcher _dispatcher;
+    public class TestApp
+    {
+        private IApplicationCommandDispatcher _dispatcher;
     
-    public TestApp(IApplicationCommandDispatcher dispatcher)
-    {
-        _dispatcher = dispatcher;
-    }
+        public TestApp(IApplicationCommandDispatcher dispatcher)
+        {
+            _dispatcher = dispatcher;
+        }
 
-    public void Test()
-    {
+        public void Test()
+        {
+        }
     }
 }

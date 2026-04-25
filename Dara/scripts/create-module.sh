@@ -21,14 +21,6 @@ dotnet new classlib -n "$PROJECT_PREFIX.Infrastructure" -o "$BASE_DIR/Infrastruc
 MOD_INFRA="$BASE_DIR/Infrastructure/$PROJECT_PREFIX.Infrastructure.csproj"
 BB_INFRA="$BB_DIR/Infrastructure/$BB_PREFIX.Infrastructure.csproj"
 
-dotnet new classlib -n "$PROJECT_PREFIX.Contracts" -o "$BASE_DIR/Contracts"
-MOD_CONT="$BASE_DIR/Contracts/$PROJECT_PREFIX.Contracts.csproj"
-BB_CONT="$BB_DIR/Contracts/$BB_PREFIX.Contracts.csproj"
-
-dotnet new classlib -n "$PROJECT_PREFIX.Configuration" -o "$BASE_DIR/Configuration"
-MOD_CONF="$BASE_DIR/Configuration/$PROJECT_PREFIX.Configuration.csproj"
-BB_CONF="$BB_DIR/Configuration/$BB_PREFIX.Configuration.csproj"
-
 echo "Adding domain layer references"
 dotnet add $MOD_DOM reference $BB_DOM
 
@@ -41,12 +33,4 @@ echo "Adding infrastructure layer references"
 dotnet add $MOD_INFRA reference $BB_INFRA
 dotnet add $MOD_INFRA reference $MOD_DOM
 dotnet add $MOD_INFRA reference $MOD_CONT
-
-echo "Adding contract layer references"
-dotnet add $MOD_CONT reference $BB_CONT
-
-echo "Adding configuration layer references"
-dotnet add $MOD_CONF reference $BB_CONF
-dotnet add $MOD_CONF reference $MOD_APP
-dotnet add $MOD_CONF reference $MOD_INFRA
 

@@ -1,51 +1,52 @@
 using Dara.Shared.Common.Console;
 using Microsoft.AspNetCore.SignalR.Client;
 
-namespace Dara.Apps.Clients.CLI;
-
-public class DaraConnection
+namespace Dara.Apps.Clients.CLI
 {
-    private readonly string _serverUrl;
-    public HubConnection Connection { get; private set; }
-
-    public DaraConnection()
+    public class DaraConnection
     {
-        _serverUrl = ProvideUrl();
-        BuildConnection();
-    }
+        private readonly string _serverUrl;
+        public HubConnection Connection { get; private set; }
 
-    string ProvideUrl()
-    {
-        return "http://127.0.0.1:5273/app";
-    }
+        public DaraConnection()
+        {
+            _serverUrl = ProvideUrl();
+            BuildConnection();
+        }
 
-    void BuildConnection()
-    {
-        var builder = new HubConnectionBuilder();
-        builder.WithUrl(_serverUrl);
-        builder.WithAutomaticReconnect();
+        string ProvideUrl()
+        {
+            return "http://127.0.0.1:5273/app";
+        }
+
+        void BuildConnection()
+        {
+            var builder = new HubConnectionBuilder();
+            builder.WithUrl(_serverUrl);
+            builder.WithAutomaticReconnect();
         
-        Connection = builder.Build();
-    }
+            Connection = builder.Build();
+        }
     
 
-    [ConsoleCommand("connect","con")]
-    async Task Connect()
-    {
-        Console.WriteLine($"Connecting to {_serverUrl}...");
+        [ConsoleCommand("connect","con")]
+        async Task Connect()
+        {
+            Console.WriteLine($"Connecting to {_serverUrl}...");
         
-        await Connection.StartAsync();
+            await Connection.StartAsync();
         
-        Console.WriteLine($"Connected to {_serverUrl}");
-    }
+            Console.WriteLine($"Connected to {_serverUrl}");
+        }
 
-    [ConsoleCommand("disconnect", "dis")]
-    async Task Disconnect()
-    {
-        Console.WriteLine($"Disconnecting from {_serverUrl}...");
+        [ConsoleCommand("disconnect", "dis")]
+        async Task Disconnect()
+        {
+            Console.WriteLine($"Disconnecting from {_serverUrl}...");
         
-        await Connection.StopAsync();
+            await Connection.StopAsync();
         
-        Console.WriteLine($"Disconnected from {_serverUrl}");
+            Console.WriteLine($"Disconnected from {_serverUrl}");
+        }
     }
 }

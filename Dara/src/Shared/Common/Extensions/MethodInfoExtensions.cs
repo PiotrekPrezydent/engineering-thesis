@@ -1,33 +1,34 @@
 using System.Reflection;
 
-namespace Dara.Shared.Common.Extensions;
-
-public static class MethodInfoExtensions
+namespace Dara.Shared.Common.Extensions
 {
-    public static bool CanBeCalledWithArgs(this MethodInfo method, params object[] args)
+    public static class MethodInfoExtensions
     {
-        var parameters = method.GetParameters();
-        if (parameters.Length != args.Length)
-            return false;
-
-        for (int i = 0; i < parameters.Length; i++)
+        public static bool CanBeCalledWithArgs(this MethodInfo method, params object[] args)
         {
-            if (parameters[i].ParameterType != args[i].GetType())
+            var parameters = method.GetParameters();
+            if (parameters.Length != args.Length)
                 return false;
+
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                if (parameters[i].ParameterType != args[i].GetType())
+                    return false;
+            }
+
+            return true;
         }
 
-        return true;
-    }
-
-    public static IEnumerable<KeyValuePair<Type, string>> MethodParametersAsDictionary(this MethodInfo method)
-    {
-        List<KeyValuePair<Type, string>> result = new();
-        var parameters = method.GetParameters();
-        
-        foreach(var parameter in parameters)
+        public static IEnumerable<KeyValuePair<Type, string>> MethodParametersAsDictionary(this MethodInfo method)
         {
-            result.Add(new(parameter.ParameterType, parameter.Name));
+            List<KeyValuePair<Type, string>> result = new();
+            var parameters = method.GetParameters();
+        
+            foreach(var parameter in parameters)
+            {
+                result.Add(new(parameter.ParameterType, parameter.Name));
+            }
+            return result;
         }
-        return result;
     }
 }

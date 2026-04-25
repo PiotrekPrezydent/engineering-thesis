@@ -1,8 +1,9 @@
-namespace Dara.Shared.Contracts.Common;
-
-public enum AppResponseStatus
+namespace Dara.Shared.Contracts.Common
 {
-    Success,
-    Pending,
-    Failure,
+    public enum AppResponseStatus
+    {
+        Success,
+        Pending,
+        Failure,
+    }
 }
