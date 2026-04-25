@@ -14,45 +14,30 @@
   
   <Folder Name="/BuildingBlocks/">
     <Project Path="src/BuildingBlocks/Application/Dara.BuildingBlocks.Application.csproj" />
-    <Project Path="src/BuildingBlocks/Configuration/Dara.BuildingBlocks.Configuration.csproj" />
-    <Project Path="src/BuildingBlocks/Contracts/Dara.BuildingBlocks.Contracts.csproj" />
     <Project Path="src/BuildingBlocks/Domain/Dara.BuildingBlocks.Domain.csproj" />
     <Project Path="src/BuildingBlocks/Infrastructure/Dara.BuildingBlocks.Infrastructure.csproj" />
   </Folder>
   
-  <Folder Name="/Modules/" />
-  <Folder Name="/Modules/RpcGateway/">
-    <Project Path="src/Modules/RpcGateway/Application/Dara.Modules.RpcGateway.Application.csproj" />
-    <Project Path="src/Modules/RpcGateway/Configuration/Dara.Modules.RpcGateway.Configuration.csproj" />
-    <Project Path="src/Modules/RpcGateway/Contracts/Dara.Modules.RpcGateway.Contracts.csproj" />
-    <Project Path="src/Modules/RpcGateway/Domain/Dara.Modules.RpcGateway.Domain.csproj" />
-    <Project Path="src/Modules/RpcGateway/Infrastructure/Dara.Modules.RpcGateway.Infrastructure.csproj" />
+  <Folder Name="/Modules/">
+    <Project Path="src/Modules/Configuration/Dara.Modules.Configuration.csproj" />
   </Folder>
   <Folder Name="/Modules/Communication/">
-    <Project Path="src/Modules/Communication/Application/Dara.Modules.Communication.Application.csproj" />
-    <Project Path="src/Modules/Communication/Configuration/Dara.Modules.Communication.Configuration.csproj" />
-    <Project Path="src/Modules/Communication/Contracts/Dara.Modules.Communication.Contracts.csproj" />
-    <Project Path="src/Modules/Communication/Domain/Dara.Modules.Communication.Domain.csproj" />
-    <Project Path="src/Modules/Communication/Infrastructure/Dara.Modules.Communication.Infrastructure.csproj" />
+    <Project Path="src\Modules\Communication\Application\Dara.Modules.Communication.Application.csproj" />
+    <Project Path="src\Modules\Communication\Domain\Dara.Modules.Communication.Domain.csproj" />
+    <Project Path="src\Modules\Communication\Infrastructure\Dara.Modules.Communication.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/Modules/Plugins/">
     <Project Path="src/Modules/Plugins/Application/Dara.Modules.Plugins.Application.csproj" />
-    <Project Path="src/Modules/Plugins/Configuration/Dara.Modules.Plugins.Configuration.csproj" />
-    <Project Path="src/Modules/Plugins/Contracts/Dara.Modules.Plugins.Contracts.csproj" />
     <Project Path="src/Modules/Plugins/Domain/Dara.Modules.Plugins.Domain.csproj" />
     <Project Path="src/Modules/Plugins/Infrastructure/Dara.Modules.Plugins.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/Modules/PromptReasoning/">
     <Project Path="src/Modules/PromptReasoning/Application/Dara.Modules.PromptReasoning.Application.csproj" />
-    <Project Path="src/Modules/PromptReasoning/Configuration/Dara.Modules.PromptReasoning.Configuration.csproj" />
-    <Project Path="src/Modules/PromptReasoning/Contracts/Dara.Modules.PromptReasoning.Contracts.csproj" />
     <Project Path="src/Modules/PromptReasoning/Domain/Dara.Modules.PromptReasoning.Domain.csproj" />
     <Project Path="src/Modules/PromptReasoning/Infrastructure/Dara.Modules.PromptReasoning.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/Modules/TaskExecution/">
     <Project Path="src/Modules/TaskExecution/Application/Dara.Modules.TaskExecution.Application.csproj" />
-    <Project Path="src/Modules/TaskExecution/Configuration/Dara.Modules.TaskExecution.Configuration.csproj" />
-    <Project Path="src/Modules/TaskExecution/Contracts/Dara.Modules.TaskExecution.Contracts.csproj" />
     <Project Path="src/Modules/TaskExecution/Domain/Dara.Modules.TaskExecution.Domain.csproj" />
     <Project Path="src/Modules/TaskExecution/Infrastructure/Dara.Modules.TaskExecution.Infrastructure.csproj" />
   </Folder>

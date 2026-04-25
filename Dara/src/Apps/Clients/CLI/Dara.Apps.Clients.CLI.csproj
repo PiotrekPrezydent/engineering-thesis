@@ -9,10 +9,12 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.5" />
+        <PackageReference Include="TypedSignalR.Client" Version="1.17.0" />
     </ItemGroup>
     
     <ItemGroup>
       <ProjectReference Include="..\..\..\Shared\Common\Dara.Shared.Common.csproj" />
+      <ProjectReference Include="..\..\..\Shared\Contracts\Dara.Shared.Contracts.csproj" />
     </ItemGroup>
 
 </Project>

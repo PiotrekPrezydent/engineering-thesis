@@ -3,13 +3,13 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\BuildingBlocks\Infrastructure\Dara.BuildingBlocks.Infrastructure.csproj" />
     <ProjectReference Include="..\Domain\Dara.Modules.Communication.Domain.csproj" />
-    <ProjectReference Include="..\Contracts\Dara.Modules.Communication.Contracts.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <RootNamespace>Dara.Modules.Communication.Infrastructure</RootNamespace>
   </PropertyGroup>
 
 </Project>

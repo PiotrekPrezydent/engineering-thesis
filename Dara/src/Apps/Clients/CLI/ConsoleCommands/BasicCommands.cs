@@ -6,13 +6,15 @@ public class BasicCommands
 {
     
     [ConsoleCommand("help")]
-    void HelpCommand()
+    async Task Help()
     {
         System.Console.WriteLine("Help command WIP");
     }
-
-    void ClearCommand()
+    
+    [ConsoleCommand("clear","cls")]
+    async Task Clear()
     {
         System.Console.Clear();
     }
+    
 }

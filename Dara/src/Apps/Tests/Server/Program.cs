@@ -1,6 +1,6 @@
-using Dara.BuildingBlocks.Domain.Commands;
-using Dara.BuildingBlocks.Domain.Events;
-using Dara.BuildingBlocks.Infrastructure;
+using Dara.BuildingBlocks.Application.Abstraction;
+using Dara.BuildingBlocks.Infrastructure.Commands;
+using Dara.BuildingBlocks.Infrastructure.Events;
 
 namespace Dara.Apps.Tests.Server;
 

@@ -5,11 +5,11 @@ namespace Dara.Shared.Common.Console;
 
 public class ConsoleCommandInterpreter
 {
-    Dictionary<string, Func<string[], Task>> _handlers = new();
+    private Dictionary<string, Func<string[], Task>> _handlers;
 
     public ConsoleCommandInterpreter()
     {
-        
+        _handlers = new();
     }
 
     public void BindObjectCommands(object commandsObject)
@@ -21,11 +21,12 @@ public class ConsoleCommandInterpreter
         foreach (var commandMethod in commandMethods)
         {
             ConsoleCommand command = commandMethod.GetCustomAttribute(typeof(ConsoleCommand)) as ConsoleCommand;
-            _handlers.Add(command.CommandName, args => SafeExecute(commandMethod,commandsObject, args));
+            foreach (var name in command.CommandNames)
+                _handlers.Add(name, args => SafeExecute(commandMethod,commandsObject, args));
         }
     }
     
-    public void Handle(string consoleLine)
+    public async Task HandleAsync(string consoleLine)
     {
         var split = consoleLine.Split(' ');
 
@@ -33,17 +34,18 @@ public class ConsoleCommandInterpreter
         string[] commandArgs = split.Skip(1).ToArray();
         
         if (_handlers.TryGetValue(commandName, out var handler))
-            handler(commandArgs);
+            await handler(commandArgs);
         else
             System.Console.WriteLine($"Command {commandName} not found");
     }
     
     //this should be awaiting invoke
-    Task SafeExecute(MethodInfo method, object instance, params object[] args)
+    async Task SafeExecute(MethodInfo method, object instance, params object[] args)
     {
         if (method.CanBeCalledWithArgs(args))
         {
-            method.Invoke(instance, args);
+            Task t = (Task)method.Invoke(instance, args);
+            await t;
         }
         else
         {
@@ -53,6 +55,5 @@ public class ConsoleCommandInterpreter
             System.Console.WriteLine($"wrong parameters for method: {method.Name}\nExpected:\n{expectedArgs}\nBut provided\n{providenArgs}");
         }
         
-        return Task.CompletedTask;
     }
 }

@@ -6,20 +6,20 @@ namespace Dara.Apps.Clients.CLI;
 
 class Program
 {
-    static HubConnection _connection;
     static async Task Main(string[] args)
     {
-        string serverUrl = "http://127.0.0.1:5273/app"; 
-            
-        _connection = new HubConnectionBuilder()
-            .WithUrl(serverUrl)
-            .WithAutomaticReconnect()
-            .Build();
+        ConsoleCommandInterpreter ci = new();
 
-        await _connection.StartAsync();
+        BasicCommands bc = new();
+        DaraConnection con = new();
+        ConnectionCommands cc = new(con.Connection);
+        ActiveConnectionCommands acc = new(con.Connection);
         
-        ConsoleCommandInterpreter cci = new();
-        cci.BindObjectCommands(new BasicCommands());
+        ci.BindObjectCommands(bc);
+        ci.BindObjectCommands(con);
+        ci.BindObjectCommands(cc);
+        ci.BindObjectCommands(acc);
+        
         do
         {
             Console.Write("Type command: ");
@@ -28,7 +28,7 @@ class Program
             if (string.IsNullOrWhiteSpace(read))
                 continue;
             
-            cci.Handle(read);
+            await ci.HandleAsync(read);
             
         } while(true);
     }
