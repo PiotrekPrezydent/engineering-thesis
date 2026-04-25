@@ -1,5 +1,6 @@
-﻿namespace Dara.Plugins.ExamplePluginB;
-
-public class Class1
+﻿namespace Dara.Plugins.ExamplePluginB
 {
+    public class Class1
+    {
+    }
 }

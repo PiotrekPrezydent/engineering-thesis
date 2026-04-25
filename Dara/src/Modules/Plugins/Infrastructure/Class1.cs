@@ -1,6 +1,7 @@
-﻿namespace Dara.Modules.Plugins.Infrastructure;
-
-public class Class1
+﻿namespace Dara.Modules.Plugins.Infrastructure
 {
+    public class Class1
+    {
 
+    }
 }

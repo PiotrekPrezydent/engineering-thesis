@@ -1,6 +1,7 @@
-using Dara.Shared.Contracts.Connection;
+using Dara.Shared.Contracts.Interactions;
 
-namespace Dara.Shared.Contracts;
-
-public interface IAppHub : IConnectionHub;
+namespace Dara.Shared.Contracts
+{
+    public interface IAppHub : IConnectionInteractions, IActiveConnectionInteractions;
+}
  

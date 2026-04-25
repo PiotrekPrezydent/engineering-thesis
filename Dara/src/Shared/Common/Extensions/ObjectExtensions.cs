@@ -1,19 +1,20 @@
-namespace Dara.Shared.Common.Extensions;
-
-public static class ObjectExtensions
+namespace Dara.Shared.Common.Extensions
 {
-    public static IEnumerable<string> GetObjectState(this object obj)
+    public static class ObjectExtensions
     {
-        List<string> ret = new();
-        
-        Type type = obj.GetType();
-        ret.Add(type.Name);
-        
-        foreach (var propertyInfo in type.GetProperties())
+        public static IEnumerable<string> GetObjectState(this object obj)
         {
+            List<string> ret = new();
+        
+            Type type = obj.GetType();
+            ret.Add(type.Name);
+        
+            foreach (var propertyInfo in type.GetProperties())
+            {
                 
-        }
+            }
 
-        return ret;
+            return ret;
+        }
     }
 }

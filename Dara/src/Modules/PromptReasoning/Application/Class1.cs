@@ -1,6 +1,7 @@
-﻿namespace Dara.Modules.PromptReasoning.Application;
-
-public class Class1
+﻿namespace Dara.Modules.PromptReasoning.Application
 {
+    public class Class1
+    {
 
+    }
 }

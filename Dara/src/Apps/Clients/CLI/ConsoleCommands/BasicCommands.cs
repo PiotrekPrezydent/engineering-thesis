@@ -1,18 +1,21 @@
 using Dara.Shared.Common.Console;
 
-namespace Dara.Apps.Clients.CLI.ConsoleCommands;
-
-public class BasicCommands
+namespace Dara.Apps.Clients.CLI.ConsoleCommands
 {
+    public class BasicCommands
+    {
     
-    [ConsoleCommand("help")]
-    void HelpCommand()
-    {
-        System.Console.WriteLine("Help command WIP");
-    }
-
-    void ClearCommand()
-    {
-        System.Console.Clear();
+        [ConsoleCommand("help")]
+        async Task Help()
+        {
+            System.Console.WriteLine("Help command WIP");
+        }
+    
+        [ConsoleCommand("clear","cls")]
+        async Task Clear()
+        {
+            System.Console.Clear();
+        }
+    
     }
 }

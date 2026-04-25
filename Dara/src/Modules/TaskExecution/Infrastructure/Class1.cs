@@ -1,6 +1,7 @@
-﻿namespace Dara.Modules.TaskExecution.Infrastructure;
-
-public class Class1
+﻿namespace Dara.Modules.TaskExecution.Infrastructure
 {
+    public class Class1
+    {
 
+    }
 }
