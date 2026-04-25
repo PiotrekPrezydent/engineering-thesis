@@ -27,10 +27,8 @@ dotnet add $MOD_DOM reference $BB_DOM
 echo "Adding application layer references"
 dotnet add $MOD_APP reference $BB_APP
 dotnet add $MOD_APP reference $MOD_DOM
-dotnet add $MOD_APP reference $MOD_CONT
 
 echo "Adding infrastructure layer references"
 dotnet add $MOD_INFRA reference $BB_INFRA
 dotnet add $MOD_INFRA reference $MOD_DOM
-dotnet add $MOD_INFRA reference $MOD_CONT
 

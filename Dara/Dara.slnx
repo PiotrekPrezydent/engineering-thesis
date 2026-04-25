@@ -26,6 +26,11 @@
     <Project Path="src\Modules\Connections\Domain\Dara.Modules.Connections.Domain.csproj" />
     <Project Path="src\Modules\Connections\Infrastructure\Dara.Modules.Connections.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/Modules/Groups/">
+    <Project Path="src\Modules\Groups\Application\Dara.Modules.Groups.Application.csproj" />
+    <Project Path="src\Modules\Groups\Domain\Dara.Modules.Groups.Domain.csproj" />
+    <Project Path="src\Modules\Groups\Infrastructure\Dara.Modules.Groups.Infrastructure.csproj" />
+  </Folder>
   <Folder Name="/Modules/Plugins/">
     <Project Path="src/Modules/Plugins/Application/Dara.Modules.Plugins.Application.csproj" />
     <Project Path="src/Modules/Plugins/Domain/Dara.Modules.Plugins.Domain.csproj" />
