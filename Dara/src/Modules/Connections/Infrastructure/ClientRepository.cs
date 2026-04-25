@@ -1,8 +1,8 @@
 using Dara.BuildingBlocks.Infrastructure.Events;
-using Dara.Modules.Communication.Domain.Clients;
-using Dara.Modules.Communication.Domain.Clients.Events;
+using Dara.Modules.Connections.Domain.Clients;
+using Dara.Modules.Connections.Domain.Clients.Events;
 
-namespace Dara.Modules.Communication.Infrastructure
+namespace Dara.Modules.Connections.Infrastructure
 {
     public class ClientRepository : IClientRepository
     {

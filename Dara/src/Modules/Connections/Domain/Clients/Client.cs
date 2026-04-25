@@ -1,9 +1,9 @@
 using Dara.BuildingBlocks.Domain.Models;
 using Dara.BuildingBlocks.Domain.Models.Abstraction;
-using Dara.Modules.Communication.Domain.Clients.Events;
-using Dara.Modules.Communication.Domain.Connections;
+using Dara.Modules.Connections.Domain.Clients.Events;
+using Dara.Modules.Connections.Domain.Connections;
 
-namespace Dara.Modules.Communication.Domain.Clients
+namespace Dara.Modules.Connections.Domain.Clients
 {
     public class Client : Entity, IAggregateRoot<ClientId>
     {

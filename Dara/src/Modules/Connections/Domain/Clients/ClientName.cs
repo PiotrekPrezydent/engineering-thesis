@@ -1,7 +1,7 @@
 using Dara.BuildingBlocks.Domain.Models;
-using Dara.Modules.Communication.Domain.Clients.Rules;
+using Dara.Modules.Connections.Domain.Clients.Rules;
 
-namespace Dara.Modules.Communication.Domain.Clients
+namespace Dara.Modules.Connections.Domain.Clients
 {
     public class ClientName : ValueObject
     {

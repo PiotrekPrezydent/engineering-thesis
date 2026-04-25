@@ -10,6 +10,7 @@
       <ProjectReference Include="..\..\Shared\Common\Dara.Shared.Common.csproj" />
       <ProjectReference Include="..\Application\Dara.BuildingBlocks.Application.csproj" />
       <ProjectReference Include="..\Domain\Dara.BuildingBlocks.Domain.csproj" />
+      <ProjectReference Include="..\Integration\Dara.BuildingBlocks.Integration.csproj" />
     </ItemGroup>
     
     <ItemGroup>

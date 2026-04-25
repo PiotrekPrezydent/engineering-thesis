@@ -1,4 +1,4 @@
-﻿namespace Dara.Modules.TaskExecution.Domain
+﻿namespace Dara.Modules.Tasks.Domain
 {
     public class Class1
     {

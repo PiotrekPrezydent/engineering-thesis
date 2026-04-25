@@ -5,9 +5,9 @@ using Dara.Modules.Connections.Application.Clients.DeleteClient;
 using Dara.Modules.Connections.Application.Clients.GetClient;
 using Dara.Modules.Connections.Application.Connections.CreateConnection;
 using Dara.Modules.Connections.Application.Connections.DeleteConnection;
-using Dara.Modules.Communication.Domain.Clients;
-using Dara.Modules.Communication.Domain.Connections;
-using Dara.Modules.Communication.Infrastructure;
+using Dara.Modules.Connections.Domain.Clients;
+using Dara.Modules.Connections.Domain.Connections;
+using Dara.Modules.Connections.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Dara.Modules.Configuration

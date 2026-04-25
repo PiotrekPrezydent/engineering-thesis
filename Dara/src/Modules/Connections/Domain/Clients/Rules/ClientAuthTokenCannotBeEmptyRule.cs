@@ -1,6 +1,6 @@
 using Dara.BuildingBlocks.Domain.Rules;
 
-namespace Dara.Modules.Communication.Domain.Clients.Rules
+namespace Dara.Modules.Connections.Domain.Clients.Rules
 {
     public class ClientAuthTokenCannotBeEmptyRule : ValueObjectMemberRule<ClientAuthToken, string>
     {

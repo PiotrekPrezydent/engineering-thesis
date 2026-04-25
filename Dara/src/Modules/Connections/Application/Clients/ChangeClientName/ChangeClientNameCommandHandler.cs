@@ -1,5 +1,5 @@
 using Dara.BuildingBlocks.Application.Abstraction;
-using Dara.Modules.Communication.Domain.Clients;
+using Dara.Modules.Connections.Domain.Clients;
 
 namespace Dara.Modules.Connections.Application.Clients.ChangeClientName
 {

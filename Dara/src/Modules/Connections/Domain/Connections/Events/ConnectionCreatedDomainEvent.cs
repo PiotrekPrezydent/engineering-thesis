@@ -1,6 +1,6 @@
 using Dara.BuildingBlocks.Domain.Events.Abstraction;
 
-namespace Dara.Modules.Communication.Domain.Connections.Events
+namespace Dara.Modules.Connections.Domain.Connections.Events
 {
     public class ConnectionCreatedDomainEvent : IDomainEvent
     {

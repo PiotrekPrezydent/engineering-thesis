@@ -1,4 +1,4 @@
-﻿namespace Dara.Modules.PromptReasoning.Domain
+﻿namespace Dara.Modules.Prompts.Domain
 {
     public class Class1
     {

@@ -1,6 +1,6 @@
 using Dara.BuildingBlocks.Domain.Models;
 
-namespace Dara.Modules.Communication.Domain.Connections
+namespace Dara.Modules.Connections.Domain.Connections
 {
     public class ConnectionIp : ValueObject
     {

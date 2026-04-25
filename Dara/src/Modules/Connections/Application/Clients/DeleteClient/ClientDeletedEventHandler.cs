@@ -1,6 +1,6 @@
 using Dara.BuildingBlocks.Application.Abstraction;
-using Dara.Modules.Communication.Domain.Clients;
-using Dara.Modules.Communication.Domain.Clients.Events;
+using Dara.Modules.Connections.Domain.Clients;
+using Dara.Modules.Connections.Domain.Clients.Events;
 
 namespace Dara.Modules.Connections.Application.Clients.DeleteClient
 {

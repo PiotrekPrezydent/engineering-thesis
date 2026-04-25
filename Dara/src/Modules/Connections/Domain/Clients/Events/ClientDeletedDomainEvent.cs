@@ -1,6 +1,6 @@
 using Dara.BuildingBlocks.Domain.Events.Abstraction;
 
-namespace Dara.Modules.Communication.Domain.Clients.Events
+namespace Dara.Modules.Connections.Domain.Clients.Events
 {
     public class ClientDeletedDomainEvent : IDomainEvent
     {

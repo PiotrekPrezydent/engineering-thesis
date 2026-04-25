@@ -1,7 +1,7 @@
 using Dara.BuildingBlocks.Application.Abstraction;
-using Dara.Modules.Communication.Domain.Clients;
-using Dara.Modules.Communication.Domain.Connections;
-using Dara.Modules.Communication.Domain.Connections.Events;
+using Dara.Modules.Connections.Domain.Clients;
+using Dara.Modules.Connections.Domain.Connections;
+using Dara.Modules.Connections.Domain.Connections.Events;
 
 namespace Dara.Modules.Connections.Application.Connections.DeleteConnection
 {

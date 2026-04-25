@@ -1,8 +1,8 @@
 using Dara.BuildingBlocks.Infrastructure.Events;
-using Dara.Modules.Communication.Domain.Connections;
-using Dara.Modules.Communication.Domain.Connections.Events;
+using Dara.Modules.Connections.Domain.Connections;
+using Dara.Modules.Connections.Domain.Connections.Events;
 
-namespace Dara.Modules.Communication.Infrastructure
+namespace Dara.Modules.Connections.Infrastructure
 {
     public class ConnectionRepository : IConnectionRepository
     {

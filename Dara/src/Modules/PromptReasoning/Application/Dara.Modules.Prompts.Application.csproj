@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\BuildingBlocks\Infrastructure\Dara.BuildingBlocks.Infrastructure.csproj" />
-    <ProjectReference Include="..\Domain\Dara.Modules.PromptReasoning.Domain.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Application\Dara.BuildingBlocks.Application.csproj" />
+    <ProjectReference Include="..\Domain\Dara.Modules.Prompts.Domain.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

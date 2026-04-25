@@ -1,6 +1,6 @@
 using Dara.BuildingBlocks.Application.Abstraction;
-using Dara.Modules.Communication.Domain.Clients;
-using Dara.Modules.Communication.Domain.Connections;
+using Dara.Modules.Connections.Domain.Clients;
+using Dara.Modules.Connections.Domain.Connections;
 
 namespace Dara.Modules.Connections.Application.Clients.CreateClient
 {
