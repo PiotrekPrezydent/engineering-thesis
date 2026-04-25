@@ -5,7 +5,7 @@ namespace Dara.BuildingBlocks.Infrastructure.Integration;
 
 public class IntegrationEventBus
 {
-    public static IntegrationEventBus Instance => _instance == null ? _instance! : new IntegrationEventBus();
+    public static IntegrationEventBus Instance => _instance ?? new IntegrationEventBus();
     static IntegrationEventBus? _instance;
 
     private readonly Dictionary<Type, List<IIntegrationEventHandler>> _handlersDict;
