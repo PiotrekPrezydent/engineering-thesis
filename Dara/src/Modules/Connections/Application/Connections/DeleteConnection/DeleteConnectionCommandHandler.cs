@@ -1,9 +1,9 @@
-using Dara.BuildingBlocks.Application.Commands;
+using Dara.BuildingBlocks.Application;
 using Dara.Modules.Connections.Domain.Connections;
 
 namespace Dara.Modules.Connections.Application.Connections.DeleteConnection
 {
-    public class DeleteConnectionCommandHandler : IModuleCommandHandler<DeleteConnectionCommand, DeleteConnectionCommandResult>
+    public class DeleteConnectionCommandHandler : IHandler<DeleteConnectionCommand>
     {
         IConnectionRepository _connectionRepository;
     
@@ -12,7 +12,7 @@ namespace Dara.Modules.Connections.Application.Connections.DeleteConnection
             _connectionRepository = connectionRepository;
         }
     
-        public async Task<DeleteConnectionCommandResult> HandleAsync(DeleteConnectionCommand command)
+        public async Task HandleAsync(DeleteConnectionCommand command)
         {
             ConnectionId connectionId = new(command.ConnectionId);
 
@@ -21,8 +21,6 @@ namespace Dara.Modules.Connections.Application.Connections.DeleteConnection
             connection.Delete(); //true deletion is in event handler
         
             await _connectionRepository.SaveAsync(connection);
-        
-            return new();
         }
     }
 }

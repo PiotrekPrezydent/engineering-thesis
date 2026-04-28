@@ -1,9 +1,9 @@
-using Dara.BuildingBlocks.Application.Commands;
+using Dara.BuildingBlocks.Application;
 using Dara.Modules.Connections.Domain.Connections;
 
 namespace Dara.Modules.Connections.Application.Connections.CreateConnection
 {
-    public class CreateConnectionCommandHandler : IModuleCommandHandler<CreateConnectionCommand, CreateConnectionCommandResult>
+    public class CreateConnectionCommandHandler : IHandler<CreateConnectionCommand>
     {
         IConnectionRepository _connectionRepository;
     
@@ -12,7 +12,7 @@ namespace Dara.Modules.Connections.Application.Connections.CreateConnection
             _connectionRepository = connectionRepository;
         }
     
-        public async Task<CreateConnectionCommandResult> HandleAsync(CreateConnectionCommand command)
+        public async Task HandleAsync(CreateConnectionCommand command)
         {
             ConnectionId id = new(command.ConnectionId);
             ConnectionIp ip = new(command.ConnectionIp);
@@ -20,8 +20,6 @@ namespace Dara.Modules.Connections.Application.Connections.CreateConnection
             Connection connection = Connection.Create(id, ip);
         
             await _connectionRepository.AddAsync(connection);
-        
-            return new();
         }
     }
 }

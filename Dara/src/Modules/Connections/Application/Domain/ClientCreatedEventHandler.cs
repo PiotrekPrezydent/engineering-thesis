@@ -1,9 +1,9 @@
-using Dara.BuildingBlocks.Application.Domain;
+using Dara.BuildingBlocks.Application;
 using Dara.Modules.Connections.Domain.Clients.Events;
 
 namespace Dara.Modules.Connections.Application.Domain
 {
-    public class ClientCreatedEventHandler : IDomainEventHandler<ClientCreatedDomainEvent>
+    public class ClientCreatedEventHandler : IHandler<ClientCreatedDomainEvent>
     {
         public ClientCreatedEventHandler()
         {

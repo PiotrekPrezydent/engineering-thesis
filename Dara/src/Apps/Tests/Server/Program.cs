@@ -1,5 +1,6 @@
-using Dara.BuildingBlocks.Infrastructure.Commands;
-using Dara.BuildingBlocks.Infrastructure.Domain;
+using Dara.BuildingBlocks.Application;
+using Dara.BuildingBlocks.Infrastructure;
+using Dara.BuildingBlocks.Infrastructure.Abstractions;
 
 namespace Dara.Apps.Tests.Server
 {
@@ -9,20 +10,18 @@ namespace Dara.Apps.Tests.Server
         {
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddSignalR();
-        
-            builder.Services.AddScoped<IApplicationCommandDispatcher, ApplicationCommandDispatcher>();
-            builder.Services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
-        
 
-            builder.Services.AddTransient<TestApp>();
+            builder.Services.AddSingleton<IModuleCommandRunner, ModuleCommandRunner>();
+            builder.Services.AddSingleton<IHandler<TestCommand>, TestHandler>();
+
+            builder.Services.AddSingleton<TestApp>();
         
+            
         
             var app = builder.Build();
-            using (var scope = app.Services.CreateScope())
-            {
-                var test = scope.ServiceProvider.GetRequiredService<TestApp>();
-                test.Test();    
-            }
+            var test = app.Services.GetRequiredService<TestApp>();
+            
+            test.Test();
         
             //app.MapHub<AppHub>("/app");
 
@@ -35,15 +34,26 @@ namespace Dara.Apps.Tests.Server
 
     public class TestApp
     {
-        private IApplicationCommandDispatcher _dispatcher;
+        private IModuleCommandRunner _commandRunner;
     
-        public TestApp(IApplicationCommandDispatcher dispatcher)
+        public TestApp(IModuleCommandRunner commandRunner)
         {
-            _dispatcher = dispatcher;
+            _commandRunner = commandRunner;
         }
 
         public void Test()
         {
+            _commandRunner.ExecuteAsync(new TestCommand("ELO"));
+        }
+    }
+
+    public record TestCommand(string Message) : IModuleCommand;
+
+    public class TestHandler : IHandler<TestCommand>
+    {
+        public async Task HandleAsync(TestCommand request)
+        {
+            Console.WriteLine("HANDLER TEST");
         }
     }
 }

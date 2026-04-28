@@ -1,10 +1,10 @@
-using Dara.BuildingBlocks.Application.Domain;
+using Dara.BuildingBlocks.Application;
 using Dara.Modules.Connections.Domain.Clients;
 using Dara.Modules.Connections.Domain.Clients.Events;
 
 namespace Dara.Modules.Connections.Application.Domain
 {
-    public class ClientDeletedEventHandler : IDomainEventHandler<ClientDeletedDomainEvent>
+    public class ClientDeletedEventHandler : IHandler<ClientDeletedDomainEvent>
     {
         IClientRepository _clientRepository;
     

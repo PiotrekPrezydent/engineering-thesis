@@ -1,4 +1,4 @@
-using Dara.BuildingBlocks.Application.Commands;
+using Dara.BuildingBlocks.Application;
 
 namespace Dara.Modules.Connections.Application.Clients.ChangeClientAuthToken
 {

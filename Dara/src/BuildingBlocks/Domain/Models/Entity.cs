@@ -1,4 +1,4 @@
-using Dara.BuildingBlocks.Domain.Events.Abstraction;
+using Dara.BuildingBlocks.Domain.Events;
 using Dara.BuildingBlocks.Domain.Exceptions;
 using Dara.BuildingBlocks.Domain.Rules.Abstraction;
 

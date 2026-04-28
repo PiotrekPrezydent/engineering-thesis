@@ -1,9 +1,9 @@
-using Dara.BuildingBlocks.Application.Commands;
+using Dara.BuildingBlocks.Application;
 using Dara.Modules.Connections.Domain.Clients;
 
 namespace Dara.Modules.Connections.Application.Clients.ChangeClientName
 {
-    public class ChangeClientNameCommandHandler : IModuleCommandHandler<ChangeClientNameCommand, ChangeClientNameCommandResult>
+    public class ChangeClientNameCommandHandler : IHandler<ChangeClientNameCommand>
     {
         IClientRepository _clientRepository;
         public ChangeClientNameCommandHandler(IClientRepository clientRepository)
@@ -11,7 +11,7 @@ namespace Dara.Modules.Connections.Application.Clients.ChangeClientName
             _clientRepository = clientRepository;
         }
     
-        public async Task<ChangeClientNameCommandResult> HandleAsync(ChangeClientNameCommand command)
+        public async Task HandleAsync(ChangeClientNameCommand command)
         {
             ClientId id = new(command.ClientId);
             Client client = await _clientRepository.GetByIdAsync(id);
@@ -20,8 +20,6 @@ namespace Dara.Modules.Connections.Application.Clients.ChangeClientName
             client.ChangeName(newName);
         
             await _clientRepository.SaveAsync(client);
-        
-            return new();
         }
     }
 }

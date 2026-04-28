@@ -1,11 +1,10 @@
-using Dara.BuildingBlocks.Application.Domain;
-using Dara.BuildingBlocks.Infrastructure.Integration;
+using Dara.BuildingBlocks.Application;
 using Dara.Modules.Connections.Domain.Connections.Events;
 using Dara.Modules.Connections.Integration;
 
 namespace Dara.Modules.Connections.Application.Domain
 {
-    public class ConnectionCreatedEventHandler : IDomainEventHandler<ConnectionCreatedDomainEvent>
+    public class ConnectionCreatedEventHandler : IHandler<ConnectionCreatedDomainEvent>
     {
         public ConnectionCreatedEventHandler()
         {
@@ -13,8 +12,6 @@ namespace Dara.Modules.Connections.Application.Domain
     
         public async Task HandleAsync(ConnectionCreatedDomainEvent domainEvent)
         {
-            await IntegrationEventBus.Instance.Publish(
-                new ConnectionCreatedIntegrationEvent(domainEvent.ConnectionId.Value));
         }
     }
 }

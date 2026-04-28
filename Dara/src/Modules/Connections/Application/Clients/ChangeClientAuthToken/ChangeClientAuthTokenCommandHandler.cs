@@ -1,9 +1,9 @@
-using Dara.BuildingBlocks.Application.Commands;
+using Dara.BuildingBlocks.Application;
 using Dara.Modules.Connections.Domain.Clients;
 
 namespace Dara.Modules.Connections.Application.Clients.ChangeClientAuthToken
 {
-    public class ChangeClientAuthTokenCommandHandler : IModuleCommandHandler<ChangeClientAuthTokenCommand, ChangeClientAuthTokenCommandResult>
+    public class ChangeClientAuthTokenCommandHandler : IHandler<ChangeClientAuthTokenCommand>
     {
         IClientRepository _clientRepository;
     
@@ -12,7 +12,7 @@ namespace Dara.Modules.Connections.Application.Clients.ChangeClientAuthToken
             _clientRepository = clientRepository;
         }
     
-        public async Task<ChangeClientAuthTokenCommandResult> HandleAsync(ChangeClientAuthTokenCommand command)
+        public async Task HandleAsync(ChangeClientAuthTokenCommand command)
         {
             ClientId id = new(command.ClientId);
             Client client = await _clientRepository.GetByIdAsync(id);
@@ -21,8 +21,6 @@ namespace Dara.Modules.Connections.Application.Clients.ChangeClientAuthToken
             client.ChangeAuthToken(newToken);
         
             await _clientRepository.SaveAsync(client);
-        
-            return new();
         }
     }
 }

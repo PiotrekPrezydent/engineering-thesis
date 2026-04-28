@@ -1,9 +1,9 @@
-using Dara.BuildingBlocks.Application.Domain;
+using Dara.BuildingBlocks.Application;
 using Dara.Modules.Connections.Domain.Clients.Events;
 
 namespace Dara.Modules.Connections.Application.Domain
 {
-    public class ClientAuthTokenChangedEventHandler : IDomainEventHandler<ClientAuthTokenChangedDomainEvent>
+    public class ClientAuthTokenChangedEventHandler : IHandler<ClientAuthTokenChangedDomainEvent>
     {
         public ClientAuthTokenChangedEventHandler()
         {

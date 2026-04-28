@@ -1,10 +1,10 @@
-using Dara.BuildingBlocks.Application.Commands;
+using Dara.BuildingBlocks.Application;
 using Dara.Modules.Connections.Domain.Clients;
 using Dara.Modules.Connections.Domain.Connections;
 
 namespace Dara.Modules.Connections.Application.Clients.GetClient
 {
-    public class GetClientCommandHandler : IModuleCommandHandler<GetClientCommand, GetClientCommandResult>
+    public class GetClientCommandHandler : IHandler<GetClientCommand>
     {
         private IConnectionRepository _connectionRepository;
     
@@ -13,14 +13,14 @@ namespace Dara.Modules.Connections.Application.Clients.GetClient
             _connectionRepository = connectionRepository;
         }
     
-        public async Task<GetClientCommandResult> HandleAsync(GetClientCommand command)
+        public async Task HandleAsync(GetClientCommand command)
         {
             ConnectionId id = new(command.ConnectionId);
 
             Connection connection = await _connectionRepository.GetByIdAsync(id);
             if (connection.TryGetClient(out Client client))
             {
-                return new(client.Id.Value);
+               
             }
             else
             {

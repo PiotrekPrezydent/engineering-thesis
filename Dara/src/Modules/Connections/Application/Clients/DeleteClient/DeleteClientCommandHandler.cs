@@ -1,10 +1,10 @@
-using Dara.BuildingBlocks.Application.Commands;
+using Dara.BuildingBlocks.Application;
 using Dara.Modules.Connections.Domain.Clients;
 using Dara.Modules.Connections.Domain.Connections;
 
 namespace Dara.Modules.Connections.Application.Clients.DeleteClient
 {
-    public class DeleteClientCommandHandler : IModuleCommandHandler<DeleteClientCommand, DeleteClientCommandResult>
+    public class DeleteClientCommandHandler : IHandler<DeleteClientCommand>
     {
         IClientRepository _clientRepository;
         IConnectionRepository _connectionRepository;
@@ -15,7 +15,7 @@ namespace Dara.Modules.Connections.Application.Clients.DeleteClient
             _connectionRepository = connectionRepository;
         }
     
-        public async Task<DeleteClientCommandResult> HandleAsync(DeleteClientCommand command)
+        public async Task HandleAsync(DeleteClientCommand command)
         {
             ConnectionId id = new(command.ConnectionId);
             Connection connection = await _connectionRepository.GetByIdAsync(id);
@@ -24,8 +24,6 @@ namespace Dara.Modules.Connections.Application.Clients.DeleteClient
             connection.RemoveClient();
         
             await _clientRepository.SaveAsync(client);
-        
-            return new();
         }
     }
 }

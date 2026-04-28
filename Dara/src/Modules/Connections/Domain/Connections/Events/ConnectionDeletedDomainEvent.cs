@@ -1,4 +1,4 @@
-using Dara.BuildingBlocks.Domain.Events.Abstraction;
+using Dara.BuildingBlocks.Domain.Events;
 
 namespace Dara.Modules.Connections.Domain.Connections.Events
 {

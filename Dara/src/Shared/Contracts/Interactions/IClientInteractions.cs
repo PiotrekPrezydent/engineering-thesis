@@ -1,12 +1,12 @@
-using Dara.Shared.Contracts.Clients;
-using Dara.Shared.Contracts.Common;
+using Dara.Shared.Common;
+using Dara.Shared.Contracts.Dtos;
 
 namespace Dara.Shared.Contracts.Interactions
 {
     public interface IActiveConnectionInteractions
     {
-        public Task<AppResponse> ChangeClientNameAsync(ClientNameDto clientName);
+        public Task<WrappedResult<MessageDto>> ChangeClientNameAsync(ClientNameDto clientName);
 
-        public Task<AppResponse> ChangeClientAuthTokenAsync(ClientAuthTokenDto clientAuthToken);
+        public Task<WrappedResult<MessageDto>> ChangeClientAuthTokenAsync(ClientAuthTokenDto clientAuthToken);
     }
 }

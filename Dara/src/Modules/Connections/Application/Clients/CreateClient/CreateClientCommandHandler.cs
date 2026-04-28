@@ -1,10 +1,10 @@
-using Dara.BuildingBlocks.Application.Commands;
+using Dara.BuildingBlocks.Application;
 using Dara.Modules.Connections.Domain.Clients;
 using Dara.Modules.Connections.Domain.Connections;
 
 namespace Dara.Modules.Connections.Application.Clients.CreateClient
 {
-    public class CreateClientCommandHandler : IModuleCommandHandler<CreateClientCommand, CreateClientCommandResult>
+    public class CreateClientCommandHandler : IHandler<CreateClientCommand>
     {
         IConnectionRepository _connectionRepository;
         IClientRepository _clientRepository;
@@ -15,7 +15,7 @@ namespace Dara.Modules.Connections.Application.Clients.CreateClient
             _clientRepository = clientRepository;
         }
     
-        public async Task<CreateClientCommandResult> HandleAsync(CreateClientCommand command)
+        public async Task HandleAsync(CreateClientCommand command)
         {
             ConnectionId id = new(command.ConnectionId);
         
@@ -27,8 +27,6 @@ namespace Dara.Modules.Connections.Application.Clients.CreateClient
             Client client = connection.CreateClient(name, token);
         
             await _clientRepository.AddAsync(client);
-        
-            return new(client.Id.Value);
         }
     }
 }

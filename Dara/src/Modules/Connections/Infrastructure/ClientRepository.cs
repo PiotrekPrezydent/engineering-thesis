@@ -1,4 +1,4 @@
-using Dara.BuildingBlocks.Infrastructure.Domain;
+using Dara.BuildingBlocks.Infrastructure.Abstractions;
 using Dara.Modules.Connections.Domain.Clients;
 using Dara.Modules.Connections.Domain.Clients.Events;
 
@@ -27,11 +27,8 @@ namespace Dara.Modules.Connections.Infrastructure
 
         public async Task AddAsync(Client aggregateRoot)
         {
-            foreach (var domainEvent in aggregateRoot.DomainEvents)
-                await _domainEventDispatcher.DispatchAsync((dynamic)domainEvent);
-        
-            aggregateRoot.ClearDomainEvents();
-        
+            await _domainEventDispatcher.DispatchEntityEventsAsync(aggregateRoot);
+            
             _clients.Add(aggregateRoot);
         }
 
@@ -48,12 +45,10 @@ namespace Dara.Modules.Connections.Infrastructure
             {
                 if ((dynamic)domainEvent is ClientDeletedDomainEvent)
                     isDeleted = true;
-            
-                await _domainEventDispatcher.DispatchAsync((dynamic)domainEvent);
             }
-        
-            aggregateRoot.ClearDomainEvents();
-        
+            
+            await _domainEventDispatcher.DispatchEntityEventsAsync(aggregateRoot);
+            
             if (isDeleted)
                 return;
         
