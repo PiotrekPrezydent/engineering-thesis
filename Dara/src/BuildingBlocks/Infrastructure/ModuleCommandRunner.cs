@@ -2,6 +2,7 @@ using Dara.BuildingBlocks.Application;
 using Dara.BuildingBlocks.Infrastructure.Abstractions;
 using Dara.Shared.Common;
 using Dara.Shared.Common.CLI;
+using Dara.Shared.Common.Logging;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Dara.BuildingBlocks.Infrastructure;
@@ -9,38 +10,28 @@ namespace Dara.BuildingBlocks.Infrastructure;
 public class ModuleCommandRunner : IModuleCommandRunner
 {
     readonly protected IServiceProvider _serviceProvider;
-    protected CLILogger _logger;
+    protected Logger _logger;
     
     public ModuleCommandRunner(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
-        _logger = new(this.GetType().Name, ConsoleColor.Red);
+        _logger = new(nameof(ModuleCommandRunner),this, LoggingType.Console);
     }
 
     public async Task<WrappedResult> ExecuteAsync<TCommand>(TCommand command) where TCommand : IModuleCommand
     {
         var handler = _serviceProvider.GetRequiredService<IHandler<TCommand>>();
         WrappedResult wrappedResult;
-        
-        string log1 = $"Calling handler of type: {handler.GetType().Name} for request of type {command.GetType().Name}";
-        string log2 = $"Request value: {command}";
-        string log3;
 
         try
         {
             await handler.HandleAsync(command);
-            
-            log3 = $"Handled without exception.";
             wrappedResult = new();
         }
         catch(Exception ex)
         {
-            log3 = $"Handled with exception of type: {ex.GetType().Name}.";
             wrappedResult = ex;
         }
-        
-        _logger.LogMany(log1, log2, log3);
-        
         return wrappedResult;
     }
 
@@ -49,24 +40,16 @@ public class ModuleCommandRunner : IModuleCommandRunner
         var handler = _serviceProvider.GetRequiredService<IHandler<TCommand, TResult>>();
         WrappedResult<TResult> wrappedResult;
         
-        string log1 = $"Calling handler of type: {handler.GetType().Name} for request of type {command.GetType().Name}";
-        string log2 = $"Request value: {command}";
-        string log3;
-        
         try
         {
             var result = await handler.HandleAsync(command);
-            
-            log3 = $"Handled with result: {result}";
             wrappedResult = result;
         }
         catch(Exception ex)
         {
-            log3 = $"Handled with exception of type: {ex.GetType().Name}.";
             wrappedResult = ex;
         }
         
-        _logger.LogMany(log1, log2, log3);
         return wrappedResult;
     }
 }
