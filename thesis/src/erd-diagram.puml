@@ -1,0 +1,82 @@
+@startuml
+' Ustawienia stylu
+hide circle
+skinparam linetype ortho
+skinparam class {
+    BackgroundColor White
+    BorderColor Black
+    ArrowColor Black
+}
+
+' Definicja formatowania encji
+!define Table(name,desc) class name as "desc" << (T,#FFAAAA) >>
+!define primary_key(x) <b><color:#b8861b><&key></color> x</b>
+!define foreign_key(x) <b><color:#aaaaaa><&key></color> x</b>
+!define column(x) <color:#000000>x</color>
+
+' Tabele
+Table(Clients, "Clients\n(Urządzenia Klienckie)") {
+  primary_key(Id) : UUID
+  --
+  column(Name) : VARCHAR(100)
+  column(DeviceType) : VARCHAR(50)
+  column(SignalRConnectionId) : VARCHAR(255)
+  column(LastSeen) : TIMESTAMP
+}
+
+Table(Groups, "Groups\n(Grupy Urządzeń)") {
+  primary_key(Id) : UUID
+  --
+  column(Name) : VARCHAR(100)
+  column(AccessCode) : VARCHAR(50)
+  column(CreatedAt) : TIMESTAMP
+}
+
+Table(ClientGroups, "ClientGroups\n(Przynależność do Grup)") {
+  primary_key(ClientId) : UUID
+  primary_key(GroupId) : UUID
+  --
+  column(JoinedAt) : TIMESTAMP
+}
+
+Table(Plugins, "Plugins\n(Zarejestrowane Wtyczki)") {
+  primary_key(Id) : UUID
+  --
+  foreign_key(ClientId) : UUID
+  column(Name) : VARCHAR(100)
+  column(Version) : VARCHAR(20)
+  column(IsActive) : BOOLEAN
+}
+
+Table(PluginFunctions, "PluginFunctions\n(Funkcje Wtyczek)") {
+  primary_key(Id) : UUID
+  --
+  foreign_key(PluginId) : UUID
+  column(FunctionName) : VARCHAR(100)
+  column(Description) : TEXT
+  column(JsonSchema) : JSONB
+}
+
+Table(Tasks, "Tasks\n(Wykonane Zadania/Zlecenia)") {
+  primary_key(Id) : UUID
+  --
+  foreign_key(GroupId) : UUID
+  foreign_key(TargetClientId) : UUID
+  foreign_key(FunctionId) : UUID
+  column(RequestedAt) : TIMESTAMP
+  column(Status) : VARCHAR(20)
+  column(ResultPayload) : TEXT
+}
+
+' Relacje
+Clients "1" -- "0..*" ClientGroups : należy do >
+Groups "1" -- "0..*" ClientGroups : zawiera >
+
+Clients "1" -- "0..*" Plugins : instaluje >
+Plugins "1" -- "1..*" PluginFunctions : dostarcza >
+
+Groups "1" -- "0..*" Tasks : inicjuje >
+Clients "1" -- "0..*" Tasks : wykonuje >
+PluginFunctions "1" -- "0..*" Tasks : definiuje akcje >
+
+@enduml

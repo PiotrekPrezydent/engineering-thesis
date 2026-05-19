@@ -1,0 +1,52 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+skinparam usecase {
+    BackgroundColor LightCyan
+    BorderColor DarkBlue
+}
+skinparam actor {
+    BackgroundColor AliceBlue
+    BorderColor DarkBlue
+}
+
+actor "Użytkownik" as User
+actor "Model Językowy\n(np. OpenAI via Semantic Kernel)" as LLM <<External System>>
+
+rectangle "Rozproszony System Asystenta AI" {
+
+    package "Zarządzanie połączeniem i grupami" {
+        usecase "Podłączenie urządzenia do serwera" as UC_Connect
+        usecase "Zarządzanie wtyczkami z poziomu klienta" as UC_Plugin
+        usecase "Tworzenie nowej grupy urządzeń" as UC_GroupCreate
+        usecase "Dołączanie urządzenia do grupy" as UC_GroupJoin
+    }
+
+    package "Przetwarzanie Promptu (Core)" {
+        usecase "Zlecenie polecenia (Prompt)" as UC_Prompt
+        usecase "Agregacja metadanych wtyczek grupy" as UC_Context
+        usecase "Wyznaczanie intencji i funkcji\n(Function Calling)" as UC_FunctionCalling
+        usecase "Zatwierdzenie wywołania akcji\nprzez użytkownika" as UC_Approve
+        usecase "Wykonanie funkcji lokalnej\nna docelowym urządzeniu" as UC_Execute
+    }
+
+    ' Relacje głównego aktora
+    User -- UC_Connect
+    User -- UC_Plugin
+    User -- UC_GroupCreate
+    User -- UC_GroupJoin
+    User -- UC_Prompt
+    User -- UC_Approve
+
+    ' Relacje wewnątrz domeny przetwarzania
+    UC_Prompt ..> UC_Context : <<include>>
+    UC_Prompt ..> UC_FunctionCalling : <<include>>
+
+    ' Jeśli Function calling zidentyfikuje akcje, to proces rozszerza się o proces zatwierdzania i egzekucji
+    UC_Prompt <.. UC_Approve : <<extend>>
+    UC_Approve ..> UC_Execute : <<include>>
+
+    ' Relacja z systemem zewnętrznym
+    UC_FunctionCalling -- LLM
+}
+@enduml

@@ -1,0 +1,46 @@
+\chapter{Wstęp i cel pracy}
+\label{cha:wstep}
+
+\section{Motywacja do podjęcia tematu}
+\label{sec:motywacja}
+W dobie powszechnej cyfryzacji i rozwoju sztucznej inteligencji (AI), asystenci głosowi i tekstowi, tacy jak Google Assistant, Amazon Alexa czy Apple Siri, stali się integralną częścią codziennego życia. Umożliwiają oni interakcję z inteligentnymi urządzeniami za pomocą języka naturalnego, co znacząco podnosi komfort i efektywność pracy. Niemniej jednak, większość z dostępnych na rynku rozwiązań komercyjnych cechuje się zamkniętością ekosystemu. Wprowadzenie obsługi nowego sprzętu lub rozszerzenie systemu o niestandardowe funkcje często wymaga integracji z dedykowanymi środowiskami programistycznymi (SDK) dostawców, przechodzenia przez skomplikowane procesy certyfikacyjne, a w niektórych przypadkach jest wręcz niemożliwe bez dostępu do kodu źródłowego rdzenia systemu.
+
+Kolejnym istotnym problemem jest brak łatwej interoperacyjności pomiędzy urządzeniami pochodzącymi od różnych producentów. Zamknięte rozwiązania rzadko oferują spójny sposób komunikacji międzyplatformowej, co prowadzi do zjawiska uzależnienia od jednego dostawcy (ang. \textit{vendor lock-in}). Dodatkowo, komercyjne asystenty opierają swoje działanie na chmurach obliczeniowych firm trzecich, co budzi uzasadnione obawy dotyczące prywatności użytkowników oraz bezpieczeństwa danych. Zauważalny jest również brak wbudowanych mechanizmów umożliwiających swobodne grupowanie posiadanych urządzeń (takich jak komputer osobisty, smartfon i smartwatch) we wspólną przestrzeń roboczą, którą można by zarządzać za pomocą jednego scentralizowanego zapytania, z dowolnego urządzenia należącego do grupy. Powyższe ograniczenia stały się główną motywacją do podjęcia prac nad otwartym, rozszerzalnym i zdecentralizowanym pod względem wykonawczym systemem asystenta AI.
+
+\section{Cel pracy i oczekiwane rezultaty projektu}
+\label{sec:cele}
+Głównym celem niniejszej pracy inżynierskiej jest zaprojektowanie oraz implementacja rozproszonego, modularnego systemu asystenta AI, który umożliwi sterowanie wieloma różnorodnymi urządzeniami przy użyciu poleceń w języku naturalnym (tekstowych lub głosowych). System ma w założeniu stanowić otwartą platformę, w której dodawanie nowych urządzeń oraz wprowadzanie nowych funkcjonalności będzie odbywać się w sposób bezinwazyjny dla głównego jądra aplikacji, dzięki zastosowaniu architektury opartej na wtyczkach (ang. \textit{plugins}).
+
+W ramach realizacji projektu oczekiwane jest stworzenie w pełni funkcjonalnego prototypu, na który złożą się dwa główne komponenty. Pierwszym z nich jest aplikacja kliencka instalowana na urządzeniach końcowych, posiadająca zdolność dynamicznego ładowania zewnętrznych modułów wykonywalnych. Drugim elementem jest serwer centralny oparty na architekturze modularnego monolitu (ang. \textit{Modular Monolith}), wykorzystujący podejście Domain-Driven Design (DDD). Serwer ma za zadanie zarządzać połączeniami, autoryzacją, grupowaniem urządzeń oraz koordynować przetwarzanie zapytań użytkownika przy wykorzystaniu dużych modeli językowych (LLM). Oczekiwanym rezultatem jest również udowodnienie słuszności przyjętej architektury poprzez implementację zestawu przykładowych wtyczek (np. integracja z systemem plików, czy sterowanie wybranymi aplikacjami), które potwierdzą elastyczność i rozszerzalność opracowanego rozwiązania.
+
+\section{Problem badawczy i wyzwania techniczne}
+\label{sec:problem_badawczy}
+Realizacja tak złożonego systemu rozproszonego wymagała rozwiązania szeregu problemów badawczych i technicznych, obejmujących zarówno architekturę oprogramowania, jak i integrację nowoczesnych technik sztucznej inteligencji z klasycznymi mechanizmami komunikacji sieciowej.
+
+\subsection{Kwestia zamkniętych ekosystemów i zjawisko \textit{vendor lock-in}}
+\label{subsec:vendor_lock_in}
+Kluczowym wyzwaniem badawczym było opracowanie mechanizmu pozwalającego na ominięcie ograniczeń narzucanych przez zamknięte ekosystemy producentów oprogramowania. Problem ten rozwiązano poprzez zaprojektowanie architektury wtyczek działających po stronie klienta. Wykorzystano tu właściwości platformy .NET, pozwalające na dynamiczne ładowanie skompilowanych bibliotek (plików \texttt{.dll}) w czasie działania programu. Mechanizm ten gwarantuje, że kod wykonawczy wtyczki pozostaje na urządzeniu końcowym, a serwer dysponuje wyłącznie jej metadanymi, co znacząco podnosi bezpieczeństwo i uniezależnia architekturę centralną od specyficznych implementacji dostawców sprzętu.
+
+\subsection{Zarządzanie rozproszonym stanem i komunikacją w czasie rzeczywistym}
+\label{subsec:zarzadzanie_stanem}
+System, z uwagi na swoją specyfikę, wymaga utrzymywania stabilnej, dwukierunkowej komunikacji między węzłem centralnym (serwerem) a wieloma klientami, zminimalizowania opóźnień oraz obsługi dynamicznych zmian stanu (np. odłączenie urządzenia, zmiana konfiguracji wtyczek). Wyzwaniem technicznym w tym obszarze było zastosowanie odpowiedniego protokołu czasu rzeczywistego. Rozwiązanie to musiało obsłużyć nie tylko transport danych, ale także umożliwić tworzenie logicznych grup urządzeń oraz bezpieczne przekazywanie wywołań zdalnych (RPC) z serwera do konkretnych instancji klientów, a następnie odbiór wyników ich wykonania.
+
+\subsection{Abstrakcja integracji z dużymi modelami językowymi i mechanizm \textit{function calling}}
+\label{subsec:abstrakcja_llm}
+Współczesne duże modele językowe różnią się interfejsami API oraz formatami obsługi wywoływania funkcji (ang. \textit{function calling}). Budowa systemu, który potrafi przełożyć intencję wyrażoną w języku naturalnym na konkretne wywołanie metody w aplikacji klienckiej, stanowi istotny problem technologiczny. Wyzwaniem było stworzenie mechanizmu, który w czasie rzeczywistym agreguje definicje funkcji ze wszystkich dostępnych urządzeń w grupie, buduje dynamiczny prompt rozszerzony o te funkcje, a następnie przetwarza odpowiedź modelu na ustrukturyzowane polecenia niezależnie od konkretnego dostawcy technologii LLM.
+
+\section{Zakres pracy}
+\label{sec:zakres}
+Z uwagi na szeroki kontekst dziedziny, w której osadzony jest projekt, konieczne było precyzyjne określenie jego zakresu, by dostarczyć spójne i mierzalne rezultaty w ramach pracy inżynierskiej.
+
+\subsection{Elementy systemu: serwer, klient oraz wtyczki}
+\label{subsec:elementy_systemu}
+W zakres realizacji projektu wchodzi zaprojektowanie od podstaw architektury systemu. Po stronie serwerowej implementacja obejmuje stworzenie aplikacji biznesowej z podziałem na moduły odpowiadające za połączenia, grupy, wtyczki, zarządzanie promptami oraz wykonywanie zadań. Po stronie klienckiej zakres obejmuje implementację programu ładującego i zarządzającego lokalnymi modułami (wtyczkami) oraz komunikującego się z serwerem. Ponadto, przygotowany zostanie zestaw podstawowych wtyczek demonstrujących działanie systemu, takich jak moduł zarządzania systemem plików czy monitorowania wybranych parametrów systemu operacyjnego.
+
+\subsection{Ograniczenia i wykluczenia projektowe}
+\label{subsec:ograniczenia}
+Projekt nie obejmuje tworzenia własnych, zaawansowanych algorytmów zamiany mowy na tekst (ang. \textit{Speech-to-Text}), a ewentualna interakcja głosowa realizowana będzie z wykorzystaniem gotowych, zewnętrznych interfejsów API dostarczanych przez system operacyjny. Ponadto, serwer centralny nie został rozproszony na mikroserwisy. Mimo iż architektura modułowego monolitu narzuca ścisłe granice i potencjalnie pozwala na taki podział w przyszłości, implementacja mikroserwisów wprowadziłaby na tym etapie nadmiarową złożoność operacyjną. Praca nie skupia się również na tworzeniu gotowego, bogatego ekosystemu wtyczek gotowych do dystrybucji komercyjnej, lecz na opracowaniu niezawodnego fundamentu umożliwiającego ich bezproblemowe tworzenie i wdrażanie w przyszłości.
+
+\section{Struktura pracy}
+\label{sec:struktura}
+Rozdział pierwszy pracy definiuje kontekst, cele i zakres projektu oraz omawia problemy badawcze. W rozdziale drugim przedstawiono przegląd dostępnych na rynku rozwiązań w dziedzinie asystentów AI oraz omówiono użyte w projekcie technologie i wzorce projektowe. Rozdział trzeci poświęcony jest szczegółowemu opisowi architektury stworzonego systemu, z naciskiem na architekturę klient-serwer, podejście Modular Monolith oraz Domain-Driven Design. Rozdział czwarty obejmuje analizę implementacji mechanizmu wtyczek oraz integracji z modelami LLM przy użyciu Semantic Kernel. Rozdział piąty prezentuje wyniki testów i weryfikację założeń projektowych na podstawie działania prototypu. Pracę kończy rozdział szósty, zawierający podsumowanie osiągniętych rezultatów oraz wskazujący kierunki dalszego rozwoju systemu.

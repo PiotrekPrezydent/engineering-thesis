@@ -1,0 +1,35 @@
+\chapter{Analiza dziedziny i przegląd technologii}
+\label{cha:analiza_dziedziny}
+
+\section{Analiza dziedziny: Asystenci sztucznej inteligencji i systemy rozproszone}
+\label{sec:analiza_asystentow_iot}
+Rozwój interfejsów konwersacyjnych oraz dużych modeli językowych (LLM, ang. \textit{Large Language Models}) zrewolucjonizował sposób interakcji człowieka z systemami komputerowymi. Współcześni asystenci sztucznej inteligencji przeszli ewolucję od prostych systemów opartych na predefiniowanych regułach i sztywnych drzewach dialogowych do zaawansowanych agentów zdolnych do rozumienia niuansów języka naturalnego. Prawdziwym przełomem, z punktu widzenia systemów sterowania, stało się wprowadzenie do modeli LLM mechanizmu wywoływania narzędzi (ang. \textit{function calling}). Pozwala on modelowi nie tylko odpowiadać tekstem, ale również analizować dostarczone metadane funkcji, decydować, która z nich jest potrzebna do zrealizowania intencji użytkownika, i zwracać sformatowany zbiór argumentów (najczęściej w formacie JSON) gotowy do uruchomienia na urządzeniu.
+
+Mimo tak znaczącego postępu w rozwoju algorytmów, praktyczne zastosowanie asystentów do zarządzania heterogenicznym środowiskiem urządzeń (komputery, smartfony, inteligentne zegarki) natrafia na poważne bariery rynkowe i technologiczne. Dominujące na rynku rozwiązania (takie jak Apple Siri, Amazon Alexa czy Google Assistant) rozwijane są w paradygmacie zamkniętych ekosystemów. Producenci wymuszają korzystanie z ich własnych środowisk programistycznych (SDK), zewnętrznej infrastruktury chmurowej oraz procesów certyfikacji, co skutecznie uniemożliwia swobodną rozbudowę systemu przez użytkownika końcowego. Zjawisko to, określane jako uzależnienie od dostawcy (ang. \textit{vendor lock-in}), stanowi barierę dla interoperacyjności.
+
+Zaprojektowana w ramach niniejszej pracy aplikacja stanowi odpowiedź na te problemy. Głównym celem jest dostarczenie rozproszonego, otwartego środowiska, w którym użytkownik może dynamicznie grupować swoje urządzenia, tworząc wspólną przestrzeń sterowania, a funkcjonalność każdego z nich może być dowolnie rozszerzana za pomocą niezależnych modułów (wtyczek), bez modyfikacji centralnego kodu serwera.
+
+\section{Przegląd technologii: Uzasadnienie stosu technologicznego}
+\label{sec:wybor_stosu}
+
+Wybór odpowiednich technologii, frameworków oraz narzędzi architektonicznych miał kluczowe znaczenie dla sprostania postawionym wymaganiom projektowym, w szczególności w zakresie wydajności, łatwości rozbudowy i stabilności komunikacji.
+
+\subsection{Platforma .NET i język C\#}
+\label{subsec:ekosystem_net}
+Jako główny język programowania dla całego systemu (zarówno serwera, jak i aplikacji klienckiej) wybrano język C\# w oparciu o platformę .NET. Wybór ten podyktowany był przede wszystkim wieloplatformowością ekosystemu (obsługa systemów Windows, Linux, macOS oraz urządzeń mobilnych). Ścisłe typowanie języka C\# znacząco ułatwia utrzymanie skomplikowanej domeny biznesowej (zgodnie z zasadami Domain-Driven Design). Ponadto, środowisko .NET dostarcza niezwykle rozwinięte mechanizmy refleksji (ang. \textit{reflection}), które stanowią technologiczny fundament dla systemu wtyczek tworzonego po stronie klienta, umożliwiając dynamiczne analizowanie ładowanych komponentów i ekstrakcję ich metadanych w czasie działania aplikacji.
+
+\subsection{Architektura wtyczek jako biblioteki dynamiczne (.dll)}
+\label{subsec:systematyka_dll}
+Dla systemu wtyczek (ang. \textit{plugins}) uruchamianych na urządzeniach klienckich, zdecydowano się na wykorzystanie skompilowanych bibliotek współdzielonych w formacie \texttt{.dll}. Format ten jest natywny dla platformy .NET. Taki wybór eliminuje konieczność instalacji dodatkowych środowisk uruchomieniowych (np. silników interpretera dla skryptów Python lub JavaScript) po stronie klienta. Umożliwia to proces instalacji wtyczki sprowadzający się do prostego skopiowania pliku, oferując przy tym wysoką wydajność skompilowanego kodu oraz bezpieczeństwo (dzięki izolacji pamięciowej tzw. \textit{AssemblyLoadContext}).
+
+\subsection{Komunikacja w czasie rzeczywistym i biblioteka SignalR}
+\label{subsec:signalr}
+System sterowania urządzeniami wymaga dwukierunkowej komunikacji sieciowej charakteryzującej się niskimi opóźnieniami. Standardowe, bezstanowe podejście oparte na zapytaniach HTTP (ang. \textit{Request-Response}) jest niewystarczające, ponieważ nie pozwala serwerowi na aktywne wysłanie polecenia do klienta, zmuszając go do ciągłego, nieefektywnego odpytywania serwera (ang. \textit{polling}). Z tego względu zdecydowano się na wykorzystanie biblioteki SignalR. Zapewnia ona warstwę abstrakcji nad protokołem WebSockets (automatycznie obniżając warstwę transportową do Server-Sent Events lub Long Polling, gdy WebSockets nie są dostępne). Co niezwykle istotne w kontekście założeń pracy, SignalR posiada wbudowany mechanizm logicznych \textit{Grup} połączeń, co idealnie pokrywa się z wymaganiem domenowym dotyczącym łączenia urządzeń we wspólne przestrzenie zarządzania.
+
+\subsection{Abstrakcja modeli LLM za pomocą Semantic Kernel}
+\label{subsec:semantic_kernel}
+Integracja mechanizmu \textit{function calling} w systemie wymaga transformacji metadanych lokalnych wtyczek na format zrozumiały dla dużego modelu językowego (LLM). Różni dostawcy modeli (np. OpenAI, Anthropic, Google) stosują zróżnicowane schematy zapytań API. W celu uniknięcia sprzęgnięcia logiki biznesowej z pojedynczym dostawcą technologii, zastosowano otwartą bibliotekę Microsoft Semantic Kernel. Działa ona jako zaawansowana warstwa pośrednicząca (ang. \textit{middleware}), standaryzująca komunikację z modelami i zarządzająca formatowaniem zapytań (tzw. \textit{prompt engineering}). Umożliwia to elastyczną zmianę używanego modelu bez konieczności przepisywania mechanizmów analizowania intencji.
+
+\subsection{Wzorce architektoniczne i bazy danych}
+\label{sec:technologie_bazodanowe}
+Projekt centralnego serwera zrealizowano w architekturze modułowego monolitu (ang. \textit{Modular Monolith}) przy użyciu metodyki Domain-Driven Design (DDD). Decyzja o rezygnacji z popularnej architektury mikroserwisowej podyktowana była chęcią uniknięcia nadmiarowego narzutu operacyjnego związanego z wdrażaniem i monitorowaniem wielu rozproszonych komponentów. Modułowy monolit dostarcza wyraźne granice modułów (ang. \textit{Bounded Contexts}) – takie jak połączenia, grupy czy przetwarzanie promptów – oferując podobną jakość separacji logiki biznesowej co mikroserwisy, jednak w obrębie pojedynczego procesu. Do persystencji danych wybrano relacyjną bazę danych (np. PostgreSQL/SQLite), wykorzystując system mapowania obiektowo-relacyjnego (ORM) Entity Framework Core. Bazy relacyjne zapewniają zgodność z zasadami ACID, co jest kluczowe z punktu widzenia integralności skomplikowanych agregatów w DDD (np. zapewnienie, że relacje między dołączonymi urządzeniami, grupami a ich politykami dostępu są trwale zachowane bez ryzyka wystąpienia niespójności).
