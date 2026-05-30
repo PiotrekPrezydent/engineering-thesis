@@ -23,7 +23,7 @@ namespace Dara.Modules.Connections.Application.Domain
             if (connection.TryGetClient(out Client client))
             {
                 connection.RemoveClient();
-                await _clientRepository.SaveAsync(client);
+                await _clientRepository.RemoveAsync(client);
             }
         
             await _connectionRepository.RemoveAsync(connection);

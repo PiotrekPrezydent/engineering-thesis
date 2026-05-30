@@ -1,6 +1,7 @@
 using Dara.Apps.Server.API.AppHubs;
-using Dara.BuildingBlocks.Infrastructure;
-using Dara.BuildingBlocks.Infrastructure.Abstractions;
+
+using Dara.BuildingBlocks.Infrastructure.Configuration;
+using Dara.Modules.Connections.Infrastructure.Configuration;
 
 namespace Dara.Apps.Server.API
 {
@@ -10,10 +11,10 @@ namespace Dara.Apps.Server.API
         {
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddSignalR();
-
-            builder.Services.AddSingleton<IDomainEventDispatcher, DomainEventDispatcher>();
-            builder.Services.AddSingleton<IModuleCommandRunner, ModuleCommandRunner>();
-            builder.Services.AddSingleton<IIntegrationDispatcher, IntegrationDispatcher>();
+            
+            BuildingBlocksCompositionRoot.Initialize(builder.Services);
+            ConnectionsCompositionRoot.Initialize(builder.Services);
+            
             var app = builder.Build();
         
             app.MapHub<AppHub>("/app");

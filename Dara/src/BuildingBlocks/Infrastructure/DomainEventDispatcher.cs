@@ -2,9 +2,7 @@ using Dara.BuildingBlocks.Application;
 using Dara.BuildingBlocks.Domain.Events;
 using Dara.BuildingBlocks.Domain.Models;
 using Dara.BuildingBlocks.Infrastructure.Abstractions;
-using Dara.Shared.Common;
-using Dara.Shared.Common.CLI;
-using Dara.Shared.Common.Logging;
+using Dara.BuildingBlocks.Infrastructure.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Dara.BuildingBlocks.Infrastructure;
@@ -12,37 +10,35 @@ namespace Dara.BuildingBlocks.Infrastructure;
 public class DomainEventDispatcher : IDomainEventDispatcher
 {
     readonly protected IServiceProvider _serviceProvider;
-    protected Logger _logger;
+    readonly BuildingBlocksLogger _logger;
 
-    public DomainEventDispatcher(IServiceProvider serviceProvider)
+    public DomainEventDispatcher(IServiceProvider serviceProvider, BuildingBlocksLogger logger)
     {
         _serviceProvider = serviceProvider;
-        _logger = new(nameof(DomainEventDispatcher),this, LoggingType.Console);
+        _logger = logger;
     }
 
-    public async Task<WrappedResult> DispatchSingleEventAsync<TDomainEvent>(TDomainEvent domainEvent) where TDomainEvent : IDomainEvent
+    public async Task DispatchSingleEventAsync<TDomainEvent>(TDomainEvent domainEvent) where TDomainEvent : IDomainEvent
     {
         var handler = _serviceProvider.GetRequiredService<IHandler<TDomainEvent>>();
-        WrappedResult wrappedResult;
-
+        _logger.DomainEventHandlerCalled(handler, domainEvent);
+        
         try
         {
             await handler.HandleAsync(domainEvent);
-            wrappedResult = new();
         }
         catch(Exception ex)
         {
-            wrappedResult = ex;
+            _logger.DomainEventHandlerException(handler, domainEvent, ex);
         }
         
-        return wrappedResult;
     }
 
     public async Task DispatchEntityEventsAsync(Entity entity)
     {
         foreach (var domainEvent in entity.DomainEvents)
         {
-           var check = await DispatchSingleEventAsync(domainEvent);
+           await DispatchSingleEventAsync(domainEvent);
         }
         
         entity.ClearDomainEvents();

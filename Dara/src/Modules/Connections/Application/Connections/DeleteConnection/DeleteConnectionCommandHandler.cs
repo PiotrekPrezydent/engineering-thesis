@@ -18,9 +18,9 @@ namespace Dara.Modules.Connections.Application.Connections.DeleteConnection
 
             Connection connection = await _connectionRepository.GetByIdAsync(connectionId);
         
-            connection.Delete(); //true deletion is in event handler
+            connection.Delete();
         
-            await _connectionRepository.SaveAsync(connection);
+            await _connectionRepository.RemoveAsync(connection);
         }
     }
 }

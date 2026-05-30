@@ -1,5 +1,6 @@
 using Dara.BuildingBlocks.Infrastructure.Abstractions;
 using Dara.Modules.Connections.Application.Connections.CreateConnection;
+using Dara.Modules.Connections.Application.Connections.DeleteConnection;
 using Dara.Shared.Contracts;
 using Microsoft.AspNetCore.SignalR;
 
@@ -21,11 +22,11 @@ public partial class AppHub : Hub<IAppHubClient>, IAppHub
 
         var command = new CreateConnectionCommand(id, ip);
         var result = await _commandRunner.ExecuteAsync(command);
-
     }
 
-    public override Task OnDisconnectedAsync(Exception? exception)
+    public async override Task OnDisconnectedAsync(Exception? exception)
     {
-        return base.OnDisconnectedAsync(exception);
+        var command = new DeleteConnectionCommand(Context.ConnectionId);
+        var result = await _commandRunner.ExecuteAsync(command);
     }
 }

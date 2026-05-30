@@ -6,18 +6,12 @@ namespace Dara.Modules.Connections.Application.Domain
 {
     public class ClientDeletedEventHandler : IHandler<ClientDeletedDomainEvent>
     {
-        IClientRepository _clientRepository;
-    
-        public ClientDeletedEventHandler(IClientRepository clientRepository)
+        public ClientDeletedEventHandler()
         {
-            _clientRepository = clientRepository;
         }
     
         public async Task HandleAsync(ClientDeletedDomainEvent domainEvent)
         {
-            Client client = await _clientRepository.GetByIdAsync(domainEvent.ClientId);
-        
-            await _clientRepository.RemoveAsync(client);
         }
     }
 }

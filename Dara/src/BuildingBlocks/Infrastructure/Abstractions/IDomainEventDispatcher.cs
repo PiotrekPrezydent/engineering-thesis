@@ -6,7 +6,7 @@ namespace Dara.BuildingBlocks.Infrastructure.Abstractions;
 
 public interface IDomainEventDispatcher
 {
-    public Task<WrappedResult> DispatchSingleEventAsync<TDomainEvent>(TDomainEvent domainEvent) where TDomainEvent : IDomainEvent;
+    public Task DispatchSingleEventAsync<TDomainEvent>(TDomainEvent domainEvent) where TDomainEvent : IDomainEvent;
     
     public Task DispatchEntityEventsAsync(Entity entity);
     

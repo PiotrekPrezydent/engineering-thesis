@@ -34,23 +34,14 @@ namespace Dara.Modules.Connections.Infrastructure
 
         public async Task RemoveAsync(Connection aggregateRoot)
         {
+            await _domainEventDispatcher.DispatchEntityEventsAsync(aggregateRoot);
+            
             _connections.Remove(aggregateRoot);
         }
 
         public async Task SaveAsync(Connection aggregateRoot)
         {
-            bool isDeleted = false;
-        
-            foreach (var domainEvent in aggregateRoot.DomainEvents)
-            {
-                if ((dynamic)domainEvent is ConnectionDeletedDomainEvent)
-                    isDeleted = true;
-            }
-            
             await _domainEventDispatcher.DispatchEntityEventsAsync(aggregateRoot);
-        
-            if (isDeleted)
-                return;
         
             int index = _connections.IndexOf(aggregateRoot);
             _connections[index] = aggregateRoot;

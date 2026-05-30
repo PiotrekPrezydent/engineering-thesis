@@ -1,5 +1,3 @@
-using Dara.BuildingBlocks.Infrastructure;
-using Dara.Modules.Connections.Application.Clients.CreateClient;
 using Dara.Shared.Common;
 using Dara.Shared.Contracts.Dtos;
 using Dara.Shared.Contracts.Interactions;
@@ -10,8 +8,6 @@ public partial class AppHub : IClientInteractions
 {
     public async Task<WrappedResult<MessageDto>> ChangeClientNameAsync(ClientNameDto clientName)
     {
-        var command = new CreateClientCommand(Context.ConnectionId, clientName.ClientName, "123");
-        
         throw new NotImplementedException();
     }
 

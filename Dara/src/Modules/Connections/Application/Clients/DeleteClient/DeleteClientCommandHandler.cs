@@ -22,8 +22,8 @@ namespace Dara.Modules.Connections.Application.Clients.DeleteClient
 
             connection.TryGetClient(out Client client);
             connection.RemoveClient();
-        
-            await _clientRepository.SaveAsync(client);
+            
+            await _clientRepository.RemoveAsync(client);
         }
     }
 }

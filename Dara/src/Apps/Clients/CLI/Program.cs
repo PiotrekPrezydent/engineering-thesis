@@ -1,5 +1,4 @@
-﻿using Dara.Apps.Clients.CLI.ConsoleCommands;
-using Dara.Shared.Common.Console;
+﻿using Dara.Shared.Common.CLI;
 using Microsoft.AspNetCore.SignalR.Client;
 
 namespace Dara.Apps.Clients.CLI
@@ -8,17 +7,17 @@ namespace Dara.Apps.Clients.CLI
     {
         static async Task Main(string[] args)
         {
-            ConsoleCommandInterpreter ci = new();
+            CLILineInterpreter ci = new();
 
-            BasicCommands bc = new();
+            // BasicCommands bc = new();
             DaraConnection con = new();
-            ConnectionCommands cc = new(con.Connection);
-            ClientCommands acc = new(con.Connection);
-        
-            ci.BindObjectCommands(bc);
+            // ConnectionCommands cc = new(con.Connection);
+            // ClientCommands acc = new(con.Connection);
+            //
+            // ci.BindObjectCommands(bc);
             ci.BindObjectCommands(con);
-            ci.BindObjectCommands(cc);
-            ci.BindObjectCommands(acc);
+            // ci.BindObjectCommands(cc);
+            // ci.BindObjectCommands(acc);
         
             do
             {

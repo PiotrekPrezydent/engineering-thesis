@@ -6,11 +6,7 @@
     <ProjectReference Include="..\Domain\Dara.Modules.Connections.Domain.csproj" />
     <ProjectReference Include="..\Integration\Dara.Modules.Connections.Integration.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Integration\" />
-  </ItemGroup>
-
+  
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
