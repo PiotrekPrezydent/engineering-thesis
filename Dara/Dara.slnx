@@ -1,64 +1,33 @@
 <Solution>
-  
-  <Folder Name="/Apps/" />
-  <Folder Name="/Apps/Clients/">
-    <Project Path="src/Apps/Clients/CLI/Dara.Apps.Clients.CLI.csproj" />
-  </Folder>
-  <Folder Name="/Apps/Server/">
-    <Project Path="src/Apps/Server/API/Dara.Apps.Server.API.csproj" />
-  </Folder>
-  <Folder Name="/Apps/Tests/">
-    <Project Path="src/Apps/Tests/CLI/Dara.Apps.Tests.CLI.csproj" />
-    <Project Path="src/Apps/Tests/Server/Dara.Apps.Tests.Server.csproj" />
+  <Folder Name="/Clients/" />
+  <Folder Name="/Clients/Apps/">
+    <Project Path="src/Clients/Apps/CLI/Dara.Clients.Apps.CLI.csproj" />
   </Folder>
   
-  <Folder Name="/BuildingBlocks/">
-    <Project Path="src/BuildingBlocks/Application/Dara.BuildingBlocks.Application.csproj" />
-    <Project Path="src/BuildingBlocks/Domain/Dara.BuildingBlocks.Domain.csproj" />
-    <Project Path="src/BuildingBlocks/Infrastructure/Dara.BuildingBlocks.Infrastructure.csproj" />
-    <Project Path="src/BuildingBlocks/Integration/Dara.BuildingBlocks.Integration.csproj" />
+  <Folder Name="/Server/" />
+  <Folder Name="/Server/Apps/">
+    <Project Path="src/Server/Apps/API/Dara.Server.Apps.API.csproj" />
   </Folder>
   
-  <Folder Name="/Modules/" />
-  <Folder Name="/Modules/Connections/">
-    <Project Path="src/Modules/Connections/Application/Dara.Modules.Connections.Application.csproj" />
-    <Project Path="src/Modules/Connections/Domain/Dara.Modules.Connections.Domain.csproj" />
-    <Project Path="src/Modules/Connections/Infrastructure/Dara.Modules.Connections.Infrastructure.csproj" />
-    <Project Path="src/Modules/Connections/Integration/Dara.Modules.Connections.Integration.csproj" />
-  </Folder>
-  <Folder Name="/Modules/Groups/">
-    <Project Path="src/Modules/Groups/Application/Dara.Modules.Groups.Application.csproj" />
-    <Project Path="src/Modules/Groups/Domain/Dara.Modules.Groups.Domain.csproj" />
-    <Project Path="src/Modules/Groups/Infrastructure/Dara.Modules.Groups.Infrastructure.csproj" />
-    <Project Path="src/Modules/Groups/Integration/Dara.Modules.Groups.Integration.csproj" />
-  </Folder>
-  <Folder Name="/Modules/Plugins/">
-    <Project Path="src/Modules/Plugins/Application/Dara.Modules.Plugins.Application.csproj" />
-    <Project Path="src/Modules/Plugins/Domain/Dara.Modules.Plugins.Domain.csproj" />
-    <Project Path="src/Modules/Plugins/Infrastructure/Dara.Modules.Plugins.Infrastructure.csproj" />
-    <Project Path="src/Modules/Plugins/Integration/Dara.Modules.Plugins.Integration.csproj" />
-  </Folder>
-  <Folder Name="/Modules/Prompts/">
-    <Project Path="src\Modules\PromptReasoning\Application\Dara.Modules.Prompts.Application.csproj" />
-    <Project Path="src\Modules\PromptReasoning\Domain\Dara.Modules.Prompts.Domain.csproj" />
-    <Project Path="src\Modules\PromptReasoning\Infrastructure\Dara.Modules.Prompts.Infrastructure.csproj" />
-    <Project Path="src\Modules\PromptReasoning\Integration\Dara.Modules.Prompts.Integration.csproj" />
-  </Folder>
-  <Folder Name="/Modules/Tasks/">
-    <Project Path="src\Modules\TaskExecution\Application\Dara.Modules.Tasks.Application.csproj" />
-    <Project Path="src\Modules\TaskExecution\Domain\Dara.Modules.Tasks.Domain.csproj" />
-    <Project Path="src\Modules\TaskExecution\Infrastructure\Dara.Modules.Tasks.Infrastructure.csproj" />
-    <Project Path="src\Modules\TaskExecution\Integration\Dara.Modules.Tasks.Integration.csproj" />
+  <Folder Name="/Server/BuildingBlocks/">
+    <Project Path="src/Server/BuildingBlocks/Application/Dara.Server.BuildingBlocks.Application.csproj" />
+    <Project Path="src/Server/BuildingBlocks/Domain/Dara.Server.BuildingBlocks.Domain.csproj" />
+    <Project Path="src/Server/BuildingBlocks/Infrastructure/Dara.Server.BuildingBlocks.Infrastructure.csproj" />
+    <Project Path="src/Server/BuildingBlocks/Integration/Dara.Server.BuildingBlocks.Integration.csproj" />
   </Folder>
   
-  <Folder Name="/Plugins/">
-    <Project Path="src/Plugins/ExamplePluginA/Dara.Plugins.ExamplePluginA.csproj" />
-    <Project Path="src/Plugins/ExamplePluginB/Dara.Plugins.ExamplePluginB.csproj" />
-    <Project Path="src/Plugins/ExamplePluginC/Dara.Plugins.ExamplePluginC.csproj" />
+  <Folder Name="/Server/Modules/" />
+  <Folder Name="/Server/Modules/Identity/">
+    <Project Path="src/Server/Modules/Identity/Application/Dara.Server.Modules.Identity.Application.csproj" />
+    <Project Path="src/Server/Modules/Identity/Domain/Dara.Server.Modules.Identity.Domain.csproj" />
+    <Project Path="src/Server/Modules/Identity/Infrastructure/Dara.Server.Modules.Identity.Infrastructure.csproj" />
+    <Project Path="src/Server/Modules/Identity/Integration/Dara.Server.Modules.Identity.Integration.csproj" />
   </Folder>
+  
   <Folder Name="/Shared/">
     <Project Path="src/Shared/Common/Dara.Shared.Common.csproj" />
     <Project Path="src/Shared/Contracts/Dara.Shared.Contracts.csproj" />
+    <Project Path="src/Shared/Logging/Dara.Shared.Logging.csproj" />
   </Folder>
   
 </Solution>
