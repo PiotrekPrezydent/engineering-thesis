@@ -1,11 +1,8 @@
 using Dara.Server.Apps.API.Hubs;
 using Dara.Server.Apps.API.Utils;
-using Dara.Server.BuildingBlocks.Application;
 using Dara.Server.Modules.Clients.Application;
-using Dara.Server.Modules.Clients.Application.Clients.StartClientSession;
 using Dara.Server.Modules.Clients.Infrastructure;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Logging.Console;
 
 namespace Dara.Server.Apps.API;
 
@@ -42,14 +39,6 @@ public class Program
             }
             await next();
         });
-        
-        using (var scope = app.Services.CreateScope())
-        {
-            var mod = scope.ServiceProvider.GetRequiredService<IClientsModule>();
-            
-            await mod.ExecuteCommandAsync(new StartClientSessionCommand(Guid.NewGuid(), "ddd"));
-            await mod.ExecuteCommandAsync(new StartClientSessionCommand(Guid.NewGuid(), "ddddsadas"));
-        }
         
         app.MapHub<AppHub>("/app");
 

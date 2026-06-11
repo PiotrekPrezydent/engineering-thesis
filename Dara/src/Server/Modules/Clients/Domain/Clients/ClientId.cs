@@ -1,4 +1,4 @@
-using Dara.BuildingBlocks.Domain;
+using Dara.Server.BuildingBlocks.Domain;
 
 namespace Dara.Server.Modules.Clients.Domain.Clients;
 

@@ -7,7 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\Shared\Common\Dara.Shared.Common.csproj" />
       <ProjectReference Include="..\Domain\Dara.Server.BuildingBlocks.Domain.csproj" />
       <ProjectReference Include="..\Integration\Dara.Server.BuildingBlocks.Integration.csproj" />
     </ItemGroup>

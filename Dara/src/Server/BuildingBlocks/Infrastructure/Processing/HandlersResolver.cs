@@ -1,10 +1,9 @@
-using Dara.BuildingBlocks.Domain;
 using Dara.Server.BuildingBlocks.Application.Commands;
 using Dara.Server.BuildingBlocks.Application.Events;
-using Dara.Server.BuildingBlocks.Integration;
+using Dara.Server.BuildingBlocks.Domain;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Dara.BuildingBlocks.Infrastructure.Processing;
+namespace Dara.Server.BuildingBlocks.Infrastructure.Processing;
 
 public class HandlersResolver : IHandlersResolver
 {

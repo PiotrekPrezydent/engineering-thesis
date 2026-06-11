@@ -1,8 +1,8 @@
-using Dara.BuildingBlocks.Domain;
 using Dara.Server.BuildingBlocks.Application.Commands;
 using Dara.Server.BuildingBlocks.Application.Events;
+using Dara.Server.BuildingBlocks.Domain;
 
-namespace Dara.BuildingBlocks.Infrastructure.Processing;
+namespace Dara.Server.BuildingBlocks.Infrastructure.Processing;
 
 public interface IHandlersResolver
 {

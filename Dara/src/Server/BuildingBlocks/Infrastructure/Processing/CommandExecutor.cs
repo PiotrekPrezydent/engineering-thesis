@@ -1,6 +1,6 @@
 using Dara.Server.BuildingBlocks.Application.Commands;
 
-namespace Dara.BuildingBlocks.Infrastructure.Processing;
+namespace Dara.Server.BuildingBlocks.Infrastructure.Processing;
 
 public class CommandExecutor : ICommandExecutor
 {

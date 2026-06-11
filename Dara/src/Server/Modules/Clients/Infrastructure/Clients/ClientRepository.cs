@@ -1,6 +1,7 @@
 using Dara.Server.Modules.Clients.Domain.Clients;
+using Microsoft.EntityFrameworkCore;
 
-namespace Dara.Server.Modules.Clients.Infrastructure;
+namespace Dara.Server.Modules.Clients.Infrastructure.Clients;
 
 public class ClientRepository : IClientRepository
 {
@@ -9,13 +10,19 @@ public class ClientRepository : IClientRepository
     {
         _clientsContext = clientsContext;
     }
-    public async Task Add(Client client)
+    public async Task AddAsync(Client client)
     {
-        _clientsContext.Clients.Add(client);
+        await _clientsContext.Clients.AddAsync(client);
     }
 
-    public async Task<Client> GetByClientIdAsync(ClientId clientId)
+    public async Task DeleteAsync(Client client)
     {
-        throw new NotImplementedException();
+        _clientsContext.Clients.Remove(client);
+        await _clientsContext.SaveChangesAsync();
+    }
+
+    public async Task<Client> GetByClientByIdAsync(ClientId clientId)
+    {
+        return await _clientsContext.Clients.FirstOrDefaultAsync(c => c.Id == clientId);
     }
 }

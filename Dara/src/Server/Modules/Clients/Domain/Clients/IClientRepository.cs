@@ -1,9 +1,10 @@
-using Dara.BuildingBlocks.Domain;
+using Dara.Server.BuildingBlocks.Domain;
 
 namespace Dara.Server.Modules.Clients.Domain.Clients;
 
 public interface IClientRepository : IRepository
 {
-    public Task Add(Client client);
-    public Task<Client> GetByClientIdAsync(ClientId clientId);
+    Task AddAsync(Client client);
+    Task DeleteAsync(Client client);
+    Task<Client> GetByClientByIdAsync(ClientId clientId);
 }

@@ -4,17 +4,14 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <RootNamespace>Dara.BuildingBlocks.Infrastructure</RootNamespace>
+        <RootNamespace>Dara.Server.BuildingBlocks.Infrastructure</RootNamespace>
     </PropertyGroup>
-    
     
     <ItemGroup>
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.8" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\Shared\Common\Dara.Shared.Common.csproj" />
-      <ProjectReference Include="..\..\..\Shared\Logging\Dara.Shared.Logging.csproj" />
       <ProjectReference Include="..\Application\Dara.Server.BuildingBlocks.Application.csproj" />
       <ProjectReference Include="..\Domain\Dara.Server.BuildingBlocks.Domain.csproj" />
       <ProjectReference Include="..\Integration\Dara.Server.BuildingBlocks.Integration.csproj" />

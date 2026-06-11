@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace Dara.BuildingBlocks.Infrastructure;
+namespace Dara.Server.BuildingBlocks.Infrastructure;
 
 public class ModuleContext : DbContext
 {

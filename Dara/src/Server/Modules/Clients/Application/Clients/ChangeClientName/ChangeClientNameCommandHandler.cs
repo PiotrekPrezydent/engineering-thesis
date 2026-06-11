@@ -3,10 +3,10 @@ using Dara.Server.Modules.Clients.Domain.Clients;
 
 namespace Dara.Server.Modules.Clients.Application.Clients.ChangeClientName;
 
-public class ChangeClientNameCommandCommandHandler : ICommandHandler<ChangeClientNameCommand>
+public class ChangeClientNameCommandHandler : ICommandHandler<ChangeClientNameCommand>
 {
-    private readonly IClientRepository _clientRepository;
-    public ChangeClientNameCommandCommandHandler(IClientRepository clientRepository)
+    readonly IClientRepository _clientRepository;
+    public ChangeClientNameCommandHandler(IClientRepository clientRepository)
     {
         _clientRepository = clientRepository;
     }
@@ -14,8 +14,7 @@ public class ChangeClientNameCommandCommandHandler : ICommandHandler<ChangeClien
     public async Task HandleAsync(ChangeClientNameCommand command)
     {
         var clientId = new ClientId(command.ClientId);
-
-        var client = await _clientRepository.GetByClientIdAsync(clientId);
+        var client = await _clientRepository.GetByClientByIdAsync(clientId);
         
         client.ChangeName(command.NewName);
     }

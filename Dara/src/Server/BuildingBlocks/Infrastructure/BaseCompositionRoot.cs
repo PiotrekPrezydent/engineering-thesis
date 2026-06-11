@@ -1,12 +1,12 @@
-using Dara.BuildingBlocks.Domain;
-using Dara.BuildingBlocks.Infrastructure.Extensions;
-using Dara.BuildingBlocks.Infrastructure.Processing;
-using Dara.Server.BuildingBlocks.Application;
 using Dara.Server.BuildingBlocks.Application.Commands;
 using Dara.Server.BuildingBlocks.Application.Events;
+using Dara.Server.BuildingBlocks.Application.Queries;
+using Dara.Server.BuildingBlocks.Domain;
+using Dara.Server.BuildingBlocks.Infrastructure.Extensions;
+using Dara.Server.BuildingBlocks.Infrastructure.Processing;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Dara.BuildingBlocks.Infrastructure;
+namespace Dara.Server.BuildingBlocks.Infrastructure;
 
 public abstract class BaseCompositionRoot<TBuilder> : ICompositionRoot where TBuilder : BaseCompositionRoot<TBuilder>, new()
 {
@@ -31,6 +31,7 @@ public abstract class BaseCompositionRoot<TBuilder> : ICompositionRoot where TBu
         
         FindAndAddTransientHandlersWithTypeWithDecorators(typeof(ICommandHandler<>));
         FindAndAddTransientHandlersWithTypeWithDecorators(typeof(ICommandHandler<,>));
+        FindAndAddTransientHandlersWithTypeWithDecorators(typeof(IQueryHandler<,>));
         FindAndAddTransientHandlersWithTypeWithDecorators(typeof(IDomainEventHandler<>));
         
         //this will find decorators as well as repositories becouse they both inheritance from IRepository in interfaces

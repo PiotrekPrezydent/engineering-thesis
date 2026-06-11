@@ -1,6 +1,6 @@
-using Dara.BuildingBlocks.Domain;
+using Dara.Server.BuildingBlocks.Domain;
 
-namespace Dara.BuildingBlocks.Infrastructure.Processing;
+namespace Dara.Server.BuildingBlocks.Infrastructure.Processing;
 
 public interface IDomainEventsDispatcher
 {

@@ -1,5 +1,5 @@
-using Dara.BuildingBlocks.Infrastructure;
-using Dara.BuildingBlocks.Infrastructure.Decorating;
+using Dara.Server.BuildingBlocks.Infrastructure;
+using Dara.Server.BuildingBlocks.Infrastructure.Decorating;
 using Dara.Server.Modules.Clients.Application;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

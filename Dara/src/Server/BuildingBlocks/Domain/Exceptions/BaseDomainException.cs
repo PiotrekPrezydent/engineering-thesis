@@ -1,4 +1,4 @@
-namespace Dara.BuildingBlocks.Domain.Exceptions;
+namespace Dara.Server.BuildingBlocks.Domain.Exceptions;
 
 public abstract class BaseDomainException : Exception
 {

@@ -4,7 +4,7 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <RootNamespace>Dara.BuildingBlocks.Domain</RootNamespace>
+        <RootNamespace>Dara.Server.BuildingBlocks.Domain</RootNamespace>
     </PropertyGroup>
 
 </Project>

@@ -25,18 +25,18 @@ public record Result<T> : Result
 {
     public T? Value { get; }
 
-    public Result(T? value) : base()
+    protected Result(T value)
     {
         Value = value;
     }
 
-    public Result(Error error) : base(error)
+    protected Result(Error error) : base(error)
     {
         Value = default;
     }
     
-    public static Result<T> Success(T value) => new Result<T>(value);
+    public static Result<T> Success(T value) => new(value);
 
-    public static Result<T> Failure(Error error) => new Result<T>(error ?? throw new ArgumentNullException(nameof(error)));
+    public new static Result<T> Failure(Error error) => new(error ?? throw new ArgumentNullException(nameof(error)));
 
 }

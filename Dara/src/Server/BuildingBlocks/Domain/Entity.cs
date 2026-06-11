@@ -1,17 +1,11 @@
-using Dara.BuildingBlocks.Domain.Exceptions;
+using Dara.Server.BuildingBlocks.Domain.Exceptions;
 
-namespace Dara.BuildingBlocks.Domain;
+namespace Dara.Server.BuildingBlocks.Domain;
 
 public abstract class Entity
 {
     public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
     readonly List<IDomainEvent> _domainEvents = new();
-
-    //EF constructor
-    protected Entity()
-    {
-        
-    }
         
     public void ClearDomainEvents()
     {
@@ -32,10 +26,5 @@ public abstract class Entity
 
 public abstract class Entity<TId> : Entity where TId : IEntityId
 {
-    public TId ClientId { get; protected set; }
-    
-    protected Entity(TId clientId)
-    {
-        ClientId = clientId;
-    }
+    public TId Id { get; protected set; }
 }

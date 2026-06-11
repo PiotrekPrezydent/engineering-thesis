@@ -1,3 +1,3 @@
-namespace Dara.BuildingBlocks.Domain;
+namespace Dara.Server.BuildingBlocks.Domain;
 
 public interface IEntityId;

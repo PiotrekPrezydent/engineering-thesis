@@ -1,10 +1,10 @@
-using Dara.BuildingBlocks.Infrastructure.Processing;
 using Dara.Server.BuildingBlocks.Application;
 using Dara.Server.BuildingBlocks.Application.Commands;
 using Dara.Server.BuildingBlocks.Application.Queries;
+using Dara.Server.BuildingBlocks.Infrastructure.Processing;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Dara.BuildingBlocks.Infrastructure;
+namespace Dara.Server.BuildingBlocks.Infrastructure;
 
 public abstract class BaseModule<TCompositionRoot> : IModule where TCompositionRoot : ICompositionRoot
 {
@@ -31,6 +31,12 @@ public abstract class BaseModule<TCompositionRoot> : IModule where TCompositionR
 
     public async Task<TResult> ExecuteQueryAsync<TQuery, TResult>(TQuery query) where TQuery : IQuery<TResult>
     {
-        throw new NotImplementedException();
+        using (var scope = TCompositionRoot.CreteScope())
+        {
+            var handler = scope.ServiceProvider.GetRequiredService<IQueryHandler<TQuery, TResult>>();
+        
+            var result = await handler.HandleAsync(query);
+            return result;
+        }
     }
 }

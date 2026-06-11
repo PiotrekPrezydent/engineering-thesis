@@ -1,7 +1,7 @@
-using Dara.BuildingBlocks.Infrastructure.Processing;
 using Dara.Server.BuildingBlocks.Application.Commands;
+using Dara.Server.BuildingBlocks.Infrastructure.Processing;
 
-namespace Dara.BuildingBlocks.Infrastructure.Decorating;
+namespace Dara.Server.BuildingBlocks.Infrastructure.Decorating;
 
 public class CommandHandlerUnitOfWorkDecorator<TCommand> : ICommandHandler<TCommand> where TCommand : ICommand
 {

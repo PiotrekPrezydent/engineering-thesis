@@ -1,4 +1,4 @@
-using Dara.BuildingBlocks.Infrastructure;
+using Dara.Server.BuildingBlocks.Infrastructure;
 using Dara.Server.Modules.Clients.Domain.Clients;
 using Microsoft.EntityFrameworkCore;
 

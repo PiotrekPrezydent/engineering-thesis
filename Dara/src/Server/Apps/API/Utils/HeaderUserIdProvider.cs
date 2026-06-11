@@ -8,7 +8,7 @@ public class HeaderUserIdProvider : IUserIdProvider
     {
         var httpContext = connection.GetHttpContext();
         
-        var clientId = httpContext?.Request.Headers["X-Client-Id"].FirstOrDefault();
+        var clientId = httpContext?.Request.Headers["X-Client-Id"].FirstOrDefault()!;
         
         return clientId;
     }

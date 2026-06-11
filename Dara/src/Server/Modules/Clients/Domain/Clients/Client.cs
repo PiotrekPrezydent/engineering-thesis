@@ -1,4 +1,4 @@
-using Dara.BuildingBlocks.Domain;
+using Dara.Server.BuildingBlocks.Domain;
 using Dara.Server.Modules.Clients.Domain.Clients.Events;
 using Dara.Server.Modules.Clients.Domain.Clients.Rules;
 
@@ -7,13 +7,21 @@ namespace Dara.Server.Modules.Clients.Domain.Clients;
 public class Client : Entity<ClientId>, IAggregateRoot
 {
     public string Name { get; private set; }
-    public bool IsActive { get; private set; }
+    public bool IsOnline { get; private set; }
+
+    public IReadOnlyList<ClientId> ClientSupervisors => _clientSupervisors.AsReadOnly();
+    private readonly List<ClientId> _clientSupervisors;
+
+    private Client() { }
     
-    internal Client(ClientId clientId, string name) : base(clientId)
+    internal Client(ClientId clientId, string name)
     {
-        IsActive = false;
-    
+        Id = clientId;
+        IsOnline = false;
+        _clientSupervisors = new();
         Name = name;
+        
+        AddDomainEvent(new ClientCreatedDomainEvent(Id));
     }
 
     public static Client Create(ClientId clientId, string name)
@@ -21,31 +29,49 @@ public class Client : Entity<ClientId>, IAggregateRoot
         return new(clientId, name);
     }
 
-    public void StartSession()
+    public void Delete()
     {
-        CheckRule(new ClientSessionCannotBeStartedTwiceRule(IsActive));
-        
-        IsActive = true;
-        
-        AddDomainEvent(new ClientStartedSessionDomainEvent());
+        AddDomainEvent(new ClientDeletedDomainEvent(Id));
     }
     
-    public void EndSession()
+    public void MarkAsOnline()
     {
-        CheckRule(new ClientSessionMustBeStartedToPreformActionsRule(IsActive, nameof(EndSession)));
+        CheckRule(new OnlyOfflineClientCanBeMarkedAsOnlineRule(IsOnline));
         
-        IsActive = false;
-        
-        AddDomainEvent(new ClientEndedSessionDomainEvent());
+        IsOnline = true;
+        AddDomainEvent(new ClientWentOnlineDomainEvent(Id));
     }
-
+    
+    public void MarkAsOffline()
+    {
+        CheckRule(new OnlyOnlineClientCanBeMarkedAsOfflineRule(IsOnline));
+        
+        IsOnline = false;
+        AddDomainEvent(new ClientWentOfflineDomainEvent(Id));
+    }
+    
     public void ChangeName(string name)
     {
-        CheckRule(new ClientSessionMustBeStartedToPreformActionsRule(IsActive, nameof(ChangeName)));
         CheckRule(new ClientNameCannotBeEmptyRule(name));
         
         Name = name;
-        
-        AddDomainEvent(new ClientChangedNameDomainEvent());
+        AddDomainEvent(new ClientNameChangedDomainEvent(Id, Name));
     }
+
+    public void AddSupervisor(ClientId supervisor)
+    {
+        CheckRule(new ClientSupervisorCannotBeAddedTwiceRule(ClientSupervisors, supervisor));
+        
+        _clientSupervisors.Add(supervisor);
+        AddDomainEvent(new ClientSupervisorAddedDomainEvent(Id, supervisor));
+    }
+
+    public void RemoveSupervisor(ClientId supervisor)
+    {
+        CheckRule(new OnlyActualClientSupervisorCanBeRemovedRule(ClientSupervisors, supervisor));
+        
+        _clientSupervisors.Remove(supervisor);
+        AddDomainEvent(new ClientSupervisorRemovedDomainEvent(Id, supervisor));
+    }
+    
 }

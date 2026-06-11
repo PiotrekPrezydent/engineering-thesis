@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace Dara.BuildingBlocks.Infrastructure.Extensions;
+namespace Dara.Server.BuildingBlocks.Infrastructure.Extensions;
 
 public static class AssemblyExtensions
 {

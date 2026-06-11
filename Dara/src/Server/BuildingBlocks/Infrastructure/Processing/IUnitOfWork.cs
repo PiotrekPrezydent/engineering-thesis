@@ -1,4 +1,4 @@
-namespace Dara.BuildingBlocks.Infrastructure.Processing;
+namespace Dara.Server.BuildingBlocks.Infrastructure.Processing;
 
 //commits changes to module
 
