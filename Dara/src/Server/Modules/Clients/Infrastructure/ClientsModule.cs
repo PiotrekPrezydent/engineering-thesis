@@ -3,7 +3,7 @@ using Dara.Server.Modules.Clients.Application;
 
 namespace Dara.Server.Modules.Clients.Infrastructure;
 
-public class ClientsModule : IClientsModule, BaseModule<IClientsModule>
+public class ClientsModule : BaseModule<ClientsCompositionRoot>, IClientsModule
 {
-
+    
 }

@@ -1,5 +1,7 @@
+using Dara.BuildingBlocks.Domain;
 using Dara.BuildingBlocks.Infrastructure.Extensions;
 using Dara.BuildingBlocks.Infrastructure.Processing;
+using Dara.Server.BuildingBlocks.Application;
 using Dara.Server.BuildingBlocks.Application.Commands;
 using Dara.Server.BuildingBlocks.Application.Events;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,7 +13,7 @@ public abstract class BaseCompositionRoot<TBuilder> : ICompositionRoot where TBu
     protected static IServiceProvider? _rootProvider;
     protected abstract Type ApplicationType { get; }
 
-    protected virtual IReadOnlyList<Type> GlobalInterfacesDecorators => Array.Empty<Type>();
+    protected virtual IReadOnlyList<Type> GlobalDecorators => Array.Empty<Type>();
     protected virtual IReadOnlyList<(Type ImplementationType, Type DecoratorType)> TypeInclusiveDecorators => Array.Empty<(Type, Type)>();
     protected virtual IReadOnlyList<(Type ImplementationType, Type DecoratorType)> TypeExclusiveDecorators => Array.Empty<(Type, Type)>();
 
@@ -19,7 +21,8 @@ public abstract class BaseCompositionRoot<TBuilder> : ICompositionRoot where TBu
     {
         var services = new ServiceCollection();
         var builder = new TBuilder();
-        var moduleAssembly = typeof(TBuilder).Assembly;
+        var infrastructureAssembly = typeof(TBuilder).Assembly;
+        var applicationAssembly = builder.ApplicationType.Assembly;
         
         AddScopedServiceWithDecorators(typeof(IUnitOfWork), typeof(UnitOfWork));
         AddScopedServiceWithDecorators(typeof(IDomainEventsDispatcher), typeof(DomainEventsDispatcher));
@@ -29,6 +32,18 @@ public abstract class BaseCompositionRoot<TBuilder> : ICompositionRoot where TBu
         FindAndAddTransientHandlersWithTypeWithDecorators(typeof(ICommandHandler<>));
         FindAndAddTransientHandlersWithTypeWithDecorators(typeof(ICommandHandler<,>));
         FindAndAddTransientHandlersWithTypeWithDecorators(typeof(IDomainEventHandler<>));
+        
+        //this will find decorators as well as repositories becouse they both inheritance from IRepository in interfaces
+        var repos = infrastructureAssembly.GetTypes()
+            .Where(t => t.IsClass && !t.IsAbstract)
+            .SelectMany(t => t.GetInterfaces()
+                .Where(i => typeof(IRepository).IsAssignableFrom(i) && i != typeof(IRepository))
+                .Select(i => (Interface: i, Implementation: t)));
+
+        foreach (var repo in repos)
+            AddScopedServiceWithDecorators(repo.Interface, repo.Implementation);
+        
+        builder.AddModuleContext(services);
 
         _rootProvider = services.BuildServiceProvider();
         return;
@@ -41,7 +56,7 @@ public abstract class BaseCompositionRoot<TBuilder> : ICompositionRoot where TBu
 
         void FindAndAddTransientHandlersWithTypeWithDecorators(Type handlerType)
         {
-            var handlers = moduleAssembly.GetImplementationsOfOpenGeneric(handlerType);
+            var handlers = applicationAssembly.GetImplementationsOfOpenGeneric(handlerType);
             foreach (var handler in handlers)
             {
                 services.AddTransient(handler.Interface, handler.Implementation);
@@ -66,7 +81,7 @@ public abstract class BaseCompositionRoot<TBuilder> : ICompositionRoot where TBu
             ? serviceInterface.GetGenericTypeDefinition() 
             : serviceInterface;
         
-        var globalDecorators = this.GlobalInterfacesDecorators.Where(decoratorType => 
+        var globalDecorators = this.GlobalDecorators.Where(decoratorType => 
         {
             if (targetInterface.IsGenericTypeDefinition)
             {

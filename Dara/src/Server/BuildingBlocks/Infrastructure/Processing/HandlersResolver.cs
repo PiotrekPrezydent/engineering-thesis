@@ -1,4 +1,4 @@
-using Dara.BuildingBlocks.Domain.Events;
+using Dara.BuildingBlocks.Domain;
 using Dara.Server.BuildingBlocks.Application.Commands;
 using Dara.Server.BuildingBlocks.Application.Events;
 using Dara.Server.BuildingBlocks.Integration;
@@ -31,11 +31,5 @@ public class HandlersResolver : IHandlersResolver
         where TDomainEvent : IDomainEvent
     {
         return _serviceProvider.GetServices<IDomainEventHandler<TDomainEvent>>();
-    }
-
-    public IEnumerable<IIntegrationEventHandler<TIntegrationEvent>> GetIntegrationEventHandlers<TIntegrationEvent>() 
-        where TIntegrationEvent : IIntegrationEvent
-    {
-        return _serviceProvider.GetServices<IIntegrationEventHandler<TIntegrationEvent>>();
     }
 }

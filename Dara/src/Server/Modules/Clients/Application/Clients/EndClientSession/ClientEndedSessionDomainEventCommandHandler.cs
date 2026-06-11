@@ -1,9 +1,9 @@
-using Dara.Server.BuildingBlocks.Application.Commands;
+using Dara.Server.BuildingBlocks.Application.Events;
 using Dara.Server.Modules.Clients.Domain.Clients.Events;
 
 namespace Dara.Server.Modules.Clients.Application.Clients.EndClientSession;
 
-public class ClientEndedSessionDomainEventCommandHandler : ICommandHandler<ClientEndedSessionDomainEvent>
+public class ClientEndedSessionDomainEventCommandHandler : IDomainEventHandler<ClientEndedSessionDomainEvent>
 {
     public ClientEndedSessionDomainEventCommandHandler()
     {

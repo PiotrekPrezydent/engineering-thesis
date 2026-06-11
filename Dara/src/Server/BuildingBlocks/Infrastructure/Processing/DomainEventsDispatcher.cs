@@ -1,4 +1,4 @@
-using Dara.BuildingBlocks.Domain.Events;
+using Dara.BuildingBlocks.Domain;
 
 namespace Dara.BuildingBlocks.Infrastructure.Processing;
 
@@ -13,8 +13,7 @@ public class DomainEventsDispatcher : IDomainEventsDispatcher
 
     public async Task DispatchAsync<TDomainEvent>(TDomainEvent domainEvent) where TDomainEvent : IDomainEvent
     {
-        var handlers = _handlersResolver.GetDomainEventHandlers<IDomainEvent>();
-        
+        var handlers = _handlersResolver.GetDomainEventHandlers<TDomainEvent>();
         foreach (var handler  in handlers)
             await handler.HandleAsync(domainEvent);
     }

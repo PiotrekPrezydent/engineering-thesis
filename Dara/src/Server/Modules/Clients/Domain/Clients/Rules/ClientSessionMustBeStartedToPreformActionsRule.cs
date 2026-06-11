@@ -1,23 +1,23 @@
-using Dara.BuildingBlocks.Domain.Rules;
+using Dara.BuildingBlocks.Domain;
 
 namespace Dara.Server.Modules.Clients.Domain.Clients.Rules;
 
-public class ClientSessionMustBeStartedToPreformActionsRule : IBuisnessRule
+public record ClientSessionMustBeStartedToPreformActionsRule : IBuisnessRule
 {
-    public Client Client;
-    public string Action;
-    
-    internal ClientSessionMustBeStartedToPreformActionsRule(Client client, string action)
+    private readonly bool _isActive;
+    private readonly string _action;
+
+    internal ClientSessionMustBeStartedToPreformActionsRule(bool isActive, string action)
     {
-        Client = client;
-        Action = action;
+        _isActive = isActive;
+        _action = action;
     }
 
     public string Message => $"{nameof(ClientSessionMustBeStartedToPreformActionsRule).TrimEnd("Rule")}";
 
     public bool IsBroken()
     {
-        return Client.IsActive;
+        return _isActive;
     }
 
 }

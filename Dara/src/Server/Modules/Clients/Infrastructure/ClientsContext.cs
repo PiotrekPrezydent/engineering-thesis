@@ -1,11 +1,20 @@
+using Dara.BuildingBlocks.Infrastructure;
+using Dara.Server.Modules.Clients.Domain.Clients;
 using Microsoft.EntityFrameworkCore;
-using DbContext = Dara.BuildingBlocks.Infrastructure.DbContext;
 
 namespace Dara.Server.Modules.Clients.Infrastructure;
 
-public class ClientsContext : DbContext
+public class ClientsContext : ModuleContext
 {
-    public ClientsContext(DbContextOptions options) : base(options)
+    public DbSet<Client>  Clients { get; set; }
+    public ClientsContext(DbContextOptions<ClientsContext> options) : base(options)
     {
     }
+    
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(ClientsContext).Assembly);
+        base.OnModelCreating(modelBuilder);
+    }
+    
 }

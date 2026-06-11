@@ -12,7 +12,6 @@ public class StartClientSessionCommandCommandHandler : ICommandHandler<StartClie
         _clientRepository = clientRepository;
     }
     
-    //this will always create new client even if 
     public async Task HandleAsync(StartClientSessionCommand command)
     {
         var clientId = new ClientId(command.ClientId);

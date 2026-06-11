@@ -18,7 +18,5 @@ public class EndClientSessionCommandCommandHandler : ICommandHandler<EndClientSe
         var client = await _clientRepository.GetByClientIdAsync(clientId);
         
         client.EndSession();
-        
-        await _clientRepository.SaveAsync(client);
     }
 }

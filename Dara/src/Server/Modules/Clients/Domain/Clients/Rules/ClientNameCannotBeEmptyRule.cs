@@ -1,20 +1,20 @@
-using Dara.BuildingBlocks.Domain.Rules;
+using Dara.BuildingBlocks.Domain;
 
 namespace Dara.Server.Modules.Clients.Domain.Clients.Rules;
 
-public class ClientNameCannotBeEmptyRule : IBuisnessRule
+public record ClientNameCannotBeEmptyRule : IBuisnessRule
 {
-    public string? Name { get; }
+    private readonly string? _name;
     internal ClientNameCannotBeEmptyRule(string name)
     {
-        Name = name;
+        _name = name;
     }
 
     public string Message => $"{nameof(ClientNameCannotBeEmptyRule).TrimEnd("Rule")}";
 
     public bool IsBroken()
     {
-        return string.IsNullOrWhiteSpace(Name);
+        return string.IsNullOrWhiteSpace(_name);
     }
 
 }

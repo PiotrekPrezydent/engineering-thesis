@@ -1,10 +1,10 @@
-using Dara.BuildingBlocks.Domain.Rules;
+using Dara.BuildingBlocks.Domain;
 
 namespace Dara.Server.Modules.Clients.Domain.Clients.Rules;
 
-public class ClientSessionCannotBeStartedTwiceRule : IBuisnessRule
+public record ClientSessionCannotBeStartedTwiceRule : IBuisnessRule
 {
-    private bool _isActive;
+    private readonly bool _isActive;
     internal ClientSessionCannotBeStartedTwiceRule(bool isActive)
     {
         _isActive = isActive;

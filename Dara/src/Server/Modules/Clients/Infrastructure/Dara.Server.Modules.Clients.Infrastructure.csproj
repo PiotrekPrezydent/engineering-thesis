@@ -12,5 +12,10 @@
     <ProjectReference Include="..\Application\Dara.Server.Modules.Clients.Application.csproj" />
     <ProjectReference Include="..\Domain\Dara.Server.Modules.Clients.Domain.csproj" />
   </ItemGroup>
+  
+  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.9" />
+  </ItemGroup>
 
 </Project>

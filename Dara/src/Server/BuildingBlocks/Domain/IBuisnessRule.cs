@@ -1,4 +1,4 @@
-namespace Dara.BuildingBlocks.Domain.Rules;
+namespace Dara.BuildingBlocks.Domain;
 
 public interface IBuisnessRule
 {

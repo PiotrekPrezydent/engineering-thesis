@@ -1,19 +1,16 @@
-using Dara.BuildingBlocks.Domain.Events;
 using Dara.BuildingBlocks.Domain.Exceptions;
-using Dara.BuildingBlocks.Domain.Rules;
 
-namespace Dara.BuildingBlocks.Domain.Models;
+namespace Dara.BuildingBlocks.Domain;
 
 public abstract class Entity
 {
-    public BaseEntityId Id { get; }
-        
     public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
     readonly List<IDomainEvent> _domainEvents = new();
 
-    protected Entity(BaseEntityId id)
+    //EF constructor
+    protected Entity()
     {
-        Id = id;
+        
     }
         
     public void ClearDomainEvents()
@@ -30,5 +27,15 @@ public abstract class Entity
     {
         if (rule.IsBroken())
             throw new BuisnessRuleValidationException(rule);
+    }
+}
+
+public abstract class Entity<TId> : Entity where TId : IEntityId
+{
+    public TId ClientId { get; protected set; }
+    
+    protected Entity(TId clientId)
+    {
+        ClientId = clientId;
     }
 }

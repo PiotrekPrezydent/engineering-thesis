@@ -1,5 +1,3 @@
-using Dara.BuildingBlocks.Domain.Rules;
-
 namespace Dara.BuildingBlocks.Domain.Exceptions;
 
 public class BuisnessRuleValidationException : BaseDomainException

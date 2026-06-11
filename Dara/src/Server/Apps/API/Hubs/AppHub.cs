@@ -2,14 +2,8 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Dara.Server.Apps.API.Hubs;
 
-public partial class AppHub : Hub<IAppHubClient>
+public partial class AppHub : Hub
 {
-    private readonly IModuleCommandRunner _commandRunner;
-
-    public AppHub(IModuleCommandRunner commandRunner)
-    {
-        _commandRunner = commandRunner;
-    }
 
     public async override Task OnConnectedAsync()
     {

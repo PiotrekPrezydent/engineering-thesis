@@ -1,4 +1,4 @@
-using Dara.BuildingBlocks.Domain.Models;
+using Dara.BuildingBlocks.Domain;
 
 namespace Dara.BuildingBlocks.Infrastructure.Processing;
 

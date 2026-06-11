@@ -5,7 +5,7 @@ namespace Dara.Server.Modules.Clients.Application.Clients.ChangeClientName;
 
 public class ChangeClientNameCommandCommandHandler : ICommandHandler<ChangeClientNameCommand>
 {
-    IClientRepository _clientRepository { get; }
+    private readonly IClientRepository _clientRepository;
     public ChangeClientNameCommandCommandHandler(IClientRepository clientRepository)
     {
         _clientRepository = clientRepository;
@@ -18,7 +18,5 @@ public class ChangeClientNameCommandCommandHandler : ICommandHandler<ChangeClien
         var client = await _clientRepository.GetByClientIdAsync(clientId);
         
         client.ChangeName(command.NewName);
-        
-        await _clientRepository.SaveAsync(client);
     }
 }

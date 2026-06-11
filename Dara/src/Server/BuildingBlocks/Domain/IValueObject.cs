@@ -1,3 +1,3 @@
 namespace Dara.BuildingBlocks.Domain;
 
-public interface IRepository;
+public interface IValueObject;
