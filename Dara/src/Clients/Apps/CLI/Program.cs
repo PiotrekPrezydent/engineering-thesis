@@ -4,27 +4,26 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 
-namespace Dara.Clients.Apps.CLI
+namespace Dara.Clients.Apps.CLI;
+
+class Program
 {
-    class Program
+    static async Task Main(string[] args)
     {
-        static async Task Main(string[] args)
+        var builder = Host.CreateApplicationBuilder(args);
+            
+        builder.Logging.ClearProviders();
+        builder.Logging.AddConsole(options =>
         {
-            var builder = Host.CreateApplicationBuilder(args);
+            options.FormatterName = nameof(SharedLogFormatter);
+        });
             
-            builder.Logging.ClearProviders();
-            builder.Logging.AddConsole(options =>
-            {
-                options.FormatterName = nameof(SharedLogFormatter);
-            });
+        builder.Logging.AddConsoleFormatter<SharedLogFormatter, ConsoleFormatterOptions>();
+        builder.Services.AddTransient<CLIClient>();
             
-            builder.Logging.AddConsoleFormatter<SharedLogFormatter, ConsoleFormatterOptions>();
-            builder.Services.AddTransient<CLIClient>();
+        var host = builder.Build();
             
-            var host = builder.Build();
-            
-            var app = host.Services.GetRequiredService<CLIClient>();
-            await app.RunAsync();
-        }
+        var app = host.Services.GetRequiredService<CLIClient>();
+        await app.RunAsync();
     }
 }

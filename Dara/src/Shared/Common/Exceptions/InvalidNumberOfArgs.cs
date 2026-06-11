@@ -1,7 +1,6 @@
-namespace Dara.Shared.Common.Exceptions
+namespace Dara.Shared.Common.Exceptions;
+
+public class InvalidNumberOfArgs(int expectedArgs, int receivedArgs) : Exception
 {
-    public class InvalidNumberOfArgs(int expectedArgs, int receivedArgs) : Exception
-    {
         
-    }
 }

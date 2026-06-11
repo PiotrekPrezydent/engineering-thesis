@@ -1,12 +1,11 @@
-namespace Dara.Shared.Common.CLI
+namespace Dara.Shared.Common.CLI;
+
+public class CLICommand : Attribute
 {
-    public class CLICommand : Attribute
-    {
-        public string[] CommandNames;
+    public string[] CommandNames;
     
-        public CLICommand(params string[] commandNames)
-        {
-            CommandNames = commandNames;
-        }
+    public CLICommand(params string[] commandNames)
+    {
+        CommandNames = commandNames;
     }
 }

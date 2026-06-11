@@ -1,15 +1,15 @@
 using Dara.BuildingBlocks.Domain.Exceptions;
 using Dara.BuildingBlocks.Domain.Rules;
 
-namespace Dara.BuildingBlocks.Domain.Models
+namespace Dara.BuildingBlocks.Domain.Models;
+
+public abstract class ValueObject
 {
-    //td add more logic for validation
-    public abstract class ValueObject
+    internal abstract void Create();
+        
+    protected static void CheckRule(IBuisnessRule rule)
     {
-        protected static void CheckRule(IDomainRule rule)
-        {
-            if (rule.IsBroken())
-                throw new DomainRuleValidationException(rule);
-        }
+        if (rule.IsBroken())
+            throw new BuisnessRuleValidationException(rule);
     }
 }

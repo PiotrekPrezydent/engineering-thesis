@@ -1,5 +1,7 @@
 <Solution>
-  <Folder Name="/Clients/" />
+  <Folder Name="/Clients/">
+    <Project Path="src/Clients/Core/Dara.Clients.Core.csproj" />
+  </Folder>
   <Folder Name="/Clients/Apps/">
     <Project Path="src/Clients/Apps/CLI/Dara.Clients.Apps.CLI.csproj" />
   </Folder>
@@ -17,11 +19,23 @@
   </Folder>
   
   <Folder Name="/Server/Modules/" />
-  <Folder Name="/Server/Modules/Identity/">
-    <Project Path="src/Server/Modules/Identity/Application/Dara.Server.Modules.Identity.Application.csproj" />
-    <Project Path="src/Server/Modules/Identity/Domain/Dara.Server.Modules.Identity.Domain.csproj" />
-    <Project Path="src/Server/Modules/Identity/Infrastructure/Dara.Server.Modules.Identity.Infrastructure.csproj" />
-    <Project Path="src/Server/Modules/Identity/Integration/Dara.Server.Modules.Identity.Integration.csproj" />
+  <Folder Name="/Server/Modules/Clients/">
+    <Project Path="src/Server/Modules/Clients/Application/Dara.Server.Modules.Clients.Application.csproj" />
+    <Project Path="src/Server/Modules/Clients/Domain/Dara.Server.Modules.Clients.Domain.csproj" />
+    <Project Path="src/Server/Modules/Clients/Infrastructure/Dara.Server.Modules.Clients.Infrastructure.csproj" />
+    <Project Path="src/Server/Modules/Clients/Integration/Dara.Server.Modules.Clients.Integration.csproj" />
+  </Folder>
+  <Folder Name="/Server/Modules/Groups/">
+    <Project Path="src/Server/Modules/Groups/Application/Dara.Server.Modules.Groups.Application.csproj" />
+    <Project Path="src/Server/Modules/Groups/Domain/Dara.Server.Modules.Groups.Domain.csproj" />
+    <Project Path="src/Server/Modules/Groups/Infrastructure/Dara.Server.Modules.Groups.Infrastructure.csproj" />
+    <Project Path="src/Server/Modules/Groups/Integration/Dara.Server.Modules.Groups.Integration.csproj" />
+  </Folder>
+  <Folder Name="/Server/Modules/Plugins/">
+    <Project Path="src/Server/Modules/Plugins/Application/Dara.Server.Modules.Plugins.Application.csproj" />
+    <Project Path="src/Server/Modules/Plugins/Domain/Dara.Server.Modules.Plugins.Domain.csproj" />
+    <Project Path="src/Server/Modules/Plugins/Infrastructure/Dara.Server.Modules.Plugins.Infrastructure.csproj" />
+    <Project Path="src/Server/Modules/Plugins/Integration/Dara.Server.Modules.Plugins.Integration.csproj" />
   </Folder>
   
   <Folder Name="/Shared/">

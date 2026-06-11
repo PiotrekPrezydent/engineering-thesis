@@ -10,4 +10,8 @@
       <ProjectReference Include="..\Common\Dara.Shared.Common.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Clients\" />
+    </ItemGroup>
+
 </Project>
