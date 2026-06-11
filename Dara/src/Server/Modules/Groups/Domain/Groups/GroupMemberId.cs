@@ -2,9 +2,9 @@ using Dara.Server.BuildingBlocks.Domain;
 
 namespace Dara.Server.Modules.Groups.Domain.Groups;
 
-public record GroupId: BaseEntityId
+public record GroupMemberId : BaseEntityId
 {
-    public GroupId(Guid value) : base(value)
+    public GroupMemberId(Guid value) : base(value)
     {
     }
 }

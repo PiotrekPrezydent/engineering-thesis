@@ -6,6 +6,8 @@ public abstract class Entity
 {
     public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
     readonly List<IDomainEvent> _domainEvents = new();
+    
+    protected Entity(){}
         
     public void ClearDomainEvents()
     {
@@ -27,4 +29,9 @@ public abstract class Entity
 public abstract class Entity<TId> : Entity where TId : IEntityId
 {
     public TId Id { get; protected set; }
+    
+    protected Entity(TId id)
+    {
+        Id = id;
+    }
 }

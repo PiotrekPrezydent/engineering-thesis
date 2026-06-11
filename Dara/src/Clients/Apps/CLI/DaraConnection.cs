@@ -12,16 +12,7 @@ public class DaraConnection
     public DaraConnection()
     {
         _serverUrl = ProvideUrl();
-        BuildConnection();
-    }
-
-    string ProvideUrl()
-    {
-        return "http://127.0.0.1:5273/app";
-    }
-
-    void BuildConnection()
-    {
+        
         var myClientId = Guid.NewGuid().ToString();
         
         var builder = new HubConnectionBuilder();
@@ -32,6 +23,10 @@ public class DaraConnection
         Connection = builder.Build();
     }
 
+    string ProvideUrl()
+    {
+        return "http://127.0.0.1:5273/app";
+    }
 
     [CLICommand("connect","con")]
     async Task Connect()

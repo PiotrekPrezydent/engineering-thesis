@@ -11,7 +11,7 @@ public record ClientNameCannotBeEmptyRule : IBuisnessRule
         _name = name;
     }
 
-    public string Message => nameof(ClientSupervisorCannotBeAddedTwiceRule);
+    public string Message => nameof(ClientNameCannotBeEmptyRule);
     public bool IsBroken()
     {
         return string.IsNullOrEmpty(_name);

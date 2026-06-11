@@ -8,16 +8,12 @@ public class Client : Entity<ClientId>, IAggregateRoot
 {
     public string Name { get; private set; }
     public bool IsOnline { get; private set; }
-
-    public IReadOnlyList<ClientId> ClientSupervisors => _clientSupervisors.AsReadOnly();
-    private readonly List<ClientId> _clientSupervisors;
-
-    private Client() { }
     
-    internal Client(ClientId clientId, string name)
+    private readonly List<ClientId> _clientSupervisors;
+    
+    internal Client(ClientId id, string name) : base(id)
     {
-        Id = clientId;
-        IsOnline = false;
+        IsOnline = true;
         _clientSupervisors = new();
         Name = name;
         
@@ -60,7 +56,7 @@ public class Client : Entity<ClientId>, IAggregateRoot
 
     public void AddSupervisor(ClientId supervisor)
     {
-        CheckRule(new ClientSupervisorCannotBeAddedTwiceRule(ClientSupervisors, supervisor));
+        CheckRule(new ClientSupervisorCannotBeAddedTwiceRule(_clientSupervisors, supervisor));
         
         _clientSupervisors.Add(supervisor);
         AddDomainEvent(new ClientSupervisorAddedDomainEvent(Id, supervisor));
@@ -68,10 +64,11 @@ public class Client : Entity<ClientId>, IAggregateRoot
 
     public void RemoveSupervisor(ClientId supervisor)
     {
-        CheckRule(new OnlyActualClientSupervisorCanBeRemovedRule(ClientSupervisors, supervisor));
+        CheckRule(new OnlyActualClientSupervisorCanBeRemovedRule(_clientSupervisors, supervisor));
         
         _clientSupervisors.Remove(supervisor);
         AddDomainEvent(new ClientSupervisorRemovedDomainEvent(Id, supervisor));
     }
-    
+
+
 }

@@ -4,52 +4,49 @@ using Dara.Server.Modules.Clients.Application.Clients.CreateClient;
 using Dara.Server.Modules.Clients.Application.Clients.GetClient;
 using Dara.Server.Modules.Clients.Application.Clients.MarkClientAsOffline;
 using Dara.Server.Modules.Clients.Application.Clients.MarkClientAsOnline;
+using Dara.Shared.Contracts.Hubs;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Dara.Server.Apps.API.Hubs;
 
-public partial class AppHub : Hub
+public partial class AppHub : Hub, IAppHub
 {
     //store connection to hub and session id
     static ConcurrentDictionary<Guid, string> _connections = new();
     private readonly IClientsModule _clientsModule;
+    Guid CallerId => Guid.Parse(Context.UserIdentifier!);
 
     public AppHub(IClientsModule clientsModule)
     {
         _clientsModule = clientsModule;
     }
 
-    public async override Task OnConnectedAsync()
+    public override async Task OnConnectedAsync()
     {
-        Console.WriteLine($"{Context.ConnectionId} --- { Context.UserIdentifier}");
-        
-        var clientId = Guid.Parse(Context.UserIdentifier!);
-        if (_connections.TryGetValue(clientId, out var connectionId))
+        if (_connections.TryGetValue(CallerId, out var connectionId))
         {
-            _connections[clientId] = connectionId;
-            var command = new MarkClientAsOnlineCommand(clientId);
+            _connections[CallerId] = connectionId;
+            var command = new MarkClientAsOnlineCommand(CallerId);
             
             await _clientsModule.ExecuteCommandAsync(command);
         }
         else
         {
-            _connections.TryAdd(clientId, Context.ConnectionId);
-            var command = new CreateClientCommand(clientId, Context.ConnectionId);
+            _connections.TryAdd(CallerId, Context.ConnectionId);
+            var command = new CreateClientCommand(CallerId, Context.ConnectionId);
             
             await _clientsModule.ExecuteCommandAsync(command);
         }
         await base.OnConnectedAsync();
     }
 
-    public async override Task OnDisconnectedAsync(Exception? exception)
+    public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        var clientId = Guid.Parse(Context.UserIdentifier!);
-        
-        var query = new GetClientQuery(clientId);
+        var query = new GetClientQuery(CallerId);
         var result = await _clientsModule.ExecuteQueryAsync<GetClientQuery, ClientDto>(query);
         if (result.IsOnline)
         {
-            var command = new MarkClientAsOfflineCommand(clientId);
+            var command = new MarkClientAsOfflineCommand(CallerId);
         
             await _clientsModule.ExecuteCommandAsync(command);
         }
