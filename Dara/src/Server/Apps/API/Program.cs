@@ -1,7 +1,5 @@
 using Dara.Server.Apps.API.Hubs;
 using Dara.Server.Apps.API.Utils;
-using Dara.Server.Modules.Clients.Application;
-using Dara.Server.Modules.Clients.Infrastructure;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Dara.Server.Apps.API;
@@ -21,8 +19,6 @@ public class Program
             //options.FormatterName = nameof(DaraLogFormatter); 
         });
         //builder.Logging.AddConsoleFormatter<DaraLogFormatter, ConsoleFormatterOptions>();
-        ClientsCompositionRoot.Initialize();
-        builder.Services.AddScoped<IClientsModule, ClientsModule>();
             
         var app = builder.Build();
             

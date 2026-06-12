@@ -15,6 +15,7 @@ public class UnitOfWork : IUnitOfWork
 
     public async Task<int> CommitAsync()
     {
+
         var entities = _context.ChangeTracker.Entries<Entity>().Where(e => e.Entity.DomainEvents.Any()).ToList();
         var domainEvents = entities.SelectMany(e => e.Entity.DomainEvents);
         

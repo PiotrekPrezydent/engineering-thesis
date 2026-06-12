@@ -1,6 +1,6 @@
 namespace Dara.Server.Modules.Plugins.Domain.Plugins;
 
-public class PluginId
+public class PluginOwnerId
 {
     
 }

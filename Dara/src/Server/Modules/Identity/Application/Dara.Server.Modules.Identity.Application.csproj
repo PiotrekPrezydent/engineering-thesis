@@ -2,16 +2,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\BuildingBlocks\Application\Dara.Server.BuildingBlocks.Application.csproj" />
-    <ProjectReference Include="..\Domain\Dara.Server.Modules.Groups.Domain.csproj" />
+    <ProjectReference Include="..\Domain\Dara.Server.Modules.Identity.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="CreateGroup\" />
-    <Folder Include="GetAvaibleGroups\" />
-    <Folder Include="GetGroupMembers\" />
-    <Folder Include="JoinGroup\" />
-    <Folder Include="LeaveGroup\" />
-    <Folder Include="SentGroupMessage\" />
+    <Folder Include="AuthenticateUser\" />
   </ItemGroup>
 
   <PropertyGroup>

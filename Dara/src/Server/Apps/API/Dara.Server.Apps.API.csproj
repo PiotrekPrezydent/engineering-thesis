@@ -19,7 +19,7 @@
     <ItemGroup>
       <ProjectReference Include="..\..\..\Shared\Contracts\Dara.Shared.Contracts.csproj" />
       <ProjectReference Include="..\..\BuildingBlocks\Infrastructure\Dara.Server.BuildingBlocks.Infrastructure.csproj" />
-      <ProjectReference Include="..\..\Modules\Clients\Infrastructure\Dara.Server.Modules.Clients.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\Modules\Clients\Infrastructure\Dara.Server.Modules.Profiles.Infrastructure.csproj" />
     </ItemGroup>
     
 </Project>

@@ -5,6 +5,12 @@
     <ProjectReference Include="..\Domain\Dara.Server.Modules.Plugins.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="CreatePlugin\" />
+    <Folder Include="GetPlugins\" />
+    <Folder Include="RemovePlugin\" />
+  </ItemGroup>
+
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
