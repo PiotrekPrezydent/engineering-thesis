@@ -12,4 +12,5 @@ public static class AssemblyExtensions
                 .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == openGenericType)
                 .Select(i => (Interface: i, Implementation: t)));
     }
+    
 }

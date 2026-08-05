@@ -48,6 +48,7 @@
     <Project Path="src/Shared/Common/Dara.Shared.Common.csproj" />
     <Project Path="src/Shared/Contracts/Dara.Shared.Contracts.csproj" />
     <Project Path="src/Shared/Logging/Dara.Shared.Logging.csproj" />
+    <Project Path="src\Shared\SourceGenerators\Dara.Shared.SourceGenerators.csproj" />
   </Folder>
   
 </Solution>

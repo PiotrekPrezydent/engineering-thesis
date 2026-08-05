@@ -1,53 +1,28 @@
+using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Dara.Server.BuildingBlocks.Infrastructure.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddDecorators(this IServiceCollection services, IEnumerable<Type> decorators)
+    public static IServiceCollection AddAssemblyInterfaceImplementations(this IServiceCollection services, Assembly assembly, Type interfaceType, ServiceLifetime serviceLifetime)
     {
-        foreach (var decorator in decorators)
-            services.UseDecorator(decorator); 
-
-        return services;
-    }
-    public static IServiceCollection UseDecorator(this IServiceCollection services, Type decoratorType)
-    {
-        var descriptor = services.LastOrDefault();
-        
-        if (descriptor == null)
-            throw new InvalidOperationException("No service registered for " + decoratorType.Name);
-
-        var serviceType = descriptor.ServiceType; 
-        Type closedDecoratorType;
-        
-        if (decoratorType.IsGenericTypeDefinition)
+        if (interfaceType.IsGenericType)
         {
-            if (!serviceType.IsGenericType)
-                throw new InvalidOperationException($"Service {serviceType.Name} is not generic type, but {decoratorType.Name} is generic.");
-            
-            var genericArguments = serviceType.GetGenericArguments();
-            closedDecoratorType = decoratorType.MakeGenericType(genericArguments);
+            var openGenericHandlers = assembly.GetImplementationsOfOpenGeneric(interfaceType);
+
+            foreach (var handler in openGenericHandlers)
+                services.Add(ServiceDescriptor.Describe(handler.Interface, handler.Implementation, serviceLifetime));
         }
         else
-            closedDecoratorType = decoratorType;
-        
-        services.Remove(descriptor);
-
-        services.Add(new ServiceDescriptor(serviceType, provider =>
         {
-            object innerInstance;
-            if (descriptor.ImplementationInstance != null)
-                innerInstance = descriptor.ImplementationInstance;
-            else if (descriptor.ImplementationFactory != null)
-                innerInstance = descriptor.ImplementationFactory(provider);
-            else
-                innerInstance = ActivatorUtilities.CreateInstance(provider, descriptor.ImplementationType!);
+            var implementations = assembly.GetTypes()
+                .Where(t => t.IsClass && !t.IsAbstract && interfaceType.IsAssignableFrom(t));
 
-            return ActivatorUtilities.CreateInstance(provider, closedDecoratorType, innerInstance);
-
-        }, descriptor.Lifetime));
-
+            foreach (var implementation in implementations)
+                services.Add(ServiceDescriptor.Describe(interfaceType, implementation, serviceLifetime));
+        }
+        
         return services;
     }
 }

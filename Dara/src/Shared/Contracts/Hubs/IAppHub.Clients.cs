@@ -1,5 +1,3 @@
-using Dara.Shared.Common.Results;
-
 namespace Dara.Shared.Contracts.Hubs;
 
 public partial interface IAppHub

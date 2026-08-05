@@ -9,22 +9,20 @@ public class Program
     public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-            
         builder.Services.AddSingleton<IUserIdProvider, HeaderUserIdProvider>();
         builder.Services.AddSignalR();
-            
         builder.Logging.ClearProviders();
+
         builder.Logging.AddConsole(options =>
         {
-            //options.FormatterName = nameof(DaraLogFormatter); 
+            //options.FormatterName = nameof(DaraLogFormatter);
         });
-        //builder.Logging.AddConsoleFormatter<DaraLogFormatter, ConsoleFormatterOptions>();
-            
+        
         var app = builder.Build();
-            
+        
         app.Use(async (context, next) =>
-        { 
-            if (context.Request.Path.StartsWithSegments("/app")) 
+        {
+            if (context.Request.Path.StartsWithSegments("/app"))
             {
                 if (!context.Request.Headers.ContainsKey("X-Client-Id"))
                 {
@@ -35,7 +33,7 @@ public class Program
             }
             await next();
         });
-        
+
         app.MapHub<AppHub>("/app");
 
         app.Run();
