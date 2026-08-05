@@ -1,6 +1,6 @@
 using System;
 
-namespace Dara.Shared.SourceGenerators.BuilderClass.Models;
+namespace Dara.Shared.SourceGenerators.Common;
 
 [Flags]
 public enum GenericConstraints

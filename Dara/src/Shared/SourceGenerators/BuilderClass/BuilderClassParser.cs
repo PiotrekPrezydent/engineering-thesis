@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Dara.Shared.SourceGenerators.Attributes;
 using Dara.Shared.SourceGenerators.BuilderClass.Models;
 using Dara.Shared.SourceGenerators.Common;
 using Microsoft.CodeAnalysis;
@@ -50,7 +51,7 @@ public static class BuilderClassParser
             if (attr.AttributeClass is null)
                 continue;
 
-            if (attr.AttributeClass.Name == Names.BuilderMethodNameAttributeName)
+            if (attr.AttributeClass.Name == AttributeNames.BuilderMethodNameAttributeName)
             {
                 if(attr.ConstructorArguments.Length != 1)
                     continue;
@@ -61,7 +62,7 @@ public static class BuilderClassParser
                 collectedAttributes.Add(new CustomMethodNameAttributeData(name));
             }
 
-            if (attr.AttributeClass.Name == Names.ObsoleteMethodOnRepeatedTypeAttributeName)
+            if (attr.AttributeClass.Name == AttributeNames.ObsoleteMethodOnRepeatedTypeAttributeName)
             {
                 if(attr.ConstructorArguments.Length != 1)
                     continue;

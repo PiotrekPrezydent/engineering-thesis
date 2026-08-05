@@ -1,3 +1,5 @@
+using Dara.Shared.SourceGenerators.Common;
+
 namespace Dara.Shared.SourceGenerators.BuilderClass.Models;
 
 public abstract record TypeData(string Name, string Namespace, GenericConstraints SatisfiedGenericConstraints)

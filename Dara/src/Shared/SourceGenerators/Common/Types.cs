@@ -4,7 +4,7 @@ namespace Dara.Shared.SourceGenerators.Common;
 
 public static class Types
 {
-    public static string[] CollectionTypes = new[]
+    public static readonly string[] CollectionTypes = new[]
     {
         typeof(List<>).FullName,
         typeof(IReadOnlyList<>).FullName,

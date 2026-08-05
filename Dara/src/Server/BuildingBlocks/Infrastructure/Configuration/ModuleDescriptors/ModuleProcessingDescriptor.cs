@@ -24,8 +24,6 @@ public partial class ModuleProcessingDescriptor : IVisitable<ModuleProcessingDes
     [ObsoleteMethodOnRepeatedType(typeof(IUnitOfWork))]
     public ITypeKey<IUnitOfWork> UnitOfWork { get; set; }
     
-    public IReadOnlyList<Type> MediationOpenTypes { get; set; }
-    
     public void Accept(IVisitor<ModuleProcessingDescriptor> visitor)
     {
         visitor.Visit(this);

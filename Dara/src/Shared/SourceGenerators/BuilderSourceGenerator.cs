@@ -28,12 +28,20 @@ public class BuilderSourceGenerator : IIncrementalGenerator
                 ctx.AddSource(file.FileNameWithSuffix, SourceText.From(file.Text, Encoding.UTF8)));
         }
 
-        var f = BuilderCollectionFileFactory.GetBuilderCollectionFile();
-        context.RegisterPostInitializationOutput(ctx =>ctx.AddSource(f.FileNameWithSuffix, SourceText.From(f.Text, Encoding.UTF8)));
+        FileDeclaration[] builderCollections =
+        [
+            BuilderCollection.GetFileDeclaration(),
+            TypeIgnoringBuilderCollection.GetFileDeclaration()
+        ];
+        
+        foreach (var file in builderCollections)
+            context.RegisterPostInitializationOutput(ctx =>
+                ctx.AddSource(file.FileNameWithSuffix, SourceText.From(file.Text, Encoding.UTF8)));
+        
         
         var classDeclarations = context.SyntaxProvider
             .ForAttributeWithMetadataName(
-                Names.AttributesNamespace + "." + Names.GenerateBuilderAttributeName,
+                AttributeNames.AttributesNamespace + "." + AttributeNames.GenerateBuilderAttributeName,
                 predicate: BuilderClassParser.IsClassTarget,
                 transform: BuilderClassParser.Parse
             )

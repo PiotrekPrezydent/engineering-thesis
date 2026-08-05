@@ -22,7 +22,7 @@ public record GenericTypeData(
 
     public string TypeArgumentsString => "<" + string.Join(", ", Arguments.Select(e => e.FullName)) + ">";
 
-    public string TypeArgumentsFormatableString =>
+    public string TypeArgumentsFormattableString =>
         "<" + string.Join(", ", Enumerable.Range(0, Arguments.Count).Select(i => "{" + i + "}")) + ">";
 
 

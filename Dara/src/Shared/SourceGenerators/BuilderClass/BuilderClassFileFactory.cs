@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Dara.Shared.SourceGenerators.BuilderClass.Methods;
 using Dara.Shared.SourceGenerators.BuilderClass.Models;
 using Dara.Shared.SourceGenerators.BuilderCollections;
 using Dara.Shared.SourceGenerators.Common;
@@ -12,8 +13,7 @@ public static class BuilderClassFileFactory
 {
     public static FileDeclaration GenerateBuilderClassFileDeclaration(BuilderClassSpecification specification)
     {
-        var methods = CollectPropertiesMethods(specification.Properties.ToArray());
-        
+        var factory = new BuilderMethodFactory(specification.BuilderClassName,specification.ClassInstanceFieldName);
         var text =
             $$""""
             namespace {{specification.Namespace}}
@@ -41,7 +41,7 @@ public static class BuilderClassFileFactory
                             return {{specification.ClassInstanceFieldName}};
                         }
                         
-                        {{CreateBuilderClassMethodsCode(methods,specification.ClassInstanceFieldName,specification.BuilderClassName).AppendIntendOnNewLine(3)}}
+                        {{CreateBuilderClassMethodsCode(specification.Properties.ToArray(), factory).AppendIntendOnNewLine(3)}}
                     }
                 }
             }
@@ -49,126 +49,75 @@ public static class BuilderClassFileFactory
         
         return new FileDeclaration(specification.ClassName, text);
     }
-    
 
-    static List<BuilderClassMethodData> CollectPropertiesMethods(PropertyData[] properties)
-    {
-        var result = new List<BuilderClassMethodData>();
-        foreach (var property in properties)
-        {
-            var methodName = "With"+property.Name;
-            var parameterType = property.Type.FullName;
-            var parameterName = property.NameAsParameter;
-            var fieldName = property.Name;
-            bool isTypeObsolete = false;
-            BuilderClassMethodData primaryMethodData = null;
-            
-            foreach (var attribute in property.Attributes)
-            {
-                if (attribute is ObsoleteMethodOnRepeatedTypeAttributeData obsoleteAttribute)
-                {
-                    var dataToReplace = obsoleteAttribute.NonRepeatableTypeData;
-                    var genericParameterName = "T" + dataToReplace.Name;
-                    if (property.Type.TryReplaceDataAsGenericType(dataToReplace, genericParameterName,
-                            out string genericTypeName, out var whereStatement))
-                    {
-
-                        primaryMethodData = new GenericBuilderClassMethodData(methodName, genericTypeName,
-                            parameterName,fieldName, $"<{genericParameterName}>", whereStatement);
-                        isTypeObsolete = true;
-                        
-                        result.Add(new SimpleBuilderClassMethodData(methodName, parameterType, parameterName,fieldName,$"[Obsolete(\"Type: {dataToReplace.Name} cannot be repeated\",true)]"));
-                    }
-                }
-            }
-
-            if (property.Type is GenericTypeData genericType)
-            {
-                if (genericType.IsCollection)
-                {
-                    var arg = genericType.Arguments[0];
-                    // primaryMethodData = new CollectionBuilderClassMethodData(methodName, parameterType, parameterName,
-                    //     fieldName, arg.FullName);
-                    result.Add(new CollectionBuilderClassMethodData(methodName, parameterType, parameterName,
-                        fieldName, arg.FullName,isTypeObsolete));
-                }
-            }
-       
-            
-            if(primaryMethodData == null)
-                primaryMethodData = new SimpleBuilderClassMethodData(methodName, parameterType, parameterName,fieldName);
-            
-            result.Add(primaryMethodData);
-        }
-        return  result;
-    }
-    
-    static StringBuilder CreateBuilderClassMethodsCode(List<BuilderClassMethodData> methods, string classInstanceFieldName, string builderClassName)
+    static StringBuilder CreateBuilderClassMethodsCode(PropertyData[] properties, BuilderMethodFactory factory)
     {
         StringBuilder sb = new();
-        foreach (var method in methods)
+        foreach (var property in properties)
         {
-            if (method.AttributeText != "")
-                sb.AppendLine(method.AttributeText);
-            
-            if(method is SimpleBuilderClassMethodData simpleMethod)
-                sb.AppendLine(CreateSimpleMethodCode(builderClassName, classInstanceFieldName, simpleMethod));
-            
-            if(method is GenericBuilderClassMethodData genericMethod)
-                sb.AppendLine(CreateGenericMethodCode(builderClassName, classInstanceFieldName, genericMethod));
-            
-            if(method is CollectionBuilderClassMethodData collectionMethod)
-                sb.AppendLine(CreateBuilderCollectionMethodCode(builderClassName, classInstanceFieldName, collectionMethod));
-
-            sb.AppendLine();
+            var methods =GetPropertyMethods(property);
+            foreach (var builderMethodData  in methods)
+            {
+                if(builderMethodData is BaseMethodData baseMethodData && baseMethodData.AddObsoleteAttribute)
+                    sb.AppendLine($"[Obsolete(\"\",true)]");
+                
+                sb.AppendLine(factory.GetMethodCodeByType(builderMethodData));
+                sb.AppendLine();
+            }
         }
-    
+
         return sb;
     }
 
-     static string CreateSimpleMethodCode(string builderClassName, string classInstanceFieldName, SimpleBuilderClassMethodData data)
-     {
-         var text = 
-             $$""""
-             public {{builderClassName}} {{data.MethodName}}({{data.ParameterType}} {{data.ParameterName}})
-             {
-                 {{classInstanceFieldName}}.{{data.FieldName}} = {{data.ParameterName}};
-                 return this;
-             }
-             """";
-         return text;
-     }
+    static List<IBuilderMethodData> GetPropertyMethods(PropertyData property)
+    {
+        var result = new List<IBuilderMethodData>();
 
-     static string CreateGenericMethodCode(string builderClassName, string classInstanceFieldName,
-         GenericBuilderClassMethodData data)
-     {
-         var text = 
-             $$""""
-               public {{builderClassName}} {{data.MethodName}}{{data.GenericParametersStatement}}({{data.ParameterType}} {{data.ParameterName}}) {{data.WhereStatement}}
-               {
-                   {{classInstanceFieldName}}.{{data.FieldName}} = {{data.ParameterName}};
-                   return this;
-               }
-               """";
-         return text;
-     }
+        CustomMethodNameAttributeData customMethodName = null;
+        ObsoleteMethodOnRepeatedTypeAttributeData obsoleteMethod = null;
+        foreach (var attr in property.Attributes)
+        {
+            if (attr is CustomMethodNameAttributeData specialName)
+                customMethodName = specialName;
+            
+            if(attr is ObsoleteMethodOnRepeatedTypeAttributeData obsolete)
+                obsoleteMethod = obsolete;
+        }
 
-     static string CreateBuilderCollectionMethodCode(string builderClassName, string classInstanceFieldName,
-         CollectionBuilderClassMethodData data)
-     {
-         var colType = BuilderCollectionFileFactory.GetFormatableName(data.isTypeObsolete);
-         var formated = string.Format(colType, data.CollectionParameterName);
-         var text = 
-             $$""""
-               public {{builderClassName}} {{data.MethodName}}(Action<{{formated}}> configure)
-               {
-                   {{classInstanceFieldName}}.{{data.FieldName}} = new List<{{data.CollectionParameterName}}>();
-                   var builderCollection = new {{formated}}({{classInstanceFieldName}}.{{data.FieldName}}.ToList());
-                   configure(builderCollection);
-                   
-                   return this;
-               }
-               """";
-         return text;
-     }
+        string methodName = "";
+        
+        if (customMethodName != null)
+            methodName = customMethodName.MethodName;
+        else
+            methodName = $"With{property.Name}";
+
+        if (property.Type is GenericTypeData generic && generic.IsCollection)
+        {
+            string collectionArgument = generic.Arguments[0].FullName;
+            string collectionType = "";
+            methodName = $"Configure{property.Name}";
+            
+            string format = BuilderCollectionNames.GetFormatableText((obsoleteMethod == null) ? BuilderCollectionNames.ClassName : BuilderCollectionNames.TypeIgnoringClassName);
+            collectionType = string.Format(format, collectionArgument);
+            var baseData = new BaseMethodData(methodName, property.Name, collectionType, "configure");
+            
+            result.Add(new CollectionMethodData(collectionArgument, baseData));
+        }
+        else
+        {
+            bool addObsolete = false;
+            if (obsoleteMethod != null)
+            {
+                var parameterName = "T" + obsoleteMethod.NonRepeatableTypeData.Name;
+                property.Type.TryReplaceDataAsGenericType(obsoleteMethod.NonRepeatableTypeData, parameterName, out string typeGenericName, out string whereStatement);
+                var baseData = new BaseMethodData(methodName,  property.Name, typeGenericName, property.NameAsParameter);
+                
+                result.Add(new GenericMethodData($"<{parameterName}>",whereStatement, baseData));
+                addObsolete = true;
+            }   
+            result.Add(new BaseMethodData(methodName, property.Name, property.Type.FullName, property.NameAsParameter, addObsolete));
+        }
+        
+        return result;
+    } 
 }

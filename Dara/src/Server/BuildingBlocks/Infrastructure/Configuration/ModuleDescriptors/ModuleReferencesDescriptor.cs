@@ -13,11 +13,10 @@ public partial class ModuleReferencesDescriptor : IVisitable<ModuleReferencesDes
     public Assembly ApplicationAssembly { get; set; }
     public Assembly InfrastructureAssembly { get; set;  }
     
+    public IReadOnlyList<Type> MediationOpenTypes { get; set; }
+    
     [ObsoleteMethodOnRepeatedType(typeof(IModule))]
-    public ITypeKey<IModule> DeclaredModule { get; set;  }
-
-    [ObsoleteMethodOnRepeatedType(typeof(IModuleCompositionRoot))]
-    public ITypeKey<IModuleCompositionRoot> ModuleCompositionRoot { get; set;  }
+    public ITypeKey<IModule> DeclaredModuleInterface { get; set;  }
 
     public void Accept(IVisitor<ModuleReferencesDescriptor> visitor)
     {

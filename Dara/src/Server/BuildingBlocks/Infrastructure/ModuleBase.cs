@@ -3,6 +3,7 @@ using Dara.Server.BuildingBlocks.Application.Commands;
 using Dara.Server.BuildingBlocks.Application.Queries;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration.CompositionRoot;
 using Dara.Server.BuildingBlocks.Infrastructure.Processing.Commands;
+using Dara.Server.BuildingBlocks.Infrastructure.Processing.DomainEvents;
 using Microsoft.Extensions.DependencyInjection;
 
 

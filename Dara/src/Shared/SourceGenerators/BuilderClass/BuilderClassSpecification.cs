@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Dara.Shared.SourceGenerators.BuilderClass.Models;
 using Dara.Shared.SourceGenerators.Common;
@@ -19,6 +20,8 @@ public record BuilderClassSpecification(
         return ClassName == other.ClassName &&
                Namespace == other.Namespace &&
                Properties.SequenceEqual(other.Properties);
+
+        ICollection<int> a;
     }
     
     public override int GetHashCode()

@@ -10,14 +10,14 @@ public record AttributeClassSpecification(
     params AttributeParameterData[] ParametersDatas)
 {
     public static AttributeClassSpecification GenerateBuilderAttributeSpecification { get; } = new(
-        Names.AttributesNamespace, 
-        Names.GenerateBuilderAttributeName, 
+        AttributeNames.AttributesNamespace, 
+        AttributeNames.GenerateBuilderAttributeName, 
         new(AttributeTargets.Class)
     );
 
     public static AttributeClassSpecification BuilderMethodNameAttributeSpecification { get; } = new(
-        Names.AttributesNamespace, 
-        Names.BuilderMethodNameAttributeName, 
+        AttributeNames.AttributesNamespace, 
+        AttributeNames.BuilderMethodNameAttributeName, 
         new(AttributeTargets.Property), 
         [
             new(typeof(string), "MethodName")
@@ -25,8 +25,8 @@ public record AttributeClassSpecification(
     );
     
     public static AttributeClassSpecification ObsoleteMethodOnRepeatedTypeAttributeClassSpecification { get; } = new(
-        Names.AttributesNamespace, 
-        Names.ObsoleteMethodOnRepeatedTypeAttributeName, 
+        AttributeNames.AttributesNamespace, 
+        AttributeNames.ObsoleteMethodOnRepeatedTypeAttributeName, 
         new(AttributeTargets.Property),
         [
             new(typeof(Type), "NonRepeatableType")

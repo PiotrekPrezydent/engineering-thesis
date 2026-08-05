@@ -1,5 +1,8 @@
 using Dara.Server.Apps.API.Hubs;
 using Dara.Server.Apps.API.Utils;
+using Dara.Server.BuildingBlocks.Infrastructure.Configuration.CompositionRoot;
+using Dara.Server.Modules.Groups.Application;
+using Dara.Server.Modules.Groups.Infrastructure;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Dara.Server.Apps.API;
@@ -17,8 +20,21 @@ public class Program
         {
             //options.FormatterName = nameof(DaraLogFormatter);
         });
+        var modulesRoots = new IModuleCompositionRoot[]
+        {
+            new GroupModuleCompositionRoot()
+        };
+        
+        foreach (var module in modulesRoots)
+            module.Initialize(builder.Services);
+        
         
         var app = builder.Build();
+
+        // using (var scope = app.Services.CreateScope())
+        // {
+        //     var mod = scope.ServiceProvider.GetRequiredService<IGroupModule>();
+        // }
         
         app.Use(async (context, next) =>
         {

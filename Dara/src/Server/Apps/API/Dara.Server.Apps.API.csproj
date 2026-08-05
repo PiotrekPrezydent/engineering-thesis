@@ -20,6 +20,7 @@
       <ProjectReference Include="..\..\..\Shared\Contracts\Dara.Shared.Contracts.csproj" />
       <ProjectReference Include="..\..\BuildingBlocks\Infrastructure\Dara.Server.BuildingBlocks.Infrastructure.csproj" />
       <ProjectReference Include="..\..\Modules\Groups\Infrastructure\Dara.Server.Modules.Groups.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\Modules\Groups\Integration\Dara.Server.Modules.Groups.Integration.csproj" />
     </ItemGroup>
     
 </Project>

@@ -1,6 +1,6 @@
-namespace Dara.Shared.SourceGenerators.Common;
+namespace Dara.Shared.SourceGenerators.Attributes;
 
-public static class Names
+public static class AttributeNames
 {
     public const string AttributesNamespace = "Dara.Shared.Attributes";
 
@@ -9,7 +9,7 @@ public static class Names
     public const string BuilderMethodNameAttributeName = "BuilderMethodNameAttribute";
 
     public const string ObsoleteMethodOnRepeatedTypeAttributeName = "ObsoleteMethodOnRepeatedTypeAttribute";
-    
+    public static string GetFullyQualifiedName(string className) => AttributesNamespace + "." + className;
 }
 
 
