@@ -1,7 +1,7 @@
 using Dara.Server.BuildingBlocks.Application;
 using Dara.Server.BuildingBlocks.Application.Commands;
 using Dara.Server.BuildingBlocks.Application.Queries;
-using Dara.Server.BuildingBlocks.Infrastructure.Configuration.CompositionRoot;
+using Dara.Server.BuildingBlocks.Infrastructure.Configuration;
 using Dara.Server.BuildingBlocks.Infrastructure.Processing.Commands;
 using Dara.Server.BuildingBlocks.Infrastructure.Processing.DomainEvents;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +20,7 @@ public abstract class ModuleBase : IModule
 
     public async Task ExecuteCommandAsync<TCommand>(TCommand command) where TCommand : ICommand
     {
+        Console.WriteLine("START EXE");
         using (var scope = _compositionRoot.CreateScope())
         {
             var executor = scope.ServiceProvider.GetRequiredService<ICommandExecutor>();
@@ -33,9 +34,7 @@ public abstract class ModuleBase : IModule
         using (var scope = _compositionRoot.CreateScope())
         {
             var executor = scope.ServiceProvider.GetRequiredService<ICommandExecutor>();
-        
-            var result = await executor.ExecuteAsync<TCommand, TResult>(command);
-            return result;
+            return await executor.ExecuteAsync<TCommand, TResult>(command);
         }
     }
 

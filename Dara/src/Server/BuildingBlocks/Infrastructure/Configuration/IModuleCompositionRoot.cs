@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Dara.Server.BuildingBlocks.Infrastructure.Configuration.CompositionRoot;
+namespace Dara.Server.BuildingBlocks.Infrastructure.Configuration;
 
 public interface IModuleCompositionRoot
 {

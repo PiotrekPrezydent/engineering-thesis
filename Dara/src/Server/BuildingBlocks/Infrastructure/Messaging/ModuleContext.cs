@@ -9,8 +9,8 @@ public class ModuleContext : DbContext
     public DbSet<InboxMessage> InboxMessages { get; set; }
     public DbSet<OutboxMessage> OutboxMessages { get; set; }
 
-    protected ModuleContext(DbContextOptions options) : base(options)
+    public ModuleContext(DbContextOptions options) : base(options)
     {
-
+    
     }
 }

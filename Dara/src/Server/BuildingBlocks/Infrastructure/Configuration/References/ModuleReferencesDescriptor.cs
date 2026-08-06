@@ -2,10 +2,9 @@ using System.Reflection;
 using Dara.Server.BuildingBlocks.Application;
 using Dara.Server.BuildingBlocks.Infrastructure.Common.Types;
 using Dara.Server.BuildingBlocks.Infrastructure.Common.Visitors;
-using Dara.Server.BuildingBlocks.Infrastructure.Configuration.CompositionRoot;
 using Dara.Shared.Attributes;
 
-namespace Dara.Server.BuildingBlocks.Infrastructure.Configuration.ModuleDescriptors;
+namespace Dara.Server.BuildingBlocks.Infrastructure.Configuration.References;
 
 [GenerateBuilder]
 public partial class ModuleReferencesDescriptor : IVisitable<ModuleReferencesDescriptor>
@@ -14,6 +13,8 @@ public partial class ModuleReferencesDescriptor : IVisitable<ModuleReferencesDes
     public Assembly InfrastructureAssembly { get; set;  }
     
     public IReadOnlyList<Type> MediationOpenTypes { get; set; }
+    
+    public IReadOnlyList<Type> TypeWiseDecorators { get; set; }
     
     [ObsoleteMethodOnRepeatedType(typeof(IModule))]
     public ITypeKey<IModule> DeclaredModuleInterface { get; set;  }

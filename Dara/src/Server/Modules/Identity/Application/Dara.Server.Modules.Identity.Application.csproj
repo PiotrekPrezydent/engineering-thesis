@@ -5,10 +5,6 @@
     <ProjectReference Include="..\Domain\Dara.Server.Modules.Identity.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="AuthenticateUser\" />
-  </ItemGroup>
-
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>

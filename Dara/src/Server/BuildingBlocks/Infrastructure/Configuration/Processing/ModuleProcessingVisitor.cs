@@ -1,12 +1,11 @@
 using Dara.Server.BuildingBlocks.Infrastructure.Common.Visitors;
-using Dara.Server.BuildingBlocks.Infrastructure.Configuration.ModuleDescriptors;
 using Dara.Server.BuildingBlocks.Infrastructure.Processing.Commands;
 using Dara.Server.BuildingBlocks.Infrastructure.Processing.DomainEvents;
 using Dara.Server.BuildingBlocks.Infrastructure.Processing.Persistence;
 using Dara.Server.BuildingBlocks.Infrastructure.Processing.Scopes;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Dara.Server.BuildingBlocks.Infrastructure.Configuration.Visitors;
+namespace Dara.Server.BuildingBlocks.Infrastructure.Configuration.Processing;
 
 public class ModuleProcessingVisitor : IVisitor<ModuleProcessingDescriptor>
 {

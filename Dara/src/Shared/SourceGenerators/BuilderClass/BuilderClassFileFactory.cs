@@ -34,6 +34,7 @@ public static class BuilderClassFileFactory
                         public {{specification.BuilderClassName}}()
                         {
                             {{specification.ClassInstanceFieldName}} = new();
+                            {{CreateCollectionPropertiesInitializationCode(specification.Properties.ToArray(),specification.ClassInstanceFieldName).AppendIntendOnNewLine(4).RemoveLastNewLine()}}
                         }
                         
                         public {{specification.ClassName}} Build()
@@ -48,6 +49,21 @@ public static class BuilderClassFileFactory
             """";
         
         return new FileDeclaration(specification.ClassName, text);
+    }
+
+    static StringBuilder CreateCollectionPropertiesInitializationCode(PropertyData[] properties, string classInstanceFieldName)
+    {
+        var sb = new StringBuilder();
+        foreach (var property in properties)
+        {
+            if (property.Type is GenericTypeData generic && generic.IsCollection)
+            {
+                sb.AppendLine(
+                    $"{classInstanceFieldName}.{property.Name} = new List<{generic.Arguments[0].FullName}>();");
+            }
+        }
+
+        return sb;
     }
 
     static StringBuilder CreateBuilderClassMethodsCode(PropertyData[] properties, BuilderMethodFactory factory)

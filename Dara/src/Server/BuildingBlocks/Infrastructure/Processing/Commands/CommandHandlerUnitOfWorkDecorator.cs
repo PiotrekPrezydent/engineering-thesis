@@ -20,3 +20,23 @@ public class CommandHandlerUnitOfWorkDecorator<TCommand> : ICommandHandler<TComm
         await _unitOfWork.CommitAsync();
     }
 }
+
+public class CommandHandlerUnitOfWorkDecorator<TCommand, TResult> : ICommandHandler<TCommand, TResult>
+    where TCommand : ICommand<TResult>
+{
+    readonly IUnitOfWork _unitOfWork;
+    readonly ICommandHandler<TCommand,TResult> _decorated;
+    
+    public CommandHandlerUnitOfWorkDecorator(IUnitOfWork unitOfWork, ICommandHandler<TCommand, TResult> decorated)
+    {
+        _unitOfWork = unitOfWork;
+        _decorated = decorated;
+    }
+    
+    public async Task<TResult> HandleAsync(TCommand command)
+    {
+        var result = await _decorated.HandleAsync(command);
+        await _unitOfWork.CommitAsync();
+        return result;
+    }
+}

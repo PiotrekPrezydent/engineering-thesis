@@ -3,8 +3,7 @@ using Dara.Server.BuildingBlocks.Infrastructure.Common.Visitors;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging;
 using Dara.Shared.Attributes;
 
-
-namespace Dara.Server.BuildingBlocks.Infrastructure.Configuration.ModuleDescriptors;
+namespace Dara.Server.BuildingBlocks.Infrastructure.Configuration.DataAccess;
 
 [GenerateBuilder]
 public partial class ModuleDataAccessDescriptor : IVisitable<ModuleDataAccessDescriptor>

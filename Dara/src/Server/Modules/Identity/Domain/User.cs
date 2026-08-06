@@ -6,16 +6,20 @@ namespace Dara.Server.Modules.Identity.Domain;
 //core user representation that is used to create and maintain other 
 public class User : Entity, IAggregateRoot
 {
-    public UserId Id { get; private set; }
+    public UserId UserId { get; private set; }
     
     public string UserIdentifier { get; private set; }
-    
+
+    protected User()
+    {
+    }
+
     internal User(UserId userId, string userIdentifier)
     {
-        Id = userId;
+        UserId = userId;
         UserIdentifier = userIdentifier;
         
-        AddDomainEvent(new NewUserRegisteredDomainEvent(userId));
+        AddDomainEvent(new NewUserCreatedDomainEvent(userId));
     }
 
     public static User CreateNewUser(string identifier)

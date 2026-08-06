@@ -1,11 +1,10 @@
 using Dara.Server.BuildingBlocks.Infrastructure.Common.Types;
 using Dara.Server.BuildingBlocks.Infrastructure.Common.Visitors;
-using Dara.Server.BuildingBlocks.Infrastructure.Configuration.ModuleDescriptors;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.EventBus;
 using Dara.Server.BuildingBlocks.Integration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Dara.Server.BuildingBlocks.Infrastructure.Configuration.Visitors;
+namespace Dara.Server.BuildingBlocks.Infrastructure.Configuration.Events;
 
 public class ModuleEventsVisitor : IVisitor<ModuleEventsDescriptor>
 {

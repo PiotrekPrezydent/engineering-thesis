@@ -1,5 +1,5 @@
 using Dara.Server.BuildingBlocks.Infrastructure;
-using Dara.Server.BuildingBlocks.Infrastructure.Configuration.CompositionRoot;
+using Dara.Server.BuildingBlocks.Infrastructure.Configuration;
 using Dara.Server.Modules.Groups.Application;
 
 namespace Dara.Server.Modules.Groups.Infrastructure;

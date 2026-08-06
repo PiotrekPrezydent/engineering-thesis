@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Dara.Server.Modules.Groups.Infrastructure;
 
-public class GroupModuleContext : ModuleContext
+public class GroupContext : ModuleContext
 {
-    protected GroupModuleContext(DbContextOptions options) : base(options)
+    protected GroupContext(DbContextOptions options) : base(options)
     {
     }
 }

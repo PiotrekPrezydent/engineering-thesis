@@ -23,6 +23,7 @@ public class BuilderMethodFactory
             _ => ""
         };
     }
+    
 
     public string CreateBaseMethodCode(BaseMethodData data)
     {

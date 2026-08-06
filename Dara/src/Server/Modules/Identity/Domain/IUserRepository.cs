@@ -5,4 +5,6 @@ namespace Dara.Server.Modules.Identity.Domain;
 public interface IUserRepository : IRepository
 {
     public Task<User?> GetByUserIdentifierAsync(string userIdentifier);
+
+    public Task AddAsync(User user);
 }

@@ -4,49 +4,48 @@ namespace Dara.Server.BuildingBlocks.Infrastructure.Extensions;
 
 public static class DecoratorExtensions
 {
-    public static IServiceCollection AddDecorators(this IServiceCollection services, IEnumerable<Type> decorators)
+    public static IServiceCollection AddTypeWiseDecorator(this IServiceCollection services, Type decoratorType)
     {
-        foreach (var decorator in decorators)
-            services.UseDecorator(decorator); 
-
-        return services;
-    }
-    public static IServiceCollection UseDecorator(this IServiceCollection services, Type decoratorType)
-    {
-        var descriptor = services.LastOrDefault();
+        var decoratorInterface = decoratorType.GetInterfaces().FirstOrDefault();
+        if(decoratorInterface == null)
+            throw new Exception($"Decorator is not implementing any interface");
         
-        if (descriptor == null)
-            throw new InvalidOperationException("No service registered for " + decoratorType.Name);
+        IEnumerable<ServiceDescriptor> descriptorsToChange;
 
-        var serviceType = descriptor.ServiceType; 
-        Type closedDecoratorType;
-        
-        if (decoratorType.IsGenericTypeDefinition)
+        if (decoratorInterface.IsGenericType)
         {
-            if (!serviceType.IsGenericType)
-                throw new InvalidOperationException($"Service {serviceType.Name} is not generic type, but {decoratorType.Name} is generic.");
-            
-            var genericArguments = serviceType.GetGenericArguments();
-            closedDecoratorType = decoratorType.MakeGenericType(genericArguments);
+            decoratorInterface = decoratorInterface.GetGenericTypeDefinition();
+            descriptorsToChange = services.Where(e => e.ServiceType.IsGenericType && e.ServiceType.GetGenericTypeDefinition() == decoratorInterface);
         }
         else
-            closedDecoratorType = decoratorType;
-        
-        services.Remove(descriptor);
-
-        services.Add(new ServiceDescriptor(serviceType, provider =>
         {
-            object innerInstance;
-            if (descriptor.ImplementationInstance != null)
-                innerInstance = descriptor.ImplementationInstance;
-            else if (descriptor.ImplementationFactory != null)
-                innerInstance = descriptor.ImplementationFactory(provider);
-            else
-                innerInstance = ActivatorUtilities.CreateInstance(provider, descriptor.ImplementationType!);
+            descriptorsToChange = services.Where(e => e.ServiceType == decoratorType);
+        }
+        
+        
+        foreach (var descriptor in descriptorsToChange.ToList())
+        {
+            var usedDecoratorType = decoratorType;
+            
+            if(decoratorInterface.IsGenericType)
+                usedDecoratorType = usedDecoratorType.MakeGenericType(descriptor.ServiceType.GetGenericArguments());
 
-            return ActivatorUtilities.CreateInstance(provider, closedDecoratorType, innerInstance);
+            var newDescriptor = new ServiceDescriptor(descriptor.ServiceType, sp =>
+            {
+                object innerInstance;
+                if (descriptor.ImplementationInstance != null)
+                    innerInstance = descriptor.ImplementationInstance;
+                else if (descriptor.ImplementationFactory != null)
+                    innerInstance = descriptor.ImplementationFactory(sp);
+                else
+                    innerInstance = ActivatorUtilities.CreateInstance(sp, descriptor.ImplementationType!);
+                
+                return ActivatorUtilities.CreateInstance(sp, usedDecoratorType, innerInstance);
+            }, descriptor.Lifetime);
 
-        }, descriptor.Lifetime));
+            services.Remove(descriptor);
+            services.Add(newDescriptor);
+        }
 
         return services;
     }

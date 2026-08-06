@@ -3,10 +3,8 @@ using Dara.Server.BuildingBlocks.Infrastructure.Common.Visitors;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.EventBus;
 using Dara.Server.BuildingBlocks.Integration;
 using Dara.Shared.Attributes;
-using Dara.Shared.SourceGenerators.BuilderCollections;
 
-
-namespace Dara.Server.BuildingBlocks.Infrastructure.Configuration.ModuleDescriptors;
+namespace Dara.Server.BuildingBlocks.Infrastructure.Configuration.Events;
 
 [GenerateBuilder]
 public partial class ModuleEventsDescriptor : IVisitable<ModuleEventsDescriptor>

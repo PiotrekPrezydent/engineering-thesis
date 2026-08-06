@@ -1,10 +1,12 @@
+using Dara.Server.BuildingBlocks.Application.Commands;
+using Dara.Server.BuildingBlocks.Domain;
 using Dara.Server.BuildingBlocks.Infrastructure.Common.Visitors;
-using Dara.Server.BuildingBlocks.Infrastructure.Configuration.CompositionRoot;
-using Dara.Server.BuildingBlocks.Infrastructure.Configuration.ModuleDescriptors;
 using Dara.Server.BuildingBlocks.Infrastructure.Extensions;
+using Dara.Server.BuildingBlocks.Infrastructure.Processing.Commands;
+using Dara.Server.BuildingBlocks.Infrastructure.Processing.Persistence;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Dara.Server.BuildingBlocks.Infrastructure.Configuration.Visitors;
+namespace Dara.Server.BuildingBlocks.Infrastructure.Configuration.References;
 
 public class ModuleReferencesVisitor : IVisitor<ModuleReferencesDescriptor>
 {
@@ -26,6 +28,18 @@ public class ModuleReferencesVisitor : IVisitor<ModuleReferencesDescriptor>
             {
                 _serviceCollection.AddTransient(implementation.Interface, implementation.Implementation);
             }
+        }
+        
+        var repositories = instance.InfrastructureAssembly.GetTypes().Where(e=>typeof(IRepository).IsAssignableFrom(e)).ToList();
+        foreach (var repository in repositories)
+        {
+            var implementedInterface = repository.GetInterfaces().First();
+            _serviceCollection.AddScoped(implementedInterface, repository);
+        }
+        
+        foreach (var decorator in instance.TypeWiseDecorators)
+        {
+            _serviceCollection.AddTypeWiseDecorator(decorator);
         }
 
         var imple = instance.InfrastructureAssembly.GetFirstImplementationOfType(instance.DeclaredModuleInterface.Value);

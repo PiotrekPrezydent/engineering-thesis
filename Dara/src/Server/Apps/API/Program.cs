@@ -1,8 +1,11 @@
 using Dara.Server.Apps.API.Hubs;
+using Dara.Server.Apps.API.Tests;
 using Dara.Server.Apps.API.Utils;
-using Dara.Server.BuildingBlocks.Infrastructure.Configuration.CompositionRoot;
+using Dara.Server.BuildingBlocks.Infrastructure.Configuration;
 using Dara.Server.Modules.Groups.Application;
 using Dara.Server.Modules.Groups.Infrastructure;
+using Dara.Server.Modules.Identity.Application;
+using Dara.Server.Modules.Identity.Infrastructure;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Dara.Server.Apps.API;
@@ -22,19 +25,22 @@ public class Program
         });
         var modulesRoots = new IModuleCompositionRoot[]
         {
-            new GroupModuleCompositionRoot()
+            new GroupCompositionRoot(),
+            new IdentityCompositionRoot()
         };
         
         foreach (var module in modulesRoots)
             module.Initialize(builder.Services);
-        
+
+        builder.Services.AddScoped<TestModules>();
         
         var app = builder.Build();
 
-        // using (var scope = app.Services.CreateScope())
-        // {
-        //     var mod = scope.ServiceProvider.GetRequiredService<IGroupModule>();
-        // }
+        using (var scope = app.Services.CreateScope())
+        {
+            var test = scope.ServiceProvider.GetRequiredService<TestModules>();
+            await test.Start();
+        }
         
         app.Use(async (context, next) =>
         {

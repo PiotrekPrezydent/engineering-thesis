@@ -6,8 +6,7 @@ using Dara.Server.BuildingBlocks.Infrastructure.Processing.Persistence;
 using Dara.Server.BuildingBlocks.Infrastructure.Processing.Scopes;
 using Dara.Shared.Attributes;
 
-
-namespace Dara.Server.BuildingBlocks.Infrastructure.Configuration.ModuleDescriptors;
+namespace Dara.Server.BuildingBlocks.Infrastructure.Configuration.Processing;
 
 [GenerateBuilder]
 public partial class ModuleProcessingDescriptor : IVisitable<ModuleProcessingDescriptor>

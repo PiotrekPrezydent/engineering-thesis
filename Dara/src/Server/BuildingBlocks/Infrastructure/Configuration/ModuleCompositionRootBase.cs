@@ -1,19 +1,19 @@
-using System.Reflection;
 using Dara.Server.BuildingBlocks.Application.Commands;
 using Dara.Server.BuildingBlocks.Application.Events;
 using Dara.Server.BuildingBlocks.Application.Queries;
+using Dara.Server.BuildingBlocks.Infrastructure.Common;
 using Dara.Server.BuildingBlocks.Infrastructure.Common.Types;
-using Dara.Server.BuildingBlocks.Infrastructure.Configuration.ModuleDescriptors;
-using Dara.Server.BuildingBlocks.Infrastructure.Configuration.Visitors;
-using Dara.Server.BuildingBlocks.Infrastructure.Extensions;
-using Dara.Server.BuildingBlocks.Infrastructure.Messaging;
+using Dara.Server.BuildingBlocks.Infrastructure.Configuration.DataAccess;
+using Dara.Server.BuildingBlocks.Infrastructure.Configuration.Events;
+using Dara.Server.BuildingBlocks.Infrastructure.Configuration.Processing;
+using Dara.Server.BuildingBlocks.Infrastructure.Configuration.References;
 using Dara.Server.BuildingBlocks.Infrastructure.Processing.Commands;
 using Dara.Server.BuildingBlocks.Infrastructure.Processing.DomainEvents;
 using Dara.Server.BuildingBlocks.Infrastructure.Processing.Persistence;
 using Dara.Server.BuildingBlocks.Infrastructure.Processing.Scopes;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Dara.Server.BuildingBlocks.Infrastructure.Configuration.CompositionRoot;
+namespace Dara.Server.BuildingBlocks.Infrastructure.Configuration;
 
 public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
 {
