@@ -1,21 +1,29 @@
+using System.Text.Json;
 using Dara.Server.BuildingBlocks.Application.Commands;
 using Dara.Server.BuildingBlocks.Application.Events;
 using Dara.Server.BuildingBlocks.Application.Queries;
+using Dara.Server.BuildingBlocks.Domain;
 using Dara.Server.BuildingBlocks.Infrastructure.Common;
+using Dara.Server.BuildingBlocks.Infrastructure.Common.Extensions;
 using Dara.Server.BuildingBlocks.Infrastructure.Common.Types;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration.DataAccess;
-using Dara.Server.BuildingBlocks.Infrastructure.Configuration.Events;
+using Dara.Server.BuildingBlocks.Infrastructure.Configuration.Mediation;
+using Dara.Server.BuildingBlocks.Infrastructure.Configuration.Messaging;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration.Processing;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration.References;
+using Dara.Server.BuildingBlocks.Infrastructure.DataAccess;
+using Dara.Server.BuildingBlocks.Infrastructure.Mediation.HandlerResolving;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox;
+using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox.Processing;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox;
+using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox.Processing;
 using Dara.Server.BuildingBlocks.Infrastructure.Processing.Commands;
 using Dara.Server.BuildingBlocks.Infrastructure.Processing.DomainEvents;
-using Dara.Server.BuildingBlocks.Infrastructure.Processing.Persistence;
-using Dara.Server.BuildingBlocks.Infrastructure.Processing.Scopes;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using ModuleMediationConfiguration = Dara.Server.BuildingBlocks.Infrastructure.Configuration.Mediation.ModuleMediationConfiguration;
+using ModuleMessagingConfiguration = Dara.Server.BuildingBlocks.Infrastructure.Configuration.Messaging.ModuleMessagingConfiguration;
 
 namespace Dara.Server.BuildingBlocks.Infrastructure.Configuration;
 
@@ -35,59 +43,70 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
     {
         _services = serviceProvider;
     }
-    
+
+    private record SpecialDomainEvent() : IDomainEvent;
 
     public void Initialize(IServiceCollection rootServices)
     {
         IServiceCollection services = new ServiceCollection();
-        
-        ModuleDataAccessDescriptor.ModuleDataAccessDescriptorBuilder dataAccessBuilder = new();
-        ModuleReferencesDescriptor.ModuleReferencesDescriptorBuilder refencesBuilder = new();
-        ModuleProcessingDescriptor.ModuleProcessingDescriptorBuilder processingBuilder = new();
-        ModuleEventsDescriptor.ModuleEventsDescriptorBuilder eventsBuilder = new();
-        
-        ConfigureDataAccess(dataAccessBuilder);
-        ConfigureReferences(refencesBuilder);
-        ConfigureProcessing(processingBuilder);
-        ConfigureEvents(eventsBuilder);
-        
-        var dataAccess = dataAccessBuilder.Build();
-        var references = refencesBuilder.Build();
-        var processing = processingBuilder.Build();
-        var events = eventsBuilder.Build();
-        
-        ModuleReferencesVisitor referencesVisitor = new(services);
-        ModuleDataAccessVisitor dataAccessVisitor = new(services);
-        ModuleProcessingVisitor processingVisitor = new(services);
-        ModuleEventsVisitor eventsVisitor = new(services,this);
-        
-        dataAccess.Accept(dataAccessVisitor);
-        references.Accept(referencesVisitor);
-        processing.Accept(processingVisitor);
-        events.Accept(eventsVisitor);
+
+        ModuleReferencesConfiguration.ModuleReferencesConfigurationBuilder referencesBuilder = new();
+        ModuleDataAccessConfiguration.ModuleDataAccessConfigurationBuilder dataAccessBuilder = new();
+        ModuleMediationConfiguration.ModuleMediationConfigurationBuilder mediationBuilder = new();
+        ModuleProcessingConfiguration.ModuleProcessingConfigurationBuilder processingBuilder = new();
+        ModuleMessagingConfiguration.ModuleMessagingConfigurationBuilder messagingBuilder = new();
         
         services.AddLogging(ConfigureLogging);
-        services.AddSingleton<IModuleCompositionRoot>(this);
+        ConfigureReferences(referencesBuilder);
+        ConfigureDataAccess(dataAccessBuilder);
+        ConfigureMediation(mediationBuilder);
+        ConfigureProcessing(processingBuilder);
+        ConfigureMessaging(messagingBuilder);
         
+        var references = referencesBuilder.Build();
+        var dataAccess = dataAccessBuilder.Build();
+        var mediation = mediationBuilder.Build();
+        var processing = processingBuilder.Build();
+        var messaging = messagingBuilder.Build();
+        
+        ModuleMediationVisitor mediationVisitor = new(references,services);
+        ModuleDataAccessVisitor dataAccessVisitor = new(references,services);
+        ModuleProcessingVisitor processingVisitor = new(services);
+        ModuleMessagingVisitor messagingVisitor = new(references,services);
+        
+        dataAccess.Accept(dataAccessVisitor);
+        mediation.Accept(mediationVisitor);
+        processing.Accept(processingVisitor);
+        messaging.Accept(messagingVisitor);
+        
+        
+        services.AddSingleton<IModuleCompositionRoot>(this);
+
+        var moduleDeclaration =
+            references.InfrastructureAssembly.GetFirstImplementationOfType(references.DeclaredModuleInterface.Value);
+        
+        services.AddScoped(moduleDeclaration.Interface,moduleDeclaration.Implementation);
         
         SetServiceProvider(services.BuildServiceProvider());
+
         
-        var moduleInterface = references.DeclaredModuleInterface.Value;
-        rootServices.AddScoped(moduleInterface, _ => _services.GetRequiredService(moduleInterface));
+        rootServices.AddScoped(moduleDeclaration.Interface , _ => _services.GetRequiredService(moduleDeclaration.Interface));
         
-        rootServices.AddSingleton<IHostedService>(_ => _services.GetRequiredService<OutboxProcessorService>());
-        rootServices.AddSingleton<IHostedService>(_ => _services.GetRequiredService<InboxProcessorService>());
+        rootServices.AddSingleton<IHostedService>(_ => _services.GetRequiredService<OutboxBackgroundWorker>());
+        rootServices.AddSingleton<IHostedService>(_ => _services.GetRequiredService<InboxBackgroundWorker>());
     }
 
     protected abstract void ConfigureLogging(ILoggingBuilder loggingBuilder);
 
-    protected abstract void ConfigureDataAccess(ModuleDataAccessDescriptor.ModuleDataAccessDescriptorBuilder builder);
+    protected abstract void ConfigureReferences(ModuleReferencesConfiguration.ModuleReferencesConfigurationBuilder builder);
     
-    protected abstract void ConfigureReferences(ModuleReferencesDescriptor.ModuleReferencesDescriptorBuilder builder);
+    protected abstract void ConfigureDataAccess(ModuleDataAccessConfiguration.ModuleDataAccessConfigurationBuilder builder);
     
-    protected abstract void ConfigureProcessing(ModuleProcessingDescriptor.ModuleProcessingDescriptorBuilder builder);
+    protected abstract void ConfigureMediation(ModuleMediationConfiguration.ModuleMediationConfigurationBuilder builder);
     
-    protected abstract void ConfigureEvents(ModuleEventsDescriptor.ModuleEventsDescriptorBuilder builder);
+    protected abstract void ConfigureProcessing(ModuleProcessingConfiguration.ModuleProcessingConfigurationBuilder builder);
+    
+    protected abstract void ConfigureMessaging(ModuleMessagingConfiguration.ModuleMessagingConfigurationBuilder builder);
 
     protected static IReadOnlyList<Type> StandardMediationOpenTypes => new List<Type>
     {

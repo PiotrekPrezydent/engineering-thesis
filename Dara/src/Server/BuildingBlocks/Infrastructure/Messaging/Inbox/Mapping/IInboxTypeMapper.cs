@@ -1,0 +1,10 @@
+namespace Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox.Mapping;
+
+public interface IInboxTypeMapper
+{
+    string GetName(Type type);
+    
+    Type GetType(string name);
+    
+    bool CanHandleType(Type type);
+}

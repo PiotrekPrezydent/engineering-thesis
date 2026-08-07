@@ -1,5 +1,5 @@
 using Dara.Server.BuildingBlocks.Domain;
-using Dara.Server.BuildingBlocks.Infrastructure.Processing.Scopes;
+using Dara.Server.BuildingBlocks.Infrastructure.Mediation.HandlerResolving;
 
 namespace Dara.Server.BuildingBlocks.Infrastructure.Processing.DomainEvents;
 

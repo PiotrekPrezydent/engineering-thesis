@@ -1,0 +1,36 @@
+using Dara.Server.BuildingBlocks.Infrastructure.Common.Types;
+using Dara.Server.BuildingBlocks.Infrastructure.Common.Visitors;
+using Dara.Server.BuildingBlocks.Infrastructure.Messaging.EventBus;
+using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox.Persistence;
+using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox.Processing;
+using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox.Persistence;
+using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox.Processing;
+using Dara.Server.BuildingBlocks.Integration;
+using Dara.Shared.Attributes;
+
+namespace Dara.Server.BuildingBlocks.Infrastructure.Configuration.Messaging;
+
+[GenerateBuilder]
+public partial class ModuleMessagingConfiguration : IVisitable<ModuleMessagingConfiguration>
+{
+    public IEventBus EventBusInstance { get; set; }
+
+    [ObsoleteMethodOnRepeatedType(typeof(IOutboxProcessor))]
+    public ITypeKey<IOutboxProcessor> OutboxProcessor { get; set; }
+    
+    [ObsoleteMethodOnRepeatedType(typeof(IOutboxRepository))]
+    public ITypeKey<IOutboxRepository> OutboxRepository { get; set; }
+    
+    [ObsoleteMethodOnRepeatedType(typeof(IInboxProcessor))]
+    public ITypeKey<IInboxProcessor> InboxProcessor { get; set; }
+    
+    [ObsoleteMethodOnRepeatedType(typeof(IInboxRepository))]
+    public ITypeKey<IInboxRepository> InboxRepository { get; set; }
+    
+    public void Accept(IVisitor<ModuleMessagingConfiguration> visitor)
+    {
+        visitor.Visit(this);
+    }
+}
+
+

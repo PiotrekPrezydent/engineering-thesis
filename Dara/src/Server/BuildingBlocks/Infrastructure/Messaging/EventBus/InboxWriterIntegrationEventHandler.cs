@@ -1,8 +1,10 @@
 using System.Text.Json;
-using Dara.Server.BuildingBlocks.Application;
 using Dara.Server.BuildingBlocks.Application.Events;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration;
+using Dara.Server.BuildingBlocks.Infrastructure.DataAccess;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox;
+using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox.Persistence;
+using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox.Processing;
 using Dara.Server.BuildingBlocks.Integration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -20,7 +22,9 @@ public class InboxWriterIntegrationEventHandler<TIntegrationEvent> : IIntegratio
     public async Task HandleAsync(TIntegrationEvent integrationEvent)
     {
         using var scope = _compositionRoot.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<ModuleContext>();
+        var inboxRepository = scope.ServiceProvider.GetRequiredService<IInboxRepository>();
+        var signal = scope.ServiceProvider.GetRequiredService<InboxQueueSignal>();
+        
         var data = JsonSerializer.Serialize(integrationEvent,integrationEvent.GetType());
         
         var message = new InboxMessage(
@@ -29,8 +33,8 @@ public class InboxWriterIntegrationEventHandler<TIntegrationEvent> : IIntegratio
             integrationEvent.GetType().Name,
             data
             );
-
-        await context.InboxMessages.AddAsync(message);
-        await context.SaveChangesAsync();
+        
+        await inboxRepository.SaveAsync(message, CancellationToken.None);
+        signal.NotifyNewMessage();
     }
 }

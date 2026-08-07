@@ -1,7 +1,6 @@
 using Dara.Server.BuildingBlocks.Application.Events;
 using Dara.Server.BuildingBlocks.Integration;
 
-
 namespace Dara.Server.BuildingBlocks.Infrastructure.Messaging.EventBus;
 
 public class InMemoryEventBus : IEventBus

@@ -1,3 +1,4 @@
+using Dara.Server.BuildingBlocks.Infrastructure.DataAccess;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging;
 using Microsoft.EntityFrameworkCore;
 

@@ -1,5 +1,5 @@
 using Dara.Server.BuildingBlocks.Application.Commands;
-using Dara.Server.BuildingBlocks.Infrastructure.Processing.Scopes;
+using Dara.Server.BuildingBlocks.Infrastructure.Mediation.HandlerResolving;
 
 namespace Dara.Server.BuildingBlocks.Infrastructure.Processing.Commands;
 

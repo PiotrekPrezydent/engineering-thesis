@@ -17,6 +17,7 @@ public class UserCreatedNotificationPublisher : IDomainEventNotificationHandler<
 
     public async Task HandleAsync(NewUserCreatedDomainEvent notification)
     {
+        Console.WriteLine("PUBLISHING");
         await _eventBus.PublishAsync(new UserCreatedIntegrationEvent(notification.UserId.Value));
     }
 }
