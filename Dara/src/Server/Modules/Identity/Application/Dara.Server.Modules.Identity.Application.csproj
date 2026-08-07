@@ -2,7 +2,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\BuildingBlocks\Application\Dara.Server.BuildingBlocks.Application.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Infrastructure\Dara.Server.BuildingBlocks.Infrastructure.csproj" />
     <ProjectReference Include="..\Domain\Dara.Server.Modules.Identity.Domain.csproj" />
+    <ProjectReference Include="..\Integration\Dara.Server.Modules.Identity.Integration.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

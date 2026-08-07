@@ -5,6 +5,7 @@ using Dara.Server.BuildingBlocks.Infrastructure.Configuration.Processing;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration.References;
 using Dara.Server.BuildingBlocks.Infrastructure.Extensions;
 using Dara.Server.Modules.Groups.Application;
+using Dara.Server.Modules.Identity.Integration;
 using Microsoft.Extensions.Logging;
 
 namespace Dara.Server.Modules.Groups.Infrastructure;
@@ -31,14 +32,18 @@ public class GroupCompositionRoot : ModuleCompositionRootBase
 
     protected override void ConfigureProcessing(ModuleProcessingDescriptor.ModuleProcessingDescriptorBuilder builder)
     {
-        builder.WithCommandExecutor(StandardCommandExecutor);
-        builder.WithDomainEventDispatcher(StandardDomainEventsDispatcher);
-        builder.WithHandlersResolver(StandardHandlersResolver);
-        builder.WithUnitOfWork(StandardUnitOfWork);
+        builder.WithCommandExecutor(StandardCommandExecutor)
+            .WithDomainEventDispatcher(StandardDomainEventsDispatcher)
+            .WithHandlersResolver(StandardHandlersResolver)
+            .WithUnitOfWork(StandardUnitOfWork);
     }
 
     protected override void ConfigureEvents(ModuleEventsDescriptor.ModuleEventsDescriptorBuilder builder)
     {
-        builder.WithOutboxProcessor(StandardOutboxProcessor);   
+        builder
+            .WithOutboxProcessor(StandardOutboxProcessor)
+            .WithInboxProcessor(StandardInboxProcessor)
+            .ConfigureEvents(e => e
+                .Add(UserCreatedIntegrationEvent.AsTypeKey));
     }
 }

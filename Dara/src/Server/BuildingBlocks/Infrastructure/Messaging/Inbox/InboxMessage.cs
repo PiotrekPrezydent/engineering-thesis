@@ -2,12 +2,12 @@ namespace Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox;
 
 public class InboxMessage
 {
-    public Guid Id { get; private set; }
-    public DateTime OccurredOn { get; private set; }
-    public DateTime? ProcessedDate { get; private set; }
-    public string Type { get; private set; }
+    public Guid Id { get; set; }
+    public DateTime OccurredOn { get;  set; }
+    public DateTime? ProcessedDate { get; set; }
+    public string Type { get; set; }
     
-    public string Content { get; private set; }
+    public string Content { get; set; }
 
     private InboxMessage() { }
 

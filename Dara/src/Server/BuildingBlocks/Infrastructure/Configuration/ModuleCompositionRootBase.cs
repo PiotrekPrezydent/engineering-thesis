@@ -7,6 +7,7 @@ using Dara.Server.BuildingBlocks.Infrastructure.Configuration.DataAccess;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration.Events;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration.Processing;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration.References;
+using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox;
 using Dara.Server.BuildingBlocks.Infrastructure.Processing.Commands;
 using Dara.Server.BuildingBlocks.Infrastructure.Processing.DomainEvents;
@@ -58,7 +59,7 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
         ModuleReferencesVisitor referencesVisitor = new(services);
         ModuleDataAccessVisitor dataAccessVisitor = new(services);
         ModuleProcessingVisitor processingVisitor = new(services);
-        ModuleEventsVisitor eventsVisitor = new(services);
+        ModuleEventsVisitor eventsVisitor = new(services,this);
         
         dataAccess.Accept(dataAccessVisitor);
         references.Accept(referencesVisitor);
@@ -68,12 +69,14 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
         services.AddLogging(ConfigureLogging);
         services.AddSingleton<IModuleCompositionRoot>(this);
         
+        
         SetServiceProvider(services.BuildServiceProvider());
         
         var moduleInterface = references.DeclaredModuleInterface.Value;
         rootServices.AddScoped(moduleInterface, _ => _services.GetRequiredService(moduleInterface));
         
         rootServices.AddSingleton<IHostedService>(_ => _services.GetRequiredService<OutboxProcessorService>());
+        rootServices.AddSingleton<IHostedService>(_ => _services.GetRequiredService<InboxProcessorService>());
     }
 
     protected abstract void ConfigureLogging(ILoggingBuilder loggingBuilder);
@@ -100,6 +103,8 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
     protected static ITypeKey<UnitOfWork> StandardUnitOfWork => new TypeKey<UnitOfWork>();
     
     protected static ITypeKey<OutboxProcessor> StandardOutboxProcessor => new TypeKey<OutboxProcessor>();
+    
+    protected static ITypeKey<InboxProcessor> StandardInboxProcessor => new TypeKey<InboxProcessor>();
 }
 
 

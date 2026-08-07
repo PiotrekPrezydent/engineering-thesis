@@ -1,6 +1,7 @@
 using Dara.Server.BuildingBlocks.Application.Commands;
 using Dara.Server.BuildingBlocks.Application.Events;
 using Dara.Server.BuildingBlocks.Domain;
+using Dara.Server.BuildingBlocks.Integration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Dara.Server.BuildingBlocks.Infrastructure.Processing.Scopes;
@@ -35,5 +36,10 @@ public class HandlersResolver : IHandlersResolver
     public IEnumerable<IDomainEventNotificationHandler<TDomainEvent>> GetDomainEventNotificationHandlers<TDomainEvent>() where TDomainEvent : IDomainEvent
     {
         return _serviceProvider.GetServices<IDomainEventNotificationHandler<TDomainEvent>>();
+    }
+
+    public IEnumerable<IIntegrationEventHandler<TIntegrationEvent>> GetIntegrationEventHandlers<TIntegrationEvent>() where TIntegrationEvent : IIntegrationEvent
+    {
+        return _serviceProvider.GetServices<IIntegrationEventHandler<TIntegrationEvent>>();
     }
 }

@@ -7,6 +7,7 @@ using Dara.Server.BuildingBlocks.Infrastructure.Configuration.References;
 using Dara.Server.BuildingBlocks.Infrastructure.Extensions;
 using Dara.Server.BuildingBlocks.Infrastructure.Processing.Commands;
 using Dara.Server.Modules.Identity.Application;
+using Dara.Server.Modules.Identity.Integration;
 using Microsoft.Extensions.Logging;
 
 namespace Dara.Server.Modules.Identity.Infrastructure;
@@ -49,6 +50,8 @@ public class IdentityCompositionRoot : ModuleCompositionRootBase
 
     protected override void ConfigureEvents(ModuleEventsDescriptor.ModuleEventsDescriptorBuilder builder)
     {
-        builder.WithOutboxProcessor(StandardOutboxProcessor);
+        builder
+            .WithOutboxProcessor(StandardOutboxProcessor)
+            .WithInboxProcessor(StandardInboxProcessor);
     }
 }

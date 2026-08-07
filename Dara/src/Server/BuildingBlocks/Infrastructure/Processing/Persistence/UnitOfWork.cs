@@ -31,10 +31,12 @@ public class UnitOfWork : IUnitOfWork
 
         foreach (var domainEvent in domainEvents)
         {
+            if(!_outboxTypeMapper.CanHandleType(domainEvent.GetType()))
+                continue;
             var type = _outboxTypeMapper.GetName(domainEvent.GetType());
             var data = JsonSerializer.Serialize(domainEvent,domainEvent.GetType());
             var message = new OutboxMessage(Guid.NewGuid(),DateTime.UtcNow,type,data); 
-            ;
+            
             _context.OutboxMessages.Add(message);
         }
         

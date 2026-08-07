@@ -1,6 +1,6 @@
-namespace Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox;
+namespace Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox;
 
-public interface IOutboxTypeMapper
+public interface IInboxTypeMapper
 {
     string GetName(Type type);
     

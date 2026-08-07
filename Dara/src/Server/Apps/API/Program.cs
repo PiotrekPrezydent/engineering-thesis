@@ -56,7 +56,7 @@ public class Program
             }
             await next();
         });
-
+        
         app.MapHub<AppHub>("/app");
 
         app.Run();

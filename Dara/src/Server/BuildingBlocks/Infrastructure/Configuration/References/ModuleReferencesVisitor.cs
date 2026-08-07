@@ -3,6 +3,7 @@ using Dara.Server.BuildingBlocks.Application.Events;
 using Dara.Server.BuildingBlocks.Domain;
 using Dara.Server.BuildingBlocks.Infrastructure.Common.Visitors;
 using Dara.Server.BuildingBlocks.Infrastructure.Extensions;
+using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox;
 using Dara.Server.BuildingBlocks.Infrastructure.Processing.Commands;
 using Dara.Server.BuildingBlocks.Infrastructure.Processing.Persistence;
@@ -46,6 +47,19 @@ public class ModuleReferencesVisitor : IVisitor<ModuleReferencesDescriptor>
             outboxMap.Add(eventType.Name, eventType);
         }
         _serviceCollection.AddSingleton<IOutboxTypeMapper>(new OutboxTypeMapper(outboxMap));
+        
+        Dictionary<string, Type> inboxMap = new Dictionary<string, Type>();
+        foreach (var consumer in instance.ApplicationAssembly.GetImplementationsOfOpenGeneric(typeof(IIntegrationEventHandler<>)))
+        {
+            _serviceCollection.AddTransient(consumer.Interface, consumer.Implementation);
+            var eventType = consumer.Interface.GenericTypeArguments[0];
+            if (inboxMap.ContainsKey(eventType.Name))
+                continue;
+            
+            inboxMap.Add(eventType.Name, eventType);
+        }
+        _serviceCollection.AddSingleton<IInboxTypeMapper>(new InboxTypeMapper(inboxMap));
+
         
         var repositories = instance.InfrastructureAssembly.GetTypes().Where(e=>typeof(IRepository).IsAssignableFrom(e)).ToList();
         foreach (var repository in repositories)
