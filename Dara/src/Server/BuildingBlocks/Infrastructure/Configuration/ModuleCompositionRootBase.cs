@@ -7,11 +7,14 @@ using Dara.Server.BuildingBlocks.Infrastructure.Configuration.DataAccess;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration.Events;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration.Processing;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration.References;
+using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox;
 using Dara.Server.BuildingBlocks.Infrastructure.Processing.Commands;
 using Dara.Server.BuildingBlocks.Infrastructure.Processing.DomainEvents;
 using Dara.Server.BuildingBlocks.Infrastructure.Processing.Persistence;
 using Dara.Server.BuildingBlocks.Infrastructure.Processing.Scopes;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Dara.Server.BuildingBlocks.Infrastructure.Configuration;
 
@@ -61,15 +64,20 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
         references.Accept(referencesVisitor);
         processing.Accept(processingVisitor);
         events.Accept(eventsVisitor);
-
+        
+        services.AddLogging(ConfigureLogging);
         services.AddSingleton<IModuleCompositionRoot>(this);
+        
         SetServiceProvider(services.BuildServiceProvider());
         
         var moduleInterface = references.DeclaredModuleInterface.Value;
-        
         rootServices.AddScoped(moduleInterface, _ => _services.GetRequiredService(moduleInterface));
+        
+        rootServices.AddSingleton<IHostedService>(_ => _services.GetRequiredService<OutboxProcessorService>());
     }
-    
+
+    protected abstract void ConfigureLogging(ILoggingBuilder loggingBuilder);
+
     protected abstract void ConfigureDataAccess(ModuleDataAccessDescriptor.ModuleDataAccessDescriptorBuilder builder);
     
     protected abstract void ConfigureReferences(ModuleReferencesDescriptor.ModuleReferencesDescriptorBuilder builder);
@@ -83,13 +91,15 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
         typeof(ICommandHandler<>),
         typeof(ICommandHandler<,>),
         typeof(IQueryHandler<,>),
-        typeof(IDomainEventHandler<>)
+        typeof(IDomainEventHandler<>),
     };
     
     protected static ITypeKey<DomainEventsDispatcher> StandardDomainEventsDispatcher => new TypeKey<DomainEventsDispatcher>();
     protected static ITypeKey<CommandExecutor> StandardCommandExecutor => new TypeKey<CommandExecutor>();
     protected static ITypeKey<HandlersResolver> StandardHandlersResolver => new TypeKey<HandlersResolver>();
     protected static ITypeKey<UnitOfWork> StandardUnitOfWork => new TypeKey<UnitOfWork>();
+    
+    protected static ITypeKey<OutboxProcessor> StandardOutboxProcessor => new TypeKey<OutboxProcessor>();
 }
 
 

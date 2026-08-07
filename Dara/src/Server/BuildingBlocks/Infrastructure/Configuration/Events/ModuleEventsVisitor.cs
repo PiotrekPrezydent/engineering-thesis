@@ -1,6 +1,7 @@
 using Dara.Server.BuildingBlocks.Infrastructure.Common.Types;
 using Dara.Server.BuildingBlocks.Infrastructure.Common.Visitors;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.EventBus;
+using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox;
 using Dara.Server.BuildingBlocks.Integration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,6 +16,8 @@ public class ModuleEventsVisitor : IVisitor<ModuleEventsDescriptor>
     }
     public void Visit(ModuleEventsDescriptor instance)
     {
+        _services.AddTransient(typeof(IOutboxProcessor),instance.OutboxProcessor.Value);
+        _services.AddSingleton<OutboxProcessorService>();
     }
 
     public class AddEventBus(IServiceCollection services) : IKeyedTypeAction<IEventBus>

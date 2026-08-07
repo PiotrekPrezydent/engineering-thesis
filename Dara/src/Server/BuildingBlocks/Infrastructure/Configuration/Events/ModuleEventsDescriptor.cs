@@ -1,6 +1,7 @@
 using Dara.Server.BuildingBlocks.Infrastructure.Common.Types;
 using Dara.Server.BuildingBlocks.Infrastructure.Common.Visitors;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.EventBus;
+using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox;
 using Dara.Server.BuildingBlocks.Integration;
 using Dara.Shared.Attributes;
 
@@ -15,6 +16,10 @@ public partial class ModuleEventsDescriptor : IVisitable<ModuleEventsDescriptor>
     [ObsoleteMethodOnRepeatedType(typeof(IEventBus))]
     public ITypeKey<IEventBus> EventBus { get; private set; }
     
+    [ObsoleteMethodOnRepeatedType(typeof(IOutboxProcessor))]
+    public ITypeKey<IOutboxProcessor> OutboxProcessor { get; private set; }
+    
+    public TimeSpan OutboxPollingInterval { get; private set; }
     
     public void Accept(IVisitor<ModuleEventsDescriptor> visitor)
     {

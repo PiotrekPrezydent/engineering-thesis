@@ -31,4 +31,9 @@ public class HandlersResolver : IHandlersResolver
     {
         return _serviceProvider.GetServices<IDomainEventHandler<TDomainEvent>>();
     }
+
+    public IEnumerable<IDomainEventNotificationHandler<TDomainEvent>> GetDomainEventNotificationHandlers<TDomainEvent>() where TDomainEvent : IDomainEvent
+    {
+        return _serviceProvider.GetServices<IDomainEventNotificationHandler<TDomainEvent>>();
+    }
 }

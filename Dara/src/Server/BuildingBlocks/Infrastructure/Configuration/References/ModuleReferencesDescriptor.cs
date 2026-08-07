@@ -16,6 +16,8 @@ public partial class ModuleReferencesDescriptor : IVisitable<ModuleReferencesDes
     
     public IReadOnlyList<Type> TypeWiseDecorators { get; set; }
     
+    public Type OutboxConsumerType { get; set; }
+    
     [ObsoleteMethodOnRepeatedType(typeof(IModule))]
     public ITypeKey<IModule> DeclaredModuleInterface { get; set;  }
 

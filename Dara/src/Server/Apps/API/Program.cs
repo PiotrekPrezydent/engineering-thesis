@@ -23,6 +23,7 @@ public class Program
         {
             //options.FormatterName = nameof(DaraLogFormatter);
         });
+        
         var modulesRoots = new IModuleCompositionRoot[]
         {
             new GroupCompositionRoot(),

@@ -13,6 +13,7 @@ public class UserRepository : IUserRepository
     
     public async Task<User?> GetByUserIdentifierAsync(string userIdentifier)
     {
+        Console.WriteLine(_context.OutboxMessages.Count());
         User? user = _context.Users
             .FirstOrDefault(e => e.UserIdentifier == userIdentifier);
         

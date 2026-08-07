@@ -5,7 +5,7 @@ namespace Dara.Server.Modules.Groups.Infrastructure;
 
 public class GroupContext : ModuleContext
 {
-    protected GroupContext(DbContextOptions options) : base(options)
+    public GroupContext(DbContextOptions options) : base(options)
     {
     }
 }
