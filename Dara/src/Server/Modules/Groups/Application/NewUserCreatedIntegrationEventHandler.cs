@@ -7,6 +7,6 @@ public class NewUserCreatedIntegrationEventHandler : IIntegrationEventHandler<Us
 {
     public async Task HandleAsync(UserCreatedIntegrationEvent integrationEvent)
     {
-        Console.WriteLine($"NewUserCreatedIntegrationEvent integrationEvent: {integrationEvent}");
+        Console.WriteLine($"CALLED ::::: NewUserCreatedIntegrationEvent integrationEvent: {integrationEvent}");
     }
 }

@@ -3,6 +3,8 @@ using Dara.Server.BuildingBlocks.Infrastructure.Common.Types;
 using Dara.Server.BuildingBlocks.Infrastructure.Common.Visitors;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration.References;
 using Dara.Server.BuildingBlocks.Infrastructure.DataAccess;
+using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox.Persistence;
+using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -28,6 +30,9 @@ public class ModuleDataAccessVisitor : IVisitor<ModuleDataAccessConfiguration>
         foreach (var repository in repositories)
         {
             var implementedInterface = repository.GetInterfaces().First();
+            if(implementedInterface == typeof(IOutboxRepository) || implementedInterface == typeof(IInboxRepository))
+                continue;
+            
             _serviceCollection.AddScoped(implementedInterface,repository);
         }
     }

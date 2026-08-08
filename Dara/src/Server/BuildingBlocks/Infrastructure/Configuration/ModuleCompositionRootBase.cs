@@ -44,8 +44,6 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
         _services = serviceProvider;
     }
 
-    private record SpecialDomainEvent() : IDomainEvent;
-
     public void Initialize(IServiceCollection rootServices)
     {
         IServiceCollection services = new ServiceCollection();
@@ -79,16 +77,13 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
         processing.Accept(processingVisitor);
         messaging.Accept(messagingVisitor);
         
-        
-        services.AddSingleton<IModuleCompositionRoot>(this);
-
         var moduleDeclaration =
             references.InfrastructureAssembly.GetFirstImplementationOfType(references.DeclaredModuleInterface.Value);
         
         services.AddScoped(moduleDeclaration.Interface,moduleDeclaration.Implementation);
+        services.AddSingleton(references.CompositionRoot);
         
         SetServiceProvider(services.BuildServiceProvider());
-
         
         rootServices.AddScoped(moduleDeclaration.Interface , _ => _services.GetRequiredService(moduleDeclaration.Interface));
         

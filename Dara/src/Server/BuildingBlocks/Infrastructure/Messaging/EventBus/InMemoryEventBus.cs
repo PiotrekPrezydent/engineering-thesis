@@ -25,8 +25,8 @@ public class InMemoryEventBus : IEventBus
         
         foreach (var handler  in _eventHandlers[eventType])
         {
-            if(handler is IIntegrationEventHandler<TEvent> eventHandler)
-                await eventHandler.HandleAsync(@event); // write inbox message in module context
+            if (handler is IIntegrationEventHandler<TEvent> eventHandler)
+                await eventHandler.HandleAsync(@event);
         }
     }
 }

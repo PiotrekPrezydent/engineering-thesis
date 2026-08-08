@@ -1,3 +1,4 @@
+using Dara.Server.BuildingBlocks.Domain.Events;
 using Dara.Server.BuildingBlocks.Domain.Exceptions;
 
 namespace Dara.Server.BuildingBlocks.Domain;

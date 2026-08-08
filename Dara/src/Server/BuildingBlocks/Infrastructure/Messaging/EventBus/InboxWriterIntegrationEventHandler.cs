@@ -28,8 +28,8 @@ public class InboxWriterIntegrationEventHandler<TIntegrationEvent> : IIntegratio
         var data = JsonSerializer.Serialize(integrationEvent,integrationEvent.GetType());
         
         var message = new InboxMessage(
-            Guid.NewGuid(),
-            DateTime.Now,
+            integrationEvent.Id,
+            integrationEvent.OccurredOn,
             integrationEvent.GetType().Name,
             data
             );

@@ -18,7 +18,10 @@ public class TestModules
         Console.WriteLine("START TESTING");
         
         await TestIdentityModule("123");
+        await Task.Delay(1);
+        
         await TestIdentityModule("123");
+        await Task.Delay(TimeSpan.FromSeconds(20));
         
         Console.WriteLine("STOP TESTING");
     }

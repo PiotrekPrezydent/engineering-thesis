@@ -1,4 +1,6 @@
+using Dara.Server.BuildingBlocks.Application;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -9,20 +11,21 @@ public class InboxBackgroundWorker : BackgroundService
 {    
     private readonly InboxQueueSignal _inboxQueueSignal;
     private readonly IModuleCompositionRoot _compositionRoot;
-    private readonly ILogger<InboxBackgroundWorker> _logger;
+    private readonly ILogger _logger;
 
 
-    public InboxBackgroundWorker(InboxQueueSignal inboxQueueSignal, IModuleCompositionRoot compositionRoot, ILogger<InboxBackgroundWorker> logger)
+    public InboxBackgroundWorker(InboxQueueSignal inboxQueueSignal, IModuleCompositionRoot compositionRoot, ILoggerFactory logger)
     {
         _inboxQueueSignal = inboxQueueSignal;
         _compositionRoot = compositionRoot;
-        _logger = logger;
+        using var scope = _compositionRoot.CreateScope();
+        var module = scope.ServiceProvider.GetRequiredService<DbContext>();
+        _logger = logger.CreateLogger("INBOX WORKER ::: " + module.GetType().Name);
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {   
-        _logger.LogInformation("STARTED INBOX PROCESSOR SERVICE");
-        
+        _logger.LogInformation("STARTED INBOX WORKER SERVICE");
         while (!stoppingToken.IsCancellationRequested)
         {
             try

@@ -36,11 +36,13 @@ public class Program
         builder.Services.AddScoped<TestModules>();
         
         var app = builder.Build();
-
+        
         using (var scope = app.Services.CreateScope())
         {
+            app.Start();
             var test = scope.ServiceProvider.GetRequiredService<TestModules>();
             await test.Start();
+            //await Task.Delay(200000);
         }
         
         app.Use(async (context, next) =>
@@ -58,7 +60,6 @@ public class Program
         });
         
         app.MapHub<AppHub>("/app");
-
         app.Run();
     }
 }

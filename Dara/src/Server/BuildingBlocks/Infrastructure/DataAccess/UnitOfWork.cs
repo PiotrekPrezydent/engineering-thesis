@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Dara.Server.BuildingBlocks.Domain;
+using Dara.Server.BuildingBlocks.Domain.Events;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox.Mapping;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox.Persistence;
@@ -43,7 +44,7 @@ public class UnitOfWork : IUnitOfWork
             
             var type = _outboxTypeMapper.GetName(domainEvent.GetType());
             var data = JsonSerializer.Serialize(domainEvent,domainEvent.GetType());
-            var message = new OutboxMessage(Guid.NewGuid(),DateTime.UtcNow,type,data);
+            var message = new OutboxMessage(domainEvent.Id,domainEvent.OccuredOn,type,data);
             
             await _outboxRepository.AddAsync(message, CancellationToken.None);
         }
