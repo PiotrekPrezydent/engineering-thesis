@@ -22,8 +22,21 @@ public class TestModules
     public async Task Start()
     {
         Console.WriteLine("START TESTING");
+        for (int i = 0; i < 10; i++)
+        {
+            Console.WriteLine("START LOOP " + i);
+            var command1 = new CreateClientCommand("TEST"+i);
+            
+            var  g = await _identityModule.ExecuteCommandAsync<CreateClientCommand, Guid>(command1);
+
+            var command2 = new ChangeProfileNameCommand(g,"1111");
+            await Task.Delay(TimeSpan.FromSeconds(2));
+            
+            await _profilesModule.ExecuteCommandAsync(command2);
+            Console.WriteLine("END LOOP " + i);
+        }
        // await TestIdentityModule("123");
-       await TestProfileCreation();
+       //await TestProfileCreation();
         
         Console.WriteLine("STOP TESTING");
         

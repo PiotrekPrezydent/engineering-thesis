@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.SignalR;
 
-namespace Dara.Server.Apps.API;
+namespace Dara.Server.Apps.API.Extensions;
 
 public static class SignalRContextExtensions
 {

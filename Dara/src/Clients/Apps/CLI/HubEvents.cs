@@ -1,41 +1,43 @@
 using Dara.Shared.Contracts;
+using Dara.Shared.Contracts.Notifications;
+using Dara.Shared.Contracts.StateSnapshots;
 
 namespace Dara.Clients.Apps.CLI;
 
 public class HubEvents : IAppHubClient
 {
-    public async Task OnProfileNameChanged(string newName)
+    public async Task OnProfileNameChanged(ProfileNameChangedNotification notification)
     {
-        Console.WriteLine("ON PROFILE NAME CHANGED + " +newName);
+        Console.WriteLine(notification);
     }
 
-    public async Task OnGroupCreated(Guid groupId, string groupName, string joinCode, List<Guid> memberIds)
+    public async Task OnGroupCreated(GroupCreatedNotification notification)
     {
-        Console.WriteLine("ON GROUP CREATED - " + groupId + " name: " +groupName + " jc: " +joinCode + " members: " +string.Join(", ",memberIds));
+        Console.WriteLine(notification);
     }
 
-    public async Task OnGroupMemberUpdated(Guid memberId)
+    public async Task OnGroupMemberUpdated(GroupMemberSnapshot groupMemberSnapshot)
     {
-        Console.WriteLine("ON GROUP MEMBER UPDATED  "  + memberId);
+        Console.WriteLine(groupMemberSnapshot);
     }
 
-    public async Task OnGroupJoined(Guid groupId, string groupName, string joinCode, List<Guid> memberIds)
+    public async Task OnGroupJoined(GroupSnapshot groupSnapshot)
     {
-        Console.WriteLine("ON GROUP JOINED  "  + groupId + " name: " +groupName + " jc: " +joinCode + " members: " +string.Join(", ",memberIds));
+        Console.WriteLine(groupSnapshot);
     }
 
     public async Task OnGroupLeft(Guid groupId)
     {
-        Console.WriteLine("On GROUP LEFT " +  groupId);
+        Console.WriteLine(groupId);
     }
 
-    public async Task OnGroupMemberJoined(Guid groupId, Guid memberId)
+    public async Task OnGroupMemberJoined(GroupMemberJoinedGroupNotification notification)
     {
-        Console.WriteLine("ON GROUP MEMBER JOINED "  + groupId + " " +memberId);
+        Console.WriteLine(notification);
     }
 
-    public async Task OnGroupMemberLeft(Guid groupId, Guid memberId)
+    public async Task OnGroupMemberLeft(GroupMemberLeftGroupNotification notification)
     {
-        Console.WriteLine("ON GROUP MEMBER LEFTs "  + groupId + " " +memberId);
+        Console.WriteLine(notification);
     }
 }

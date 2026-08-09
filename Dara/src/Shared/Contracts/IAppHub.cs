@@ -6,8 +6,8 @@ public interface IAppHub
 
     public Task CreateGroup(string groupName);
     
-    public Task JoinGroup(string joinCode);
+    public Task JoinGroup(Guid groupId, string joinCode);
     
-    public Task LeaveGroup(string groupName);
+    public Task LeaveGroup(Guid groupId);
 }
 

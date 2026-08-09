@@ -1,4 +1,5 @@
 using Dara.Server.BuildingBlocks.Application.Queries;
+using Dara.Server.BuildingBlocks.Infrastructure.DataAccess;
 using Dara.Server.Modules.Groups.Domain.Groups;
 using Microsoft.EntityFrameworkCore;
 

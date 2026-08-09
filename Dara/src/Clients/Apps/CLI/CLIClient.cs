@@ -18,11 +18,13 @@ public class CLIClient
 
         // BasicCommands bc = new();
         DaraConnection con = new();
+        HubCommands hc = new();
         // ConnectionCommands cc = new(con.Connection);
         // ClientCommands acc = new(con.Connection);
         //
         // ci.BindObjectCommands(bc);
         ci.BindObjectCommands(con);
+        ci.BindObjectCommands(hc);
         // ci.BindObjectCommands(cc);
         // ci.BindObjectCommands(acc);
         

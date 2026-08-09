@@ -1,7 +1,9 @@
+using Dara.Server.Apps.API.Extensions;
 using Dara.Server.Modules.Groups.Application;
 using Dara.Server.Modules.Groups.Application.CreateGroup;
 using Dara.Server.Modules.Groups.Application.GetValidGroup;
 using Dara.Server.Modules.Groups.Application.JoinToGroup;
+using Dara.Server.Modules.Groups.Application.LeaveGroup;
 using Dara.Server.Modules.Identity.Application;
 using Dara.Server.Modules.Profiles.Application;
 using Dara.Server.Modules.Profiles.Application.ChangeProfileName;
@@ -16,20 +18,17 @@ public partial class AppHub : Hub<IAppHubClient>, IAppHub
     private readonly IGroupModule _groupModule;
     private readonly IProfilesModule _profilesModule;
 
-    public static IHubContext<AppHub, IAppHubClient> InstanceContext;
-
     public AppHub(IIdentityModule identityModule, IProfilesModule profilesModule, IGroupModule groupModule)
     {
         _identityModule = identityModule;
         _profilesModule = profilesModule;
         _groupModule = groupModule;
     }
-    
-    public static IAppHubClient GetClientByGuid(Guid guid) => InstanceContext.Clients.User(guid.ToString());
 
     public override async Task OnConnectedAsync()
     {
         Console.WriteLine($"{Context.ConnectionId} connected - GUID: {Context.GuidIdentifier()}");
+        await Clients.Caller.OnGroupLeft(Context.GuidIdentifier());
         await base.OnConnectedAsync();
     }
 
@@ -52,18 +51,13 @@ public partial class AppHub : Hub<IAppHubClient>, IAppHub
         await _groupModule.ExecuteCommandAsync<CreateGroupCommand>(command);
     }
 
-    public async Task JoinGroup(string joinCode)
+    public async Task JoinGroup(Guid groupId, string joinCode)
     {
-        var groupId = await _groupModule.ExecuteQueryAsync<GetValidGroupQuery, Guid?>(new GetValidGroupQuery(joinCode));
-        if(groupId == null)
-            throw new HubException("Group not found");
-        
-        await _groupModule.ExecuteCommandAsync(new JoinToGroupCommand(groupId.Value,Context.GuidIdentifier()));
+        await _groupModule.ExecuteCommandAsync(new JoinToGroupCommand(groupId,Context.GuidIdentifier(),joinCode));
     }
 
-    public async Task LeaveGroup(string groupName)
+    public async Task LeaveGroup(Guid groupId)
     {
-        //var groupId = _groupModule.ExecuteQueryAsync<>()
-        throw new NotImplementedException();
+        await _groupModule.ExecuteCommandAsync(new LeaveGroupCommand(groupId, Context.GuidIdentifier()));
     }
 }

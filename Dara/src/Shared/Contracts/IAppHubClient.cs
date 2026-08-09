@@ -1,18 +1,21 @@
+using Dara.Shared.Contracts.Notifications;
+using Dara.Shared.Contracts.StateSnapshots;
+
 namespace Dara.Shared.Contracts;
 
 public interface IAppHubClient
 {
-    public Task OnProfileNameChanged(string newName);
+    public Task OnProfileNameChanged(ProfileNameChangedNotification notification);
     
-    public Task OnGroupCreated(Guid groupId, string groupName, string joinCode, List<Guid> memberIds);
+    public Task OnGroupCreated(GroupCreatedNotification notification);
 
-    public Task OnGroupMemberUpdated(Guid memberId);
+    public Task OnGroupMemberUpdated(GroupMemberSnapshot groupMemberSnapshot);
     
-    public Task OnGroupJoined(Guid groupId, string groupName, string joinCode, List<Guid> memberIds);
+    public Task OnGroupJoined(GroupSnapshot groupSnapshot);
     
     public Task OnGroupLeft(Guid groupId);
     
-    public Task OnGroupMemberJoined(Guid groupId, Guid memberId);
+    public Task OnGroupMemberJoined(GroupMemberJoinedGroupNotification notification);
     
-    public Task OnGroupMemberLeft(Guid groupId, Guid memberId);
+    public Task OnGroupMemberLeft(GroupMemberLeftGroupNotification notification);
 }

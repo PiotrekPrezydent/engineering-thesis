@@ -1,4 +1,4 @@
-namespace Dara.Server.BuildingBlocks.Application.Queries;
+namespace Dara.Server.BuildingBlocks.Infrastructure.DataAccess;
 
 public interface IReadModel
 {

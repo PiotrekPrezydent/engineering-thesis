@@ -11,11 +11,10 @@ using TypedSignalR.Client;
 
 namespace Dara.Clients.Apps.CLI;
 
-public class DaraConnection : IAppHub
+public class DaraConnection
 {
     private readonly string _serverUrl;
     public HubConnection Connection { get; private set; }
-    public IAppHub Proxy { get; private set; }
 
     public DaraConnection()
     {
@@ -32,7 +31,7 @@ public class DaraConnection : IAppHub
     
         Connection = builder.Build();
         Connection.Register<IAppHubClient>(new HubEvents());
-        Proxy = Connection.CreateHubProxy<IAppHub>(); 
+        HubCommands.Proxy = Connection.CreateHubProxy<IAppHub>(); 
     }
 
     string ProvideUrl()
@@ -46,7 +45,6 @@ public class DaraConnection : IAppHub
         var key = Encoding.ASCII.GetBytes(secretKey);
         return Convert.ToBase64String(key);
     }
-    
 
     [CLICommand("connect","con")]
     async Task Connect()
@@ -66,35 +64,5 @@ public class DaraConnection : IAppHub
         await Connection.StopAsync();
     
         Console.WriteLine($"Disconnected from {_serverUrl}");
-    }
-
-    [CLICommand("test")]
-    async Task TestCall()
-    {
-        await Connection.SendAsync("Test");
-    }
-    
-    [CLICommand("cn")]
-    public async Task ChangeName(string name)
-    {
-        await Proxy.ChangeName(name);
-    }
-
-    [CLICommand("cg")]
-    public async Task CreateGroup(string groupName)
-    {
-        await Proxy.CreateGroup(groupName);
-    }
-
-    [CLICommand("jg")]
-    public async Task JoinGroup(string joinCode)
-    {
-        await Proxy.JoinGroup(joinCode);
-    }
-
-    [CLICommand("lg")]
-    public async Task LeaveGroup(string groupName)
-    {
-        throw new NotImplementedException();
     }
 }

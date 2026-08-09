@@ -36,9 +36,11 @@ public class Group : Entity, IAggregateRoot
         return new Group(ownerId, name, joinCode);
     }
 
-    public bool IsCodeValid(string code)
+    public void JoinToGroup(GroupMemberId groupMemberId, string providedCode)
     {
-        return code == JoinCode;
+        CheckRule(new GroupCodeMustBeValid(JoinCode, providedCode));
+        
+        AddMember(groupMemberId);
     }
 
     public void AddMember(GroupMemberId memberId)

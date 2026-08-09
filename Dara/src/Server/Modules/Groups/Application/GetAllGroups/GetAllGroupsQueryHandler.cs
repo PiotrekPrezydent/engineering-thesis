@@ -1,4 +1,5 @@
 using Dara.Server.BuildingBlocks.Application.Queries;
+using Dara.Server.BuildingBlocks.Infrastructure.DataAccess;
 using Dara.Server.Modules.Groups.Domain.Groups;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,6 +16,9 @@ public class GetAllGroupsQueryHandler : IQueryHandler<GetAllGroupsQuery,List<Gro
 
     public async Task<List<GroupDto>> HandleAsync(GetAllGroupsQuery query)
     {
-        return _readModel.Query<Group>().Select(e => new GroupDto(e.GroupId, e.Name)).ToList();
+        return await _readModel
+            .Query<Group>()
+            .Select(e => new GroupDto(e.GroupId, e.Name))
+            .ToListAsync();
     }
 }
