@@ -66,7 +66,7 @@ public class Program
         builder.Services.AddScoped<IHubNotificationHandler<GroupCreatedIntegrationEvent>,GroupCreatedNotificationHandler>();
         builder.Services.AddScoped<IHubNotificationHandler<NewMemberJoinedGroupIntegrationEvent>,GroupMemberJoinedGroupNotificationHandler >();
         builder.Services.AddScoped<IHubNotificationHandler<MemberLeftGroupIntegrationEvent>,GroupMemberLeftGroupNotificationHandler>();
-        
+        builder.Services.AddScoped<IHubNotificationHandler<NewGroupMessageCreatedIntegrationEvent>,NewGroupMessageNotificationHandler>();
         
         builder.Services.AddSingleton(Channel.CreateUnbounded<IIntegrationEvent>());
         builder.Services.AddHostedService<HubNotificationsProcessor>();
@@ -79,18 +79,19 @@ public class Program
         InMemoryEventBus.Instance.Subscribe(new ChannelWriterIntegrationEventHandler<NewMemberJoinedGroupIntegrationEvent>(channel));
         InMemoryEventBus.Instance.Subscribe(new ChannelWriterIntegrationEventHandler<MemberLeftGroupIntegrationEvent>(channel));
         InMemoryEventBus.Instance.Subscribe(new ChannelWriterIntegrationEventHandler<GroupCreatedIntegrationEvent>(channel));
+        InMemoryEventBus.Instance.Subscribe(new ChannelWriterIntegrationEventHandler<NewGroupMessageCreatedIntegrationEvent>(channel));
         
         app.UseAuthentication();
         app.UseAuthorization();
         
-        // using (var scope = app.Services.CreateScope())
-        // {
-        //     app.Start();
-        //     var test = scope.ServiceProvider.GetRequiredService<TestModules>();
-        //     await test.Start();
-        //
-        //     //await Task.Delay(200000);
-        // }
+        using (var scope = app.Services.CreateScope())
+        {
+            app.Start();
+            var test = scope.ServiceProvider.GetRequiredService<TestModules>();
+            await test.Start();
+        
+            //await Task.Delay(200000);
+        }
         
         app.MapHub<AppHub>(Connections.HubName);
         app.Run();

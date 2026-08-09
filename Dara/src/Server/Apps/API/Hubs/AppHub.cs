@@ -48,7 +48,7 @@ public partial class AppHub : Hub<IAppHubClient>, IAppHub
     public async Task CreateGroup(string groupName)
     {
         var command = new CreateGroupCommand(Context.GuidIdentifier(), groupName);
-        await _groupModule.ExecuteCommandAsync<CreateGroupCommand>(command);
+        await _groupModule.ExecuteCommandAsync<CreateGroupCommand,Guid>(command);
     }
 
     public async Task JoinGroup(Guid groupId, string joinCode)

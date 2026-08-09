@@ -6,7 +6,7 @@ namespace Dara.Server.Modules.Groups.Domain.GroupMessages;
 
 public class GroupMessage : Entity, IAggregateRoot
 {
-    public GroupMessageId Id { get; init; }
+    public GroupMessageId MessageId { get; init; }
     
     public GroupId GroupId { get; init; }
     
@@ -16,17 +16,15 @@ public class GroupMessage : Entity, IAggregateRoot
 
     private GroupMessage(GroupId groupId, GroupMemberId sender, string content)
     {
-        Id = new GroupMessageId(Guid.NewGuid());
+        MessageId = new GroupMessageId(Guid.NewGuid());
         GroupId = groupId;
         Sender = sender;
         Content = content;
-        AddDomainEvent(new NewGroupMessageCreated(GroupId,Sender,Content));
+        AddDomainEvent(new NewGroupMessageCreatedDomainEvent(MessageId, GroupId, Sender, Content));
     }
 
     public static GroupMessage Create(GroupId groupId, GroupMemberId sender, string content)
     {
         return new GroupMessage(groupId, sender, content);
     }
-    
-    
 }

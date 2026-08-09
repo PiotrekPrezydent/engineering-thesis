@@ -3,7 +3,7 @@ using Dara.Server.Modules.Groups.Domain.Groups;
 
 namespace Dara.Server.Modules.Groups.Application.CreateGroup;
 
-public class CreateGroupCommandHandler : ICommandHandler<CreateGroupCommand>
+public class CreateGroupCommandHandler : ICommandHandler<CreateGroupCommand,Guid>
 {
     private readonly IGroupRepository _groupRepository;
 
@@ -14,9 +14,10 @@ public class CreateGroupCommandHandler : ICommandHandler<CreateGroupCommand>
         _groupRepository = groupRepository;
     }
     
-    public async Task HandleAsync(CreateGroupCommand command)
+    public async Task<Guid> HandleAsync(CreateGroupCommand command)
     {
         var group = Group.Create(new(command.CreatorId), command.Name, $"GROUP-{counter++}");
         await _groupRepository.AddAsync(group);
+        return group.GroupId;
     }
 }

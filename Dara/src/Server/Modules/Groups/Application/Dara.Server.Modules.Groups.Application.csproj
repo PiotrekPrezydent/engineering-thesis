@@ -8,10 +8,6 @@
     <ProjectReference Include="..\Integration\Dara.Server.Modules.Groups.Integration.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="SentGroupMessage\" />
-  </ItemGroup>
-
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>

@@ -1,4 +1,8 @@
 using System.Diagnostics;
+using Dara.Server.Modules.Groups.Application;
+using Dara.Server.Modules.Groups.Application.CreateGroup;
+using Dara.Server.Modules.Groups.Application.JoinToGroup;
+using Dara.Server.Modules.Groups.Application.SendMessageToGroup;
 using Dara.Server.Modules.Identity.Application;
 using Dara.Server.Modules.Identity.Application.CreateClient;
 using Dara.Server.Modules.Identity.Application.GetClient;
@@ -11,30 +15,42 @@ public class TestModules
 {
     private readonly IIdentityModule _identityModule;
     private readonly IProfilesModule _profilesModule;
+    private readonly IGroupModule _groupModule;
 
-    public TestModules(IIdentityModule  identityModule, IProfilesModule profilesModule)
+    public TestModules(IIdentityModule  identityModule, IProfilesModule profilesModule, IGroupModule groupModule)
     {
         //_identityModule = provider.GetRequiredService<IIdentityModule>();
         _identityModule = identityModule;
         _profilesModule = profilesModule;
+        _groupModule = groupModule;
     }
 
     public async Task Start()
     {
-        Console.WriteLine("START TESTING");
+        var clients = new List<Guid>();
         for (int i = 0; i < 10; i++)
         {
             Console.WriteLine("START LOOP " + i);
             var command1 = new CreateClientCommand("TEST"+i);
             
             var  g = await _identityModule.ExecuteCommandAsync<CreateClientCommand, Guid>(command1);
-
-            var command2 = new ChangeProfileNameCommand(g,"1111");
-            await Task.Delay(TimeSpan.FromSeconds(2));
-            
-            await _profilesModule.ExecuteCommandAsync(command2);
+            clients.Add(g);
             Console.WriteLine("END LOOP " + i);
         }
+
+        string code = "GROUP-0";
+
+        var grid = await _groupModule.ExecuteCommandAsync<CreateGroupCommand,Guid>(new CreateGroupCommand(clients[0], "NAME"));
+        for (int i = 1; i < 10; i++)
+        {
+            await _groupModule.ExecuteCommandAsync(new JoinToGroupCommand(grid,clients[i],code));
+        }
+        
+        
+        await _groupModule.ExecuteCommandAsync(new SendMessageToGroupCommand(grid,clients[0],"SOME MESSAGE"));
+        
+        
+        await Task.Delay(TimeSpan.FromSeconds(20));
        // await TestIdentityModule("123");
        //await TestProfileCreation();
         
