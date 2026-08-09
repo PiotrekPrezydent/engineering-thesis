@@ -11,6 +11,7 @@
         <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.5" />
         <PackageReference Include="TypedSignalR.Client" Version="1.17.0" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.8" />
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.22.0" />
     </ItemGroup>
     
     <ItemGroup>
@@ -18,5 +19,8 @@
       <ProjectReference Include="..\..\..\Shared\Contracts\Dara.Shared.Contracts.csproj" />
       <ProjectReference Include="..\..\..\Shared\Logging\Dara.Shared.Logging.csproj" />
     </ItemGroup>
+    
+
+    
 
 </Project>

@@ -1,6 +1,12 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Net;
+using System.Security.Claims;
+using System.Text;
 using Dara.Shared.Common.CLI;
+using Dara.Shared.Contracts;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Dara.Clients.Apps.CLI;
 
@@ -13,11 +19,14 @@ public class DaraConnection
     {
         _serverUrl = ProvideUrl();
         
-        var myClientId = Guid.NewGuid().ToString();
+        string identifier = GenerateIdentifier();
+        CLIClient.Logger.LogInformation($"Created id {identifier}");
         
         var builder = new HubConnectionBuilder();
-        Console.WriteLine(myClientId);
-        builder.WithUrl(_serverUrl, options => options.Headers.Add("X-Client-Id", myClientId));
+        builder.WithUrl(_serverUrl, options =>
+        {
+            options.Headers[Connections.IdentifierHeaderName] = identifier;
+        });
         builder.WithAutomaticReconnect();
     
         Connection = builder.Build();
@@ -25,7 +34,14 @@ public class DaraConnection
 
     string ProvideUrl()
     {
-        return "http://127.0.0.1:5273/app";
+        return $"http://127.0.0.1:5273/{Connections.HubName}";
+    }
+
+    string GenerateIdentifier()
+    {
+        var secretKey = $"{AppDomain.CurrentDomain.BaseDirectory}-{DateTime.UtcNow.Ticks}";
+        var key = Encoding.ASCII.GetBytes(secretKey);
+        return Convert.ToBase64String(key);
     }
 
     [CLICommand("connect","con")]
@@ -46,5 +62,11 @@ public class DaraConnection
         await Connection.StopAsync();
     
         Console.WriteLine($"Disconnected from {_serverUrl}");
+    }
+
+    [CLICommand("test")]
+    async Task TestCall()
+    {
+        await Connection.SendAsync("Test");
     }
 }
