@@ -27,9 +27,7 @@ public class InboxProcessor : IInboxProcessor
 
     public async Task ProcessInboxAsync(CancellationToken stoppingToken)
     {
-        var id = Guid.NewGuid();
         var messages = await _inboxRepository.GetPendingMessagesAsync(stoppingToken);
-        _logger.LogInformation("Inbox processor started PENDING MESSAGES: " +  messages.Count + " ID " + id);
         
         foreach (var message in messages)
         {
@@ -38,9 +36,8 @@ public class InboxProcessor : IInboxProcessor
             await DispatchIntegrationEventAsync((dynamic)integrationEvent!);
             
             await _inboxRepository.MarkAsCompletedAsync(message.Id, stoppingToken);
+            _logger.LogInformation($"PROCESSED INBOX MESSAGE {message.Type} IN {(message.ProcessedDate! - message.OccurredOn).Value.TotalSeconds}");
         }
-        
-        _logger.LogInformation("Inbox processor ENDED " +  " ID " + id);
     }
 
     async Task DispatchIntegrationEventAsync<TIntegrationEvent>(TIntegrationEvent integrationEvent) where TIntegrationEvent : IIntegrationEvent

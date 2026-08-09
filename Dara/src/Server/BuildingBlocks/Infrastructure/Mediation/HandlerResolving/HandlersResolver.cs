@@ -1,5 +1,6 @@
 using Dara.Server.BuildingBlocks.Application.Commands;
 using Dara.Server.BuildingBlocks.Application.Events;
+using Dara.Server.BuildingBlocks.Application.Queries;
 using Dara.Server.BuildingBlocks.Domain;
 using Dara.Server.BuildingBlocks.Domain.Events;
 using Dara.Server.BuildingBlocks.Integration;
@@ -26,6 +27,11 @@ public class HandlersResolver : IHandlersResolver
         where TCommand : ICommand<TResult>
     {
         return _serviceProvider.GetRequiredService<ICommandHandler<TCommand, TResult>>();
+    }
+
+    public IQueryHandler<TQuery, TResult> GetQueryHandler<TQuery, TResult>() where TQuery : IQuery<TResult>
+    {
+        return _serviceProvider.GetRequiredService<IQueryHandler<TQuery, TResult>>();
     }
 
     public IEnumerable<IDomainEventHandler<TDomainEvent>> GetDomainEventHandlers<TDomainEvent>() 

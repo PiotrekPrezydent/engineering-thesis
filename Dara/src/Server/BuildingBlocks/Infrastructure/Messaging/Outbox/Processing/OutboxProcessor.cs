@@ -27,19 +27,18 @@ public class OutboxProcessor : IOutboxProcessor
 
     public async Task ProcessOutboxAsync(CancellationToken cancellationToken)
     {
-        var id = Guid.NewGuid();
         var messages = await _outboxRepository.GetPendingMessagesAsync(cancellationToken);
-        _logger.LogInformation("Outbox processor started  PENDING MESSAGES: " +  messages.Count + " ID " + id);
-        foreach (var msg in messages)
+        
+        foreach (var message in messages)
         {
-            var type = _outboxTypeMapper.GetType(msg.Type);
-            var domainEvent = JsonSerializer.Deserialize(msg.Content, type) as IDomainEvent;
+            var type = _outboxTypeMapper.GetType(message.Type);
+            var domainEvent = JsonSerializer.Deserialize(message.Content, type) as IDomainEvent;
             
             await DispatchDomainEventNotificationAsync((dynamic)domainEvent!);
             
-            await _outboxRepository.MarkAsCompletedAsync(msg.Id, cancellationToken);
+            await _outboxRepository.MarkAsCompletedAsync(message.Id, cancellationToken);
+            _logger.LogInformation($"PROCESSED OUTBOX MESSAGE {message.Type} IN {(message.ProcessedDate! - message.OccurredOn).Value.TotalSeconds}");
         }
-        _logger.LogInformation("Outbox processor ENDED " +  " ID " + id);
     }
     
     async Task DispatchDomainEventNotificationAsync<TDomainEvent>(TDomainEvent domainEvent) where TDomainEvent : IDomainEvent

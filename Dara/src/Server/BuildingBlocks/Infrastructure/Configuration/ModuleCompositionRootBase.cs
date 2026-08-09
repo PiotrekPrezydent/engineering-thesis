@@ -12,6 +12,7 @@ using Dara.Server.BuildingBlocks.Infrastructure.Configuration.Messaging;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration.Processing;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration.References;
 using Dara.Server.BuildingBlocks.Infrastructure.DataAccess;
+using Dara.Server.BuildingBlocks.Infrastructure.Mediation.Decorators;
 using Dara.Server.BuildingBlocks.Infrastructure.Mediation.HandlerResolving;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox.Processing;
@@ -103,6 +104,24 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
     
     protected abstract void ConfigureMessaging(ModuleMessagingConfiguration.ModuleMessagingConfigurationBuilder builder);
 
+
+    protected void AddStandardMediation(ModuleMediationConfiguration.ModuleMediationConfigurationBuilder builder)
+    {
+        builder.ConfigureMediationOpenTypes(e => e
+                .AddRange(StandardMediationOpenTypes))
+            .ConfigureTypeWiseDecorators(e => e
+                .Add(typeof(CommandHandlerUnitOfWorkDecorator<,>))
+                .Add(typeof(CommandHandlerUnitOfWorkDecorator<>)))
+            .WithHandlersResolver(StandardHandlersResolver);
+    }
+
+    protected void AddStandardProcessing(ModuleProcessingConfiguration.ModuleProcessingConfigurationBuilder builder)
+    {
+        builder
+            .WithCommandExecutor(StandardCommandExecutor)
+            .WithDomainEventDispatcher(StandardDomainEventsDispatcher);
+    }
+    
     protected static IReadOnlyList<Type> StandardMediationOpenTypes => new List<Type>
     {
         typeof(ICommandHandler<>),

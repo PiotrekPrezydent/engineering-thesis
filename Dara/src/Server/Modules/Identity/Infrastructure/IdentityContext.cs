@@ -7,11 +7,10 @@ namespace Dara.Server.Modules.Identity.Infrastructure;
 
 public class IdentityContext : ModuleContext
 {
-    public DbSet<User> Users { get; set; }
+    public DbSet<Client> Clients { get; set; }
     
     public IdentityContext(DbContextOptions options) : base(options)
     {
-        
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

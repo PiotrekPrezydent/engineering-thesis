@@ -6,6 +6,7 @@ using Dara.Server.Modules.Groups.Application;
 using Dara.Server.Modules.Groups.Infrastructure;
 using Dara.Server.Modules.Identity.Application;
 using Dara.Server.Modules.Identity.Infrastructure;
+using Dara.Server.Modules.Profiles.Infrastructure;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Dara.Server.Apps.API;
@@ -27,7 +28,8 @@ public class Program
         var modulesRoots = new IModuleCompositionRoot[]
         {
             new GroupCompositionRoot(),
-            new IdentityCompositionRoot()
+            new IdentityCompositionRoot(),
+            new ProfilesCompositionRoot()
         };
         
         foreach (var module in modulesRoots)
@@ -42,6 +44,7 @@ public class Program
             app.Start();
             var test = scope.ServiceProvider.GetRequiredService<TestModules>();
             await test.Start();
+
             //await Task.Delay(200000);
         }
         

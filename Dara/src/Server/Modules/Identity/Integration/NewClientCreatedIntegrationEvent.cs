@@ -2,4 +2,4 @@ using Dara.Server.BuildingBlocks.Integration;
 
 namespace Dara.Server.Modules.Identity.Integration;
 
-public record UserCreatedIntegrationEvent(Guid CreatedUserId) : IntegrationEventBase;
+public record NewClientCreatedIntegrationEvent(Guid CreatedClientId) : IntegrationEventBase;

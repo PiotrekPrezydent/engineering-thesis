@@ -1,3 +1,4 @@
+using Dara.Server.BuildingBlocks.Application.Queries;
 using Dara.Server.BuildingBlocks.Domain;
 using Dara.Server.BuildingBlocks.Infrastructure.Common.Types;
 using Dara.Server.BuildingBlocks.Infrastructure.Common.Visitors;
@@ -34,6 +35,13 @@ public class ModuleDataAccessVisitor : IVisitor<ModuleDataAccessConfiguration>
                 continue;
             
             _serviceCollection.AddScoped(implementedInterface,repository);
+        }
+        
+        var queryHelpers = _referencesConfiguration.InfrastructureAssembly.GetTypes().Where(e => typeof(IQueryHelper).IsAssignableFrom(e)).ToList();
+        foreach (var queryHelper in queryHelpers)
+        {
+            var implementedInterface = queryHelper.GetInterfaces().First();
+            _serviceCollection.AddScoped(implementedInterface, queryHelper);
         }
     }
     

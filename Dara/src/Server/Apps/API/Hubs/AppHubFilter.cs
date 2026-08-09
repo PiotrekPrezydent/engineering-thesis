@@ -26,7 +26,7 @@ public class AppHubFilter : IHubFilter
         // }
 
         // Kontynuuj standardowe wywołanie metody na Hubie
-        return await next(invocationContext);
+        
         try
         {
             return await next(invocationContext);

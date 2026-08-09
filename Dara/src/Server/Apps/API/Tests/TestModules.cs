@@ -1,11 +1,15 @@
+using System.Diagnostics;
 using Dara.Server.Modules.Identity.Application;
-using Dara.Server.Modules.Identity.Application.ResolveUserId;
+using Dara.Server.Modules.Identity.Application.CreateClient;
+using Dara.Server.Modules.Identity.Application.GetClient;
+using Dara.Server.Modules.Profiles.Application;
 
 namespace Dara.Server.Apps.API.Tests;
 
 public class TestModules
 {
     private readonly IIdentityModule _identityModule;
+    private readonly IProfilesModule _profilesModule;
 
     public TestModules(IIdentityModule  identityModule)
     {
@@ -17,21 +21,35 @@ public class TestModules
     {
         Console.WriteLine("START TESTING");
         
-        await TestIdentityModule("123");
-        await Task.Delay(1);
-        
-        await TestIdentityModule("123");
-        await Task.Delay(TimeSpan.FromSeconds(20));
+       // await TestIdentityModule("123");
+       await TestProfileCreation();
         
         Console.WriteLine("STOP TESTING");
+        
     }
 
     async Task TestIdentityModule(string userIndentifier)
     {
-        var command = new ResolveUserIdCommand(userIndentifier);
+        var q = new GetClientQuery(userIndentifier);
+        var dto = await _identityModule.ExecuteQueryAsync<GetClientQuery, ClientDto>(q);
         
-        var id = await _identityModule.ExecuteCommandAsync<ResolveUserIdCommand,Guid>(command);
-        Console.WriteLine("RESOLVED ID : " + id.ToString());
+        //var command = new CreateClientCommand(userIndentifier);
+        
+        //var id = await _identityModule.ExecuteCommandAsync<CreateClientCommand,Guid>(command);
+        Console.WriteLine("RESOLVED ID : " + dto.ClientId);
+    }
+
+
+    async Task TestProfileCreation()
+    {
+        Stopwatch sw = Stopwatch.StartNew();
+        Console.WriteLine("START: " + sw.ToString());
+        
+        var command = new CreateClientCommand("TEST");
+        var g = await _identityModule.ExecuteCommandAsync<CreateClientCommand, Guid>(command);
+        Console.WriteLine("POST COMMAND GUID: " + g);
+        
+        await Task.Delay(TimeSpan.FromSeconds(20));
     }
     
 }

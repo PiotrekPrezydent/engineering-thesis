@@ -23,6 +23,7 @@
       <ProjectReference Include="..\..\Modules\Groups\Integration\Dara.Server.Modules.Groups.Integration.csproj" />
       <ProjectReference Include="..\..\Modules\Identity\Application\Dara.Server.Modules.Identity.Application.csproj" />
       <ProjectReference Include="..\..\Modules\Identity\Infrastructure\Dara.Server.Modules.Identity.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\Modules\Profiles\Infrastructure\Dara.Server.Modules.Profiles.Infrastructure.csproj" />
     </ItemGroup>
     
 </Project>

@@ -5,7 +5,6 @@ using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox.Persistence;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox.Processing;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox.Persistence;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox.Processing;
-using Dara.Server.BuildingBlocks.Integration;
 using Dara.Shared.Attributes;
 
 namespace Dara.Server.BuildingBlocks.Infrastructure.Configuration.Messaging;

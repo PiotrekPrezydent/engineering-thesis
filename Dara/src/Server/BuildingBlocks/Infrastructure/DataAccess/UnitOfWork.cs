@@ -51,11 +51,7 @@ public class UnitOfWork : IUnitOfWork
         
         await _context.SaveChangesAsync();
         _outboxQueueSignal.NotifyNewMessage();
+        
         return 0;
-    }
-
-    void Test<TDomainEvent>(TDomainEvent domainEvent) where TDomainEvent : IDomainEvent
-    {
-        Console.WriteLine("TEST"+domainEvent.GetType());
     }
 }

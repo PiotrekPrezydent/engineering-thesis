@@ -3,7 +3,7 @@ using Dara.Server.BuildingBlocks.Infrastructure.Mediation.HandlerResolving;
 
 namespace Dara.Server.BuildingBlocks.Infrastructure.Processing.Commands;
 
-public class CommandExecutor : ICommandExecutor
+public class CommandExecutor : ICommandExecutor, IInternalCommandExecutor
 {
     private readonly IHandlersResolver _handlersResolver;
     
