@@ -7,13 +7,15 @@ using Dara.Shared.Contracts;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using TypedSignalR.Client;
 
 namespace Dara.Clients.Apps.CLI;
 
-public class DaraConnection
+public class DaraConnection : IAppHub
 {
     private readonly string _serverUrl;
     public HubConnection Connection { get; private set; }
+    public IAppHub Proxy { get; private set; }
 
     public DaraConnection()
     {
@@ -21,7 +23,6 @@ public class DaraConnection
         
         string identifier = GenerateIdentifier();
         CLIClient.Logger.LogInformation($"Created id {identifier}");
-        
         var builder = new HubConnectionBuilder();
         builder.WithUrl(_serverUrl, options =>
         {
@@ -30,7 +31,8 @@ public class DaraConnection
         builder.WithAutomaticReconnect();
     
         Connection = builder.Build();
-        Connection.On("CallClient", () => CallClient());
+        Connection.Register<IAppHubClient>(new HubEvents());
+        Proxy = Connection.CreateHubProxy<IAppHub>(); 
     }
 
     string ProvideUrl()
@@ -44,6 +46,7 @@ public class DaraConnection
         var key = Encoding.ASCII.GetBytes(secretKey);
         return Convert.ToBase64String(key);
     }
+    
 
     [CLICommand("connect","con")]
     async Task Connect()
@@ -70,11 +73,28 @@ public class DaraConnection
     {
         await Connection.SendAsync("Test");
     }
-
-
-    Task CallClient()
+    
+    [CLICommand("cn")]
+    public async Task ChangeName(string name)
     {
-        Console.WriteLine("CALLED");
-        return Task.CompletedTask;
+        await Proxy.ChangeName(name);
+    }
+
+    [CLICommand("cg")]
+    public async Task CreateGroup(string groupName)
+    {
+        await Proxy.CreateGroup(groupName);
+    }
+
+    [CLICommand("jg")]
+    public async Task JoinGroup(string joinCode)
+    {
+        await Proxy.JoinGroup(joinCode);
+    }
+
+    [CLICommand("lg")]
+    public async Task LeaveGroup(string groupName)
+    {
+        throw new NotImplementedException();
     }
 }

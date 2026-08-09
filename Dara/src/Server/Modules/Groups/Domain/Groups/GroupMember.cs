@@ -7,7 +7,11 @@ public class GroupMember : Entity
     public GroupMemberId MemberId { get; }
     
     public GroupId GroupId { get; }
-    
+
+    private GroupMember()
+    {
+    }
+
     private GroupMember(GroupId groupId, GroupMemberId memberId)
     {
         GroupId = groupId;

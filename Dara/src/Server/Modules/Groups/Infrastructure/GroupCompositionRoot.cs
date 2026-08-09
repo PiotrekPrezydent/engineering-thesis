@@ -42,12 +42,7 @@ public class GroupCompositionRoot : ModuleCompositionRootBase
 
     protected override void ConfigureMediation(ModuleMediationConfiguration.ModuleMediationConfigurationBuilder builder)
     {
-        builder
-            .ConfigureMediationOpenTypes(e => e
-                .AddRange(StandardMediationOpenTypes))
-            .ConfigureTypeWiseDecorators(e => e
-                .Add(typeof(CommandHandlerUnitOfWorkDecorator<,>)))
-            .WithHandlersResolver(StandardHandlersResolver);
+        AddStandardMediation(builder);
     }
 
     protected override void ConfigureProcessing(ModuleProcessingConfiguration.ModuleProcessingConfigurationBuilder builder)

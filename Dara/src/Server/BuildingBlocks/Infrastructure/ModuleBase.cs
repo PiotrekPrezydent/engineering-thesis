@@ -19,7 +19,6 @@ public abstract class ModuleBase : IModule
 
     public async Task ExecuteCommandAsync<TCommand>(TCommand command) where TCommand : ICommand
     {
-        Console.WriteLine("START EXE");
         using (var scope = _compositionRoot.CreateScope())
         {
             var executor = scope.ServiceProvider.GetRequiredService<ICommandExecutor>();
@@ -47,5 +46,4 @@ public abstract class ModuleBase : IModule
             return result;
         }
     }
-    
 }

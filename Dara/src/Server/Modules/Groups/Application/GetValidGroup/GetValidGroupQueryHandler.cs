@@ -15,7 +15,11 @@ public class GetValidGroupQueryHandler : IQueryHandler<GetValidGroupQuery,Guid?>
 
     public async Task<Guid?> HandleAsync(GetValidGroupQuery query)
     {
-        var group = await _readModel.Query<Group>().FirstOrDefaultAsync(e => e.JoinCode == query.JoinCode);
+        var group = await _readModel
+            .Query<Group>()
+            .Include(g => g.Members)
+            .FirstOrDefaultAsync(e => e.JoinCode == query.JoinCode);
+        
         if (group == null)
             return null;
         return group.GroupId;

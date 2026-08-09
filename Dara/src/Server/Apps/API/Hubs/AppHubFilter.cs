@@ -16,5 +16,10 @@ public class AppHubFilter : IHubFilter
             Console.WriteLine("DOMAIN EX" + ex.Message + " --- " + ex.GetType().Name);
             throw new HubException(ex.Message);
         }
+        catch (Exception e)
+        {
+            Console.WriteLine("NORMAL EXCEPTION" + e.Message + " --- " + e.StackTrace);
+            throw new HubException(e.Message);
+        }
     }
 }

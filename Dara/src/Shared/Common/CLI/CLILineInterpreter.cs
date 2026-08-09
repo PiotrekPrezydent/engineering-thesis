@@ -15,7 +15,7 @@ public class CLILineInterpreter
     public void BindObjectCommands(object commandsObject)
     {
         var commandObjectType = commandsObject.GetType();
-        var commandMethods = commandObjectType.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
+        var commandMethods = commandObjectType.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
             .Where(m => m.CustomAttributes.Any(a => a.AttributeType == typeof(CLICommand)));
         
         foreach (var commandMethod in commandMethods)

@@ -58,21 +58,26 @@ public class Program
         
         var app = builder.Build();
         
-        var con = app.Services.GetRequiredService<IHubContext<AppHub>>();
+        var con = app.Services.GetRequiredService<IHubContext<AppHub,IAppHubClient>>();
+        AppHub.InstanceContext = con;
         
-        InMemoryEventBus.Instance.Subscribe(new ProfileNameChangedEventHandler(con));
+        
+        InMemoryEventBus.Instance.Subscribe(new ProfileNameChangedEventHandler(app.Services));
+        InMemoryEventBus.Instance.Subscribe(new NewMemberJoinedGroupEventHandler(app.Services));
+        InMemoryEventBus.Instance.Subscribe(new MemberLeftGroupEventHandler(app.Services));
+        InMemoryEventBus.Instance.Subscribe(new GroupCreatedEventHandler(app.Services));
         
         app.UseAuthentication();
         app.UseAuthorization();
         
-        using (var scope = app.Services.CreateScope())
-        {
-            app.Start();
-            var test = scope.ServiceProvider.GetRequiredService<TestModules>();
-            await test.Start();
-        
-            //await Task.Delay(200000);
-        }
+        // using (var scope = app.Services.CreateScope())
+        // {
+        //     app.Start();
+        //     var test = scope.ServiceProvider.GetRequiredService<TestModules>();
+        //     await test.Start();
+        //
+        //     //await Task.Delay(200000);
+        // }
 
 
         

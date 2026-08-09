@@ -6,25 +6,29 @@ namespace Dara.Server.Modules.Groups.Domain.Groups;
 
 public class Group : Entity, IAggregateRoot
 {
-    public GroupId GroupId { get; }
+    public GroupId GroupId { get; private set; }
     
-    public string Name { get; }
+    public string Name { get; private set; }
     
-    public string JoinCode  { get; }
+    public string JoinCode  { get; private set; }
     
-    public List<GroupMember> Members { get; }
+    public List<GroupMember> Members { get;private set; }
     
-    public GroupMember Owner { get; set; }
+    public GroupMemberId OwnerId { get; private set; }
+
+    private Group()
+    {
+    }
 
     private Group(GroupMemberId ownerId, string groupName, string joinCode)
     {
         GroupId = new GroupId(Guid.NewGuid());
         Name = groupName;
         JoinCode = joinCode;
-        Owner = GroupMember.Create(GroupId, ownerId);
-        Members = new List<GroupMember> { Owner };
+        OwnerId = ownerId;
+        Members = new List<GroupMember> { GroupMember.Create(GroupId, ownerId) };
         
-        AddDomainEvent(new GroupCreatedDomainEvent(GroupId, Owner.MemberId));
+        AddDomainEvent(new GroupCreatedDomainEvent(GroupId, OwnerId));
     }
 
     public static Group Create(GroupMemberId ownerId, string name, string joinCode)

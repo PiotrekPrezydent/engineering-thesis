@@ -20,6 +20,6 @@ public class GroupRepository : IGroupRepository
 
     public async Task<Group> GetByIdAsync(GroupId groupId)
     {
-        return await _context.Groups.FirstAsync(e=>e.GroupId == groupId);
+        return await _context.Groups.Include(g=>g.Members).FirstAsync(e=>e.GroupId == groupId);
     }
 }
