@@ -14,6 +14,8 @@
 
     <ItemGroup>
 
+      <ProjectReference Include="..\..\..\Shared\Logging\Dara.Shared.Logging.csproj" />
+
       <ProjectReference Include="..\Application\Dara.Server.BuildingBlocks.Application.csproj" />
       <ProjectReference Include="..\Domain\Dara.Server.BuildingBlocks.Domain.csproj" />
       <ProjectReference Include="..\Integration\Dara.Server.BuildingBlocks.Integration.csproj" />

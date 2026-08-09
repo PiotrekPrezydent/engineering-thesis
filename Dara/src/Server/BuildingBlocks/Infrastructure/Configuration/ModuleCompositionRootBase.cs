@@ -20,9 +20,11 @@ using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox.Processing;
 using Dara.Server.BuildingBlocks.Infrastructure.Processing.Commands;
 using Dara.Server.BuildingBlocks.Infrastructure.Processing.DomainEvents;
+using Dara.Shared.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 using ModuleMediationConfiguration = Dara.Server.BuildingBlocks.Infrastructure.Configuration.Mediation.ModuleMediationConfiguration;
 using ModuleMessagingConfiguration = Dara.Server.BuildingBlocks.Infrastructure.Configuration.Messaging.ModuleMessagingConfiguration;
 
@@ -83,6 +85,19 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
         
         services.AddScoped(moduleDeclaration.Interface,moduleDeclaration.Implementation);
         services.AddSingleton(references.CompositionRoot);
+        services.AddLogging(e =>
+        {
+            e.ClearProviders();
+            e.AddConsole(options =>
+            {
+                options.FormatterName = nameof(SharedLogFormatter);
+
+            }).AddConsoleFormatter<SharedLogFormatter, ConsoleFormatterOptions>();
+        });
+            
+        
+        
+        
         
         SetServiceProvider(services.BuildServiceProvider());
         

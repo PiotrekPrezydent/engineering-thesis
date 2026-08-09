@@ -31,18 +31,23 @@ public class OutboxBackgroundWorker : BackgroundService
         
         while (!stoppingToken.IsCancellationRequested)
         {
+            _logger.LogInformation("OUTBOX LOOP");
             try
             {
                 using var scope = _compositionRoot.CreateScope();
                 var processor = scope.ServiceProvider.GetRequiredService<IOutboxProcessor>();
                 await processor.ProcessOutboxAsync(stoppingToken);
                 
-                using var periodicTimer = new PeriodicTimer(TimeSpan.FromSeconds(30));
-                
-                var waitSignalTask = _outboxQueueSignal.WaitAsync(stoppingToken);
-                var waitTimerTask = periodicTimer.WaitForNextTickAsync(stoppingToken).AsTask();
-                
-                await Task.WhenAny(waitSignalTask, waitTimerTask);
+                using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
+                timeoutCts.CancelAfter(TimeSpan.FromSeconds(30));
+                try
+                {
+                    await _outboxQueueSignal.WaitAsync(timeoutCts.Token);
+                }
+                catch (OperationCanceledException) when (!stoppingToken.IsCancellationRequested)
+                {
+                    _logger.LogInformation("OUTBOX TIMEOUT");
+                }
             }
             catch (Exception ex)
             {

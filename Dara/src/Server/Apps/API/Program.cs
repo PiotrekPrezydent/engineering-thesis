@@ -15,7 +15,9 @@ using Dara.Server.Modules.Identity.Infrastructure;
 using Dara.Server.Modules.Profiles.Infrastructure;
 using Dara.Server.Modules.Profiles.Integration;
 using Dara.Shared.Contracts;
+using Dara.Shared.Logging;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging.Console;
 
 namespace Dara.Server.Apps.API;
 
@@ -29,8 +31,10 @@ public class Program
             .ClearProviders()
             .AddConsole(options =>
             {
-                //options.FormatterName = nameof(DaraLogFormatter);
+                options.FormatterName = nameof(SharedLogFormatter);
             });
+        
+        builder.Logging.AddConsoleFormatter<SharedLogFormatter, ConsoleFormatterOptions>();
         
         builder.Services.AddMemoryCache();
         

@@ -28,18 +28,23 @@ public class InboxBackgroundWorker : BackgroundService
         _logger.LogInformation("STARTED INBOX WORKER SERVICE");
         while (!stoppingToken.IsCancellationRequested)
         {
+            _logger.LogInformation("INBOX LOOP");
             try
             {
                 using var scope = _compositionRoot.CreateScope();
                 var processor = scope.ServiceProvider.GetRequiredService<IInboxProcessor>();
                 await processor.ProcessInboxAsync(stoppingToken);
                 
-                using var periodicTimer = new PeriodicTimer(TimeSpan.FromSeconds(30));
-                
-                var waitSignalTask = _inboxQueueSignal.WaitAsync(stoppingToken);
-                var waitTimerTask = periodicTimer.WaitForNextTickAsync(stoppingToken).AsTask();
-                
-                await Task.WhenAny(waitSignalTask, waitTimerTask);
+                using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
+                timeoutCts.CancelAfter(TimeSpan.FromSeconds(30));
+                try
+                {
+                    await _inboxQueueSignal.WaitAsync(timeoutCts.Token);
+                }
+                catch (OperationCanceledException) when (!stoppingToken.IsCancellationRequested)
+                {
+                    _logger.LogInformation("INBOX TIMEOUT");
+                }
             }
             catch (Exception ex)
             {
