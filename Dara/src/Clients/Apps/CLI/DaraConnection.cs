@@ -30,6 +30,7 @@ public class DaraConnection
         builder.WithAutomaticReconnect();
     
         Connection = builder.Build();
+        Connection.On("CallClient", () => CallClient());
     }
 
     string ProvideUrl()
@@ -68,5 +69,12 @@ public class DaraConnection
     async Task TestCall()
     {
         await Connection.SendAsync("Test");
+    }
+
+
+    Task CallClient()
+    {
+        Console.WriteLine("CALLED");
+        return Task.CompletedTask;
     }
 }

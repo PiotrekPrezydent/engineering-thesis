@@ -1,8 +1,10 @@
 using System.Security.Claims;
 using Dara.Server.Apps.API.Authentication;
+using Dara.Server.Apps.API.Events;
 using Dara.Server.Apps.API.Hubs;
 using Dara.Server.Apps.API.Tests;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration;
+using Dara.Server.BuildingBlocks.Infrastructure.Messaging.EventBus;
 using Dara.Server.Modules.Groups.Application;
 using Dara.Server.Modules.Groups.Infrastructure;
 using Dara.Server.Modules.Identity.Application;
@@ -55,6 +57,11 @@ public class Program
         builder.Services.AddScoped<TestModules>();
         
         var app = builder.Build();
+        
+        var con = app.Services.GetRequiredService<IHubContext<AppHub>>();
+        
+        InMemoryEventBus.Instance.Subscribe(new ProfileNameChangedEventHandler(con));
+        
         app.UseAuthentication();
         app.UseAuthorization();
         

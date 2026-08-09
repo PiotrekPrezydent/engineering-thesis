@@ -6,7 +6,5 @@ public interface IProfileRepository : IRepository
 {
     Task AddAsync(Profile profile);
     
-    Task UpdateAsync(Profile profile);
-    
     Task<Profile> GetByIdAsync(ProfileId profileId);
 }

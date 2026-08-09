@@ -8,13 +8,10 @@
   
   <ItemGroup>
     <ProjectReference Include="..\..\..\BuildingBlocks\Application\Dara.Server.BuildingBlocks.Application.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Infrastructure\Dara.Server.BuildingBlocks.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Identity\Integration\Dara.Server.Modules.Identity.Integration.csproj" />
     <ProjectReference Include="..\Domain\Dara.Server.Modules.Profiles.Domain.csproj" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Folder Include="ChangeProfileName\" />
-    <Folder Include="GetProfiles\" />
+    <ProjectReference Include="..\Integration\Dara.Server.Modules.Profiles.Integration.csproj" />
   </ItemGroup>
 
 </Project>

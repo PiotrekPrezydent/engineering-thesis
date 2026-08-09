@@ -15,16 +15,10 @@ public class ProfileRepository : IProfileRepository
     public async Task AddAsync(Profile profile)
     {
         await _context.Profiles.AddAsync(profile);
-        Console.WriteLine("ADDED PROFILE " + profile.Id.Value);
     }
-
-    public async Task UpdateAsync(Profile profile)
-    {
-        throw new NotImplementedException();
-    }
-
+    
     public async Task<Profile> GetByIdAsync(ProfileId profileId)
     {
-        throw new NotImplementedException();
+        return await _context.Profiles.FirstAsync(e => e.ClientProfileId == profileId);
     }
 }

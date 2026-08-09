@@ -5,7 +5,7 @@ using Dara.Server.Modules.Identity.Integration;
 
 namespace Dara.Server.Modules.Identity.Application.CreateClient;
 
-public class NewClientCreatedEventPublisher : IDomainEventHandler<NewClientCreatedDomainEvent>
+public class NewClientCreatedEventPublisher : IDomainEventNotificationHandler<NewClientCreatedDomainEvent>
 {
     private readonly IEventBus _eventBus;
 

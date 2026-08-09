@@ -5,14 +5,14 @@ namespace Dara.Server.Modules.Profiles.Domain;
 
 public class Profile : Entity, IAggregateRoot
 {
-    public ProfileId Id { get; private set; }
+    public ProfileId ClientProfileId { get; private set; }
     
     public string Name { get; private set; }
-    internal Profile(ProfileId id, string name)
+    internal Profile(ProfileId clientProfileId, string name)
     {
-        Id = id;
+        ClientProfileId = clientProfileId;
         Name = name;
-        AddDomainEvent(new ProfileCreatedDomainEvent(id));
+        AddDomainEvent(new ProfileCreatedDomainEvent(clientProfileId));
     }
 
 
@@ -24,7 +24,7 @@ public class Profile : Entity, IAggregateRoot
     public void UpdateName(string name)
     {
         Name = name;
-        AddDomainEvent(new ProfileNameChangedDomainEvent(Id, name));
+        AddDomainEvent(new ProfileNameChangedDomainEvent(ClientProfileId, name));
     }
     
 }

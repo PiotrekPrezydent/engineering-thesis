@@ -9,10 +9,10 @@ public class ProfileEntityTypeConfiguration : IEntityTypeConfiguration<Profile>
     public void Configure(EntityTypeBuilder<Profile> builder)
     {
         builder
-            .HasKey(u => u.Id);
+            .HasKey(u => u.ClientProfileId);
 
         builder
-            .Property(u => u.Id)
+            .Property(u => u.ClientProfileId)
             .HasConversion(
                 id => id.Value,
                 value => new ProfileId(value)

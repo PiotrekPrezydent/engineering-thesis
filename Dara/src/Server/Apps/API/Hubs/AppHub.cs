@@ -1,4 +1,5 @@
 using Dara.Server.Modules.Identity.Application;
+using Microsoft.AspNetCore.SignalR;
 using Hub = Microsoft.AspNetCore.SignalR.Hub;
 
 namespace Dara.Server.Apps.API.Hubs;
@@ -26,6 +27,7 @@ public partial class AppHub : Hub
 
     public async Task Test()
     {
+        Clients.Caller.SendAsync("CallClient");
         await Task.CompletedTask;
     }
 }
