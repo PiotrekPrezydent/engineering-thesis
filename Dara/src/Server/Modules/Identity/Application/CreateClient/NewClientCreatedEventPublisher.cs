@@ -19,3 +19,4 @@ public class NewClientCreatedEventPublisher : IDomainEventNotificationHandler<Ne
         await _eventBus.PublishAsync(new NewClientCreatedIntegrationEvent(notification.ClientId.Value));
     }
 }
+

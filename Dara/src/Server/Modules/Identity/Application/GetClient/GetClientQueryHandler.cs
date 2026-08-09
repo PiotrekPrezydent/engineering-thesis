@@ -1,22 +1,25 @@
 using Dara.Server.BuildingBlocks.Application.Queries;
+using Dara.Server.BuildingBlocks.Infrastructure.DataAccess;
+using Dara.Server.Modules.Identity.Domain;
+using Microsoft.EntityFrameworkCore;
 
 namespace Dara.Server.Modules.Identity.Application.GetClient;
 
-public class GetClientQueryHandler : IQueryHandler<GetClientQuery, ClientDto>
+public class GetClientQueryHandler : IQueryHandler<GetClientQuery, Guid?>
 {
-    private readonly IClientQueries _clientQueries;
+    private readonly IReadModel _readModel;
 
-    public GetClientQueryHandler(IClientQueries clientQueries)
+    public GetClientQueryHandler(IReadModel readModel)
     {
-        _clientQueries = clientQueries;
+        _readModel = readModel;
     }
     
-    public async Task<ClientDto> HandleAsync(GetClientQuery query)
+    public async Task<Guid?> HandleAsync(GetClientQuery query)
     {
-        var client = await  _clientQueries.GetClientByIdentifierAsync(query.ClientIdentifier);
+        var client = await  _readModel.Query<Client>().FirstOrDefaultAsync(e=>e.ClientIdentifier == query.ClientIdentifier);
         if (client == null)
-            return new(Guid.Empty);
+            return null;
 
-        return new(client.ClientId.Value);
+        return client.ClientId.Value;
     }
 }

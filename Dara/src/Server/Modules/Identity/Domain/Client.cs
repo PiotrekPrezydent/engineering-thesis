@@ -10,9 +10,7 @@ public class Client : Entity, IAggregateRoot
     
     public string ClientIdentifier { get; private set; }
 
-    protected Client()
-    {
-    }
+    private Client() { }
 
     internal Client(string clientIdentifier)
     {

@@ -19,6 +19,6 @@ public class ProfileRepository : IProfileRepository
     
     public async Task<Profile> GetByIdAsync(ProfileId profileId)
     {
-        return await _context.Profiles.FirstAsync(e => e.ClientProfileId == profileId);
+        return await _context.Profiles.FirstAsync(e => e.ProfileId == profileId);
     }
 }

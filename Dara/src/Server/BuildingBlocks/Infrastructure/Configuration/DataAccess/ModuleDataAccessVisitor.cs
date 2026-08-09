@@ -37,17 +37,11 @@ public class ModuleDataAccessVisitor : IVisitor<ModuleDataAccessConfiguration>
             _serviceCollection.AddScoped(implementedInterface,repository);
         }
         
-        var queryHelpers = _referencesConfiguration.InfrastructureAssembly.GetTypes().Where(e => typeof(IQueryHelper).IsAssignableFrom(e)).ToList();
-        foreach (var queryHelper in queryHelpers)
-        {
-            var implementedInterface = queryHelper.GetInterfaces().First();
-            _serviceCollection.AddScoped(implementedInterface, queryHelper);
-        }
     }
     
-    public class ModuleContextRegistrator(IServiceCollection services) : IKeyedTypeAction<DbContext>
+    public class ModuleContextRegistrator(IServiceCollection services) : IKeyedTypeAction<ModuleContext>
     {
-        public void Execute<TType>(ITypeKey<DbContext> typeKey) where TType : DbContext
+        public void Execute<TType>(ITypeKey<ModuleContext> typeKey) where TType : ModuleContext
         {
             services.AddDbContext<TType>(options =>
             {
@@ -55,6 +49,7 @@ public class ModuleDataAccessVisitor : IVisitor<ModuleDataAccessConfiguration>
             });
             
             services.AddScoped<DbContext>(sp => sp.GetRequiredService<TType>());
+            services.AddScoped<IReadModel>(sp=>sp.GetRequiredService<TType>());
         }
     }
 }

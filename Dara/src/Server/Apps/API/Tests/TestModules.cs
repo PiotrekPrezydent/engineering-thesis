@@ -20,8 +20,7 @@ public class TestModules
     public async Task Start()
     {
         Console.WriteLine("START TESTING");
-        
-       // await TestIdentityModule("123");
+        await TestIdentityModule("123");
        await TestProfileCreation();
         
         Console.WriteLine("STOP TESTING");
@@ -31,12 +30,12 @@ public class TestModules
     async Task TestIdentityModule(string userIndentifier)
     {
         var q = new GetClientQuery(userIndentifier);
-        var dto = await _identityModule.ExecuteQueryAsync<GetClientQuery, ClientDto>(q);
+        var dto = await _identityModule.ExecuteQueryAsync<GetClientQuery, Guid?>(q);
         
         //var command = new CreateClientCommand(userIndentifier);
         
         //var id = await _identityModule.ExecuteCommandAsync<CreateClientCommand,Guid>(command);
-        Console.WriteLine("RESOLVED ID : " + dto.ClientId);
+        Console.WriteLine("RESOLVED ID : " + dto);
     }
 
 

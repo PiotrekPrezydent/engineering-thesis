@@ -35,15 +35,11 @@ public class ClientIdentifierAuthHandler :  AuthenticationHandler<Authentication
         if (!_cache.TryGetValue(cacheKey, out claims!))
         {
             claims = new List<Claim>();
-            Guid clientId;
             
-            var client = await _identityModule.ExecuteQueryAsync<GetClientQuery, ClientDto>(new GetClientQuery(identifier.ToString()));
-            clientId = client.ClientId;
+            var clientId = await _identityModule.ExecuteQueryAsync<GetClientQuery, Guid?>(new GetClientQuery(identifier.ToString()));
             
-            if (clientId == Guid.Empty)
-            {
+            if(clientId == null)
                 clientId = await _identityModule.ExecuteCommandAsync<CreateClientCommand, Guid>(new CreateClientCommand(identifier.ToString()));
-            }
             
             claims.Add(new Claim(ClaimTypes.NameIdentifier, clientId.ToString()));
             

@@ -26,13 +26,3 @@ public abstract class Entity
             throw new BuisnessRuleValidationException(rule);
     }
 }
-
-public abstract class Entity<TId> : Entity where TId : IEntityId
-{
-    public TId Id { get; protected set; }
-    
-    protected Entity(TId id)
-    {
-        Id = id;
-    }
-}

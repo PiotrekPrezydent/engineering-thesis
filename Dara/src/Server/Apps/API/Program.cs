@@ -65,14 +65,14 @@ public class Program
         app.UseAuthentication();
         app.UseAuthorization();
         
-        // using (var scope = app.Services.CreateScope())
-        // {
-        //     app.Start();
-        //     var test = scope.ServiceProvider.GetRequiredService<TestModules>();
-        //     await test.Start();
-        //
-        //     //await Task.Delay(200000);
-        // }
+        using (var scope = app.Services.CreateScope())
+        {
+            app.Start();
+            var test = scope.ServiceProvider.GetRequiredService<TestModules>();
+            await test.Start();
+        
+            //await Task.Delay(200000);
+        }
 
 
         

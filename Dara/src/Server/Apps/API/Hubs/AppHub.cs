@@ -16,7 +16,7 @@ public partial class AppHub : Hub
     public override async Task OnConnectedAsync()
     {
         Console.WriteLine($"{Context.ConnectionId} connected - GUID: {Context.GuidIdentifier()}");
-        
+        Console.WriteLine($"{Clients.User(Context.UserIdentifier)} -- CONNECTED2");
         await base.OnConnectedAsync();
     }
 
