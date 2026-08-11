@@ -14,17 +14,6 @@ public class GroupsContext : ModuleContextBase
     public GroupsContext(DbContextOptions options) : base(options)
     {
     }
-
-    public object SeedGroup()
-    {
-        return new
-        {
-            Id = new GroupId(SharedSeedGuids.Group1),
-            _ownerId = new GroupMemberId(SharedSeedGuids.User1),
-            _name = "G1",
-            _joinCode = "JG1"
-        };
-    }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -39,8 +28,6 @@ public class GroupsContext : ModuleContextBase
             .HasData(
                 SeedGroups.SeedAllGroupMembers()
         );
-
-
         
         base.OnModelCreating(modelBuilder);
     }

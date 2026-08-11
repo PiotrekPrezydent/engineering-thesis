@@ -9,8 +9,8 @@ public class PluginOwner : Entity, IAggregateRoot
 {
     public PluginOwnerId Id { get; private set; }
 
-    public IReadOnlyList<Plugin> Plugins => _plugins;
-    
+    public IReadOnlyList<Plugin> Plugins => _plugins.AsReadOnly();
+
     private List<Plugin> _plugins;
 
     private PluginOwner() { }
@@ -26,15 +26,11 @@ public class PluginOwner : Entity, IAggregateRoot
         return new PluginOwner(pluginOwnerId);
     }
     
-    public Plugin BuildPlugin(IEnumerable<PluginFunction> pluginFunctions)
+    public void RegisterPlugin(string name, string description, ImmutableArray<PluginFunction> functions)
     {
-        return Plugin.Create(this, [..pluginFunctions]);
-    }
-
-    public void RegisterPlugin(Plugin plugin)
-    {
-        CheckRule(new PluginCannotBeAddedTwiceRule(plugin, Plugins));
+        var plugin = Plugin.Create(Id, name, description, functions);
         
+        CheckRule(new PluginCannotBeAddedTwiceRule(plugin, Plugins));
         _plugins.Add(plugin);
     }
 

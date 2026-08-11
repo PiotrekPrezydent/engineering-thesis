@@ -10,6 +10,7 @@ using Dara.Server.BuildingBlocks.Integration;
 using Dara.Server.Modules.Groups.Infrastructure;
 using Dara.Server.Modules.Groups.Integration;
 using Dara.Server.Modules.Identity.Infrastructure;
+using Dara.Server.Modules.Plugins.Infrastructure;
 using Dara.Server.Modules.Profiles.Infrastructure;
 using Dara.Server.Modules.Profiles.Integration;
 using Dara.Shared.Contracts;
@@ -52,7 +53,8 @@ public class Program
         {
             new GroupsCompositionRoot(),
             new IdentityCompositionRoot(),
-            new ProfilesCompositionRoot()
+            new ProfilesCompositionRoot(),
+            new PluginsCompositionRoot(),
         };
         
         
@@ -60,6 +62,7 @@ public class Program
             module.Initialize(builder.Services, InMemoryEventBus.Instance);
 
         builder.Services.AddScoped<TestModules>();
+        builder.Services.AddScoped<LogMockData>();
 
         builder.Services.AddScoped<IHubNotificationHandler<ProfileNameChangedIntegrationEvent>,NotifyProfileNameChangedHandler>();
         builder.Services.AddScoped<IHubNotificationHandler<GroupCreatedIntegrationEvent>,NotifyGroupCreatedHandler>();
@@ -83,13 +86,19 @@ public class Program
         app.UseAuthentication();
         app.UseAuthorization();
         
+        // using (var scope = app.Services.CreateScope())
+        // {
+        //     app.Start();
+        //     var test = scope.ServiceProvider.GetRequiredService<TestModules>();
+        //     await test.Start();
+        //
+        //     //await Task.Delay(200000);
+        // }
+        
         using (var scope = app.Services.CreateScope())
         {
-            app.Start();
-            var test = scope.ServiceProvider.GetRequiredService<TestModules>();
-            await test.Start();
-        
-            //await Task.Delay(200000);
+            var logger = scope.ServiceProvider.GetRequiredService<LogMockData>();
+            await logger.LogDataAsync();
         }
         
         app.MapHub<AppHub>(Connections.HubName);

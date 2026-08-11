@@ -6,19 +6,26 @@ namespace Dara.Server.Modules.Plugins.Domain.PluginOwners.Plugins;
 public class Plugin : Entity
 {
     public PluginId Id { get; private set; }
-    public PluginOwner Owner { get; private set; }
+    public PluginOwnerId OwnerId { get; private set; }
+    
+    public string Name { get; private set; }
+    public string Description { get; private set; }
     
     public ImmutableArray<PluginFunction> Functions  { get; private set; }
 
-    private Plugin(PluginOwner owner, ImmutableArray<PluginFunction> functions)
+    private Plugin() { }
+
+    private Plugin(PluginOwnerId ownerId, string name, string description, ImmutableArray<PluginFunction> functions)
     {
         Id = new(Guid.NewGuid());
-        Owner = owner;
+        OwnerId = ownerId;
         Functions = functions;
+        Description = description;
+        Name = name;
     }
 
-    public static Plugin Create(PluginOwner owner, ImmutableArray<PluginFunction> functions)
+    internal static Plugin Create(PluginOwnerId ownerId,string name, string description, ImmutableArray<PluginFunction> functions)
     {
-        return new Plugin(owner, functions);
+        return new Plugin(ownerId,name,description, functions);
     }
 }

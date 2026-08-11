@@ -9,6 +9,8 @@ using Dara.Server.Modules.Groups.Application.SendGroupMessage;
 using Dara.Server.Modules.Identity.Application;
 using Dara.Server.Modules.Identity.Application.CreateUser;
 using Dara.Server.Modules.Identity.Application.GetUser;
+using Dara.Server.Modules.Plugins.Application;
+using Dara.Server.Modules.Plugins.Application.GetPlugins;
 using Dara.Server.Modules.Profiles.Application;
 using Dara.Server.Modules.Profiles.Application.ChangeProfileName;
 
@@ -17,22 +19,23 @@ namespace Dara.Server.Apps.API.Tests;
 public class TestModules
 {
     private readonly IIdentityModule _identityModule;
-    
+    private readonly IPluginsModule _pluginsModule;
     private readonly IProfilesModule _profilesModule;
     private readonly IGroupsModule _groupModule;
 
-    public TestModules(IIdentityModule  identityModule, IProfilesModule profilesModule, IGroupsModule groupModule)
+    public TestModules(IIdentityModule  identityModule, IProfilesModule profilesModule, IGroupsModule groupModule, IPluginsModule pluginsModule)
     {
-        //_identityModule = provider.GetRequiredService<IIdentityModule>();
         _identityModule = identityModule;
         _profilesModule = profilesModule;
         _groupModule = groupModule;
+        _pluginsModule = pluginsModule;
     }
 
     public async Task Start()
     {
-        await TestGroups();
+        //await TestGroups();
         //await TestIdentityModule("1");
+        await TestPlugins();
         //
         // var grid = await _groupModule.ExecuteCommandAsync<CreateGroupCommand,Guid>(new CreateGroupCommand(clients[0], "NAME"));
         // for (int i = 1; i < 10; i++)
@@ -44,7 +47,7 @@ public class TestModules
         // await _groupModule.ExecuteCommandAsync(new SendMessageToGroupCommand(grid,clients[0],"SOME MESSAGE"));
 
      
-        await Task.Delay(TimeSpan.FromSeconds(2));
+        await Task.Delay(TimeSpan.FromSeconds(10));
         Environment.Exit(0);
        // await TestIdentityModule("123");
        //await TestProfileCreation();
@@ -71,6 +74,16 @@ public class TestModules
                 Console.WriteLine("M  " + m);
             }
         }
+    }
+
+    async Task TestPlugins()
+    {
+        var userQuery = new GetUserQuery("1");
+        var userDto = await _identityModule.ExecuteQueryAsync<GetUserQuery, Guid?>(userQuery);
+
+        var pluginQuery = new GetPluginsQuery(userDto.Value);
+        var pluginDto = await _pluginsModule.ExecuteQueryAsync<GetPluginsQuery,List<PluginDto>>(pluginQuery);
+        Console.WriteLine(pluginDto == null);
     }
 
     async Task TestIdentityModule(string userIndentifier)

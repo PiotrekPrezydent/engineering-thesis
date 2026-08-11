@@ -3,6 +3,7 @@ using Dara.Server.BuildingBlocks.Infrastructure.DataAccess;
 using Dara.Server.Modules.Groups.Domain.Groups;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace Dara.Server.Modules.Groups.Application.GetAllGroups;
 
 public class GetAllGroupsQueryHandler : IQueryHandler<GetAllGroupsQuery,List<GroupDto>>

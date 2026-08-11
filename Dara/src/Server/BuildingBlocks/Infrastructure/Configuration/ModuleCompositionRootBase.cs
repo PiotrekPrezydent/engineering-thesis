@@ -112,6 +112,11 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
         services.AddSingleton(references.CompositionRoot);
         
         SetServiceProvider(services.BuildServiceProvider());
+
+        using (var scope = CreateScope())
+        {
+            OnServiceProviderCreated(scope.ServiceProvider);
+        }
         
         rootServices.AddScoped(moduleDeclaration.Interface , _ => _services.GetRequiredService(moduleDeclaration.Interface));
         
@@ -126,6 +131,10 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
             var handler = new InboxWriterIntegrationEventHandler<TType>(compositionRoot);
             eventBus.Subscribe(handler);
         }
+    }
+
+    protected virtual void OnServiceProviderCreated(IServiceProvider serviceProvider)
+    {
     }
 
     protected abstract void ConfigureReferences(ModuleReferencesConfiguration.ModuleReferencesConfigurationBuilder builder);

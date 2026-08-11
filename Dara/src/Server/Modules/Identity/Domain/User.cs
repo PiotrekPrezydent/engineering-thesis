@@ -24,6 +24,9 @@ public class User : Entity, IAggregateRoot
     {
         return new(identifier);
     }
+    
+    public string Identifier => _identifier;
+    
 
     public bool IsIdentifiedBy(string identifier)
     {

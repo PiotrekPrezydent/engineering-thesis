@@ -54,7 +54,7 @@ public class DaraConnection
         Console.WriteLine($"Connected to {_serverUrl}");
     }
     
-    [CLICommand("con--")]
+    [CLICommand("con-u")]
     async Task Connect(string identifier)
     {
         CLIClient.Logger.LogInformation("Connecting to {url}...", _serverUrl);
