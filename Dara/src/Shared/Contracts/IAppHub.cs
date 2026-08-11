@@ -9,5 +9,9 @@ public interface IAppHub
     public Task JoinGroup(Guid groupId, string joinCode);
     
     public Task LeaveGroup(Guid groupId);
+    
+    public Task SendGroupMessage(Guid groupId, string message);
+    
+    public Task RegisterPlugin(PluginData pluginData);
 }
 

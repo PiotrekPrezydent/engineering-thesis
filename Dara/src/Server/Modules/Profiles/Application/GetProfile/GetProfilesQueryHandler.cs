@@ -16,7 +16,7 @@ public class GetProfilesQueryHandler : IQueryHandler<GetProfilesQuery, List<Prof
     public async Task<List<ProfileDto>> HandleAsync(GetProfilesQuery query)
     {
         var profiles = _readModel.Query<Profile>()
-            .Where(e => query.ProfilesIds.Contains(e.Id.Value))
+            .Where(e => e.Id.MatchAny(query.ProfilesIds))
             .Select(p => p.GetSnapshot())
             .Select(p => new ProfileDto(p.ProfileId, p.Name));
         

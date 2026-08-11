@@ -40,4 +40,14 @@ public class HubEvents : IAppHubClient
     {
         Console.WriteLine(notification);
     }
+
+    public async Task OnGroupMessageReceived(GroupMessageReceivedNotification notification)
+    {
+        Console.WriteLine(notification);
+    }
+
+    public async Task OnPluginRegistered()
+    {
+        Console.WriteLine(nameof(OnPluginRegistered));
+    }
 }

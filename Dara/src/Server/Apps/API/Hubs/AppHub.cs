@@ -3,6 +3,7 @@ using Dara.Server.Modules.Groups.Application;
 using Dara.Server.Modules.Groups.Application.CreateGroup;
 using Dara.Server.Modules.Groups.Application.JoinToGroup;
 using Dara.Server.Modules.Groups.Application.LeaveGroup;
+using Dara.Server.Modules.Groups.Application.SendGroupMessage;
 using Dara.Server.Modules.Identity.Application;
 using Dara.Server.Modules.Profiles.Application;
 using Dara.Server.Modules.Profiles.Application.ChangeProfileName;
@@ -58,5 +59,15 @@ public partial class AppHub : Hub<IAppHubClient>, IAppHub
     public async Task LeaveGroup(Guid groupId)
     {
         await _groupsModule.ExecuteCommandAsync(new LeaveGroupCommand(groupId, Context.GuidIdentifier()));
+    }
+
+    public async Task SendGroupMessage(Guid groupId, string message)
+    {
+        await _groupsModule.ExecuteCommandAsync(new SendGroupMessageCommand(groupId, Context.GuidIdentifier(), message));
+    }
+
+    public async Task RegisterPlugin(PluginData pluginData)
+    {
+        throw new NotImplementedException();
     }
 }

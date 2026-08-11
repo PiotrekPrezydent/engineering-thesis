@@ -11,23 +11,25 @@ public class DaraConnection
 {
     private readonly string _serverUrl;
     public HubConnection Connection { get; private set; }
+    
 
     public DaraConnection()
     {
         _serverUrl = ProvideUrl();
-        
-        string identifier = GenerateIdentifier();
-        CLIClient.Logger.LogInformation($"Created id {identifier}");
+    }
+    
+    public HubConnection SetConnection(string identifier)
+    {
         var builder = new HubConnectionBuilder();
         builder.WithUrl(_serverUrl, options =>
         {
             options.Headers[Connections.IdentifierHeaderName] = identifier;
         });
         builder.WithAutomaticReconnect();
-    
         Connection = builder.Build();
         Connection.Register<IAppHubClient>(new HubEvents());
-        HubCommands.Proxy = Connection.CreateHubProxy<IAppHub>(); 
+        HubCommands.Proxy = Connection.CreateHubProxy<IAppHub>();
+        return Connection;
     }
 
     string ProvideUrl()
@@ -47,10 +49,22 @@ public class DaraConnection
     {
         CLIClient.Logger.LogInformation("Connecting to {url}...", _serverUrl);
         
-        await Connection.StartAsync();
+        await SetConnection(GenerateIdentifier()).StartAsync();
         
         Console.WriteLine($"Connected to {_serverUrl}");
     }
+    
+    [CLICommand("con--")]
+    async Task Connect(string identifier)
+    {
+        CLIClient.Logger.LogInformation("Connecting to {url}...", _serverUrl);
+        
+        await SetConnection(identifier).StartAsync();
+        
+        Console.WriteLine($"Connected to {_serverUrl}");
+    }
+    
+    
 
     [CLICommand("disconnect", "dis")]
     async Task Disconnect()

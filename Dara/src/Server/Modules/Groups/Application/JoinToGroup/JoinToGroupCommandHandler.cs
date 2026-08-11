@@ -15,6 +15,6 @@ public class JoinToGroupCommandHandler : ICommandHandler<JoinToGroupCommand>
     public async Task HandleAsync(JoinToGroupCommand command)
     {
         var group = await _groupRepository.GetByIdAsync(new GroupId(command.GroupId));
-        group.JoinToGroup(new (command.MemberId), command.JoinCode);
+        group.JoinMemberToGroup(new (command.MemberId), command.JoinCode);
     }
 }

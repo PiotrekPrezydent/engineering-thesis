@@ -18,6 +18,7 @@ public class GetAllGroupsQueryHandler : IQueryHandler<GetAllGroupsQuery,List<Gro
     {
         return await _readModel
             .Query<Group>()
+            .Include(g=>g.Members)
             .Select(e =>e.GetSnapshot())
             .Select(e=>new GroupDto(e.GroupId, e.Name))
             .ToListAsync();

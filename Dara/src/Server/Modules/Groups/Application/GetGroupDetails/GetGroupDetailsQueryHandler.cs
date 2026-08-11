@@ -19,7 +19,7 @@ public class GetGroupDetailsQueryHandler : IQueryHandler<GetGroupDetailsQuery,Gr
         var group = await _readModel
             .Query<Group>()
             .Include(g => g.Members)
-            .FirstAsync(e => e.Id.Value == query.GroupId);
+            .FirstAsync(e => e.Id.Match(query.GroupId));
         
         var snapshot = group.GetSnapshot();
         var g = new GroupDetailsDto(snapshot.GroupId, snapshot.OwnerId, snapshot.Name, snapshot.JoinCode,

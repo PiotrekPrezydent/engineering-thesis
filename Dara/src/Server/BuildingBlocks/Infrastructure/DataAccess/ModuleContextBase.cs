@@ -13,18 +13,20 @@ public class ModuleContextBase : DbContext, IReadModel, IInboxContext, IOutboxCo
 
     public ModuleContextBase(DbContextOptions options) : base(options)
     {
+        this.Database.EnsureCreated();
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfiguration(new InboxMessageEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new OutboxMessageEntityTypeConfiguration());
-        
+
         base.OnModelCreating(modelBuilder);
     }
 
     public IQueryable<TEntity> Query<TEntity>() where TEntity : class
     {
+
         return Set<TEntity>().AsNoTracking();
     }
 }

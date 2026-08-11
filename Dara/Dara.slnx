@@ -5,6 +5,12 @@
   <Folder Name="/Clients/Apps/">
     <Project Path="src/Clients/Apps/CLI/Dara.Clients.Apps.CLI.csproj" />
   </Folder>
+  <Folder Name="/Clients/Plugins/">
+    <Project Path="src/Clients/Plugins/SamplePluginB/Clients.Plugins.SamplePluginB.csproj" />
+    <Project Path="src/Clients/Plugins/SamplePluginC/Clients.Plugins.SamplePluginC.csproj" />
+    <Project Path="src/Clients/Plugins/SamplePluginD/Clients.Plugins.SamplePluginD.csproj" />
+    <Project Path="src/Clients/Plugins/SamplePluginA/Clients.Plugins.SamplePluginA.csproj" />
+  </Folder>
   
   <Folder Name="/Server/" />
   <Folder Name="/Server/Apps/">

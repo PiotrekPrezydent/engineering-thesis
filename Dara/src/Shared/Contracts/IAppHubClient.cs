@@ -18,4 +18,8 @@ public interface IAppHubClient
     public Task OnGroupMemberJoined(GroupMemberJoinedGroupNotification notification);
     
     public Task OnGroupMemberLeft(GroupMemberLeftGroupNotification notification);
+
+    public Task OnGroupMessageReceived(GroupMessageReceivedNotification notification);
+
+    public Task OnPluginRegistered();
 }

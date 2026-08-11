@@ -3,6 +3,7 @@ using Dara.Server.BuildingBlocks.Domain.Exceptions;
 using Dara.Server.BuildingBlocks.Infrastructure.DataAccess;
 using Dara.Server.Modules.Groups.Domain.GroupMessages;
 using Dara.Server.Modules.Groups.Domain.Groups;
+using Dara.Server.Modules.Groups.Domain.Groups.Rules;
 using Microsoft.EntityFrameworkCore;
 
 namespace Dara.Server.Modules.Groups.Application.SendGroupMessage;
@@ -20,16 +21,12 @@ public class SendGroupMessageCommandHandler : ICommandHandler<SendGroupMessageCo
     
     public async Task HandleAsync(SendGroupMessageCommand command)
     {
-        var groupId = new GroupId(command.GroupId);
-        var senderId = new GroupMemberId(command.AuthorId);
-        GroupMember? gm = await _readModel.Query<GroupMember>().FirstOrDefaultAsync(e=>e.Id == senderId);
-        Group? group = await _readModel.Query<Group>().FirstOrDefaultAsync(e=>e.Id == groupId);
+        Group group = await _readModel.Query<Group>()
+            .Include(g => g.Members)
+            .FirstAsync(e => e.Id.Match(command.GroupId));
 
-        var rule = new OnlyActualGroupMemberCanSendMessage(group, gm);
-        if(gm == null || group == null || rule.IsBroken())
-            throw new BuisnessRuleValidationException(rule);
+        var message = group.SendMessageToGroup(new(command.AuthorId), command.Content);
         
-        var message = GroupMessage.Create(groupId, senderId,command.Content);
         await _groupMessageRepository.AddAsync(message);
     }
 }

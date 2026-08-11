@@ -1,5 +1,8 @@
+using Dara.Server.BuildingBlocks.Infrastructure.DataAccess;
 using Dara.Server.Modules.Groups.Application;
 using Dara.Server.Modules.Groups.Application.CreateGroup;
+using Dara.Server.Modules.Groups.Application.GetAllGroups;
+using Dara.Server.Modules.Groups.Application.GetGroupDetails;
 using Dara.Server.Modules.Groups.Application.JoinToGroup;
 using Dara.Server.Modules.Groups.Application.LeaveGroup;
 using Dara.Server.Modules.Groups.Application.SendGroupMessage;
@@ -27,6 +30,61 @@ public class TestModules
     }
 
     public async Task Start()
+    {
+        await TestGroups();
+        //await TestIdentityModule("1");
+        //
+        // var grid = await _groupModule.ExecuteCommandAsync<CreateGroupCommand,Guid>(new CreateGroupCommand(clients[0], "NAME"));
+        // for (int i = 1; i < 10; i++)
+        // {
+        //     await _groupModule.ExecuteCommandAsync(new JoinToGroupCommand(grid,clients[i],code));
+        // }
+        //
+        //
+        // await _groupModule.ExecuteCommandAsync(new SendMessageToGroupCommand(grid,clients[0],"SOME MESSAGE"));
+
+     
+        await Task.Delay(TimeSpan.FromSeconds(2));
+        Environment.Exit(0);
+       // await TestIdentityModule("123");
+       //await TestProfileCreation();
+        
+        Console.WriteLine("STOP TESTING");
+        
+    }
+
+    async Task TestGroups()
+    {
+        var q = new GetAllGroupsQuery();
+        var dts = await _groupModule.ExecuteQueryAsync<GetAllGroupsQuery, List<GroupDto>>(q);
+        Console.WriteLine(dts.Count);
+        foreach (var group in dts)
+        {
+            Console.WriteLine("DATAG:  " +group);
+            var dets =
+                await _groupModule.ExecuteQueryAsync<GetGroupDetailsQuery, GroupDetailsDto>(
+                    new GetGroupDetailsQuery(group.GroupId));
+            
+            Console.WriteLine("DETS:  " + dets);
+            foreach (var m in dets.Members)
+            {
+                Console.WriteLine("M  " + m);
+            }
+        }
+    }
+
+    async Task TestIdentityModule(string userIndentifier)
+    {
+        var q = new GetUserQuery(userIndentifier);
+        var dto = await _identityModule.ExecuteQueryAsync<GetUserQuery, Guid?>(q);
+        
+        //var command = new CreateClientCommand(userIndentifier);
+        
+        //var id = await _identityModule.ExecuteCommandAsync<CreateClientCommand,Guid>(command);
+        Console.WriteLine("RESOLVED ID : " + dto);
+    }
+
+    async Task TestCommands()
     {
         var clients = new List<Guid>();
         for (int i = 0; i < 5; i++)
@@ -69,36 +127,6 @@ public class TestModules
             var command = new LeaveGroupCommand(group, client);
             await _groupModule.ExecuteCommandAsync(command);
         }
-        
-        
-        //
-        // var grid = await _groupModule.ExecuteCommandAsync<CreateGroupCommand,Guid>(new CreateGroupCommand(clients[0], "NAME"));
-        // for (int i = 1; i < 10; i++)
-        // {
-        //     await _groupModule.ExecuteCommandAsync(new JoinToGroupCommand(grid,clients[i],code));
-        // }
-        //
-        //
-        // await _groupModule.ExecuteCommandAsync(new SendMessageToGroupCommand(grid,clients[0],"SOME MESSAGE"));
-        
-        
-        await Task.Delay(TimeSpan.FromSeconds(20));
-       // await TestIdentityModule("123");
-       //await TestProfileCreation();
-        
-        Console.WriteLine("STOP TESTING");
-        
-    }
-
-    async Task TestIdentityModule(string userIndentifier)
-    {
-        var q = new GetUserQuery(userIndentifier);
-        var dto = await _identityModule.ExecuteQueryAsync<GetUserQuery, Guid?>(q);
-        
-        //var command = new CreateClientCommand(userIndentifier);
-        
-        //var id = await _identityModule.ExecuteCommandAsync<CreateClientCommand,Guid>(command);
-        Console.WriteLine("RESOLVED ID : " + dto);
     }
 
 

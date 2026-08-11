@@ -15,6 +15,6 @@ public class LeaveGroupCommandHandler : ICommandHandler<LeaveGroupCommand>
     public async Task HandleAsync(LeaveGroupCommand command)
     {
         var group = await _groupRepository.GetByIdAsync(new(command.GroupId));
-        group.RemoveMember(new (command.MemberId));
+        group.LeaveGroup(new (command.MemberId));
     }
 }

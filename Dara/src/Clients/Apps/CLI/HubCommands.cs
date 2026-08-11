@@ -34,4 +34,16 @@ public class HubCommands : IAppHub
     {
         await Proxy.LeaveGroup(groupId);
     }
+
+    [CLICommand("sm")]
+    public async Task SendGroupMessage(Guid groupId, string message)
+    {
+        await Proxy.SendGroupMessage(groupId, message);
+    }
+
+    [CLICommand("rp")]
+    public async Task RegisterPlugin(PluginData pluginData)
+    {
+        await Proxy.RegisterPlugin(pluginData);
+    }
 }

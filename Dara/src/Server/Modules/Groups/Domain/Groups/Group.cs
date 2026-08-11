@@ -1,4 +1,5 @@
 using Dara.Server.BuildingBlocks.Domain;
+using Dara.Server.Modules.Groups.Domain.GroupMessages;
 using Dara.Server.Modules.Groups.Domain.Groups.Events;
 using Dara.Server.Modules.Groups.Domain.Groups.Rules;
 
@@ -35,28 +36,30 @@ public class Group : Entity, IAggregateRoot, IHasSnapshot<GroupSnapshot>
         return new Group(ownerId, name, joinCode);
     }
 
-    public void JoinToGroup(GroupMemberId groupMemberId, string providedCode)
+    public void JoinMemberToGroup(GroupMemberId memberId, string providedCode)
     {
-        CheckRule(new GroupCodeMustBeValid(_joinCode, providedCode));
-        
-        AddMember(groupMemberId);
-    }
-
-    public void AddMember(GroupMemberId memberId)
-    {
-        CheckRule(new GroupMemberCannotBeAddedTwice(Members, memberId));
+        CheckRule(new ProvidedGroupJoiningCodeMustBeValidRule(providedCode, _joinCode));
+        CheckRule(new GroupMemberCannotBeAddedTwiceRule(Members, memberId));
         
         _members.Add(GroupMember.Create(memberId, Id));
+        
         AddDomainEvent(new NewMemberJoinedGroupDomainEvent(Id, memberId));
     }
 
-    public void RemoveMember(GroupMemberId memberId)
+    public void LeaveGroup(GroupMemberId memberId)
     {
-        CheckRule(new NotActualMemberCannotLeaveGroup(Members, memberId));
+        CheckRule(new NonActualMemberCannotLeaveGroupRule(Members, memberId));
         var member = Members.Single(member => member.Id == memberId);
         
         _members.Remove(member);
         AddDomainEvent(new MemberLeftGroupDomainEvent(Id, memberId));
+    }
+
+    public GroupMessage SendMessageToGroup(GroupMemberId memberId, string message)
+    {
+        CheckRule(new OnlyActualGroupMemberCanSendMessageRule(_members,memberId));
+        
+        return GroupMessage.Create(Id, memberId, message);
     }
 
     public GroupSnapshot GetSnapshot()
