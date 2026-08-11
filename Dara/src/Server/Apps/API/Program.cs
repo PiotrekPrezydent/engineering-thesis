@@ -1,14 +1,17 @@
 using System.Threading.Channels;
 using Dara.Server.Apps.API.Authentication;
 using Dara.Server.Apps.API.Hubs;
+using Dara.Server.Apps.API.Notifications;
 using Dara.Server.Apps.API.Processing;
 using Dara.Server.Apps.API.Tests;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.EventBus;
 using Dara.Server.BuildingBlocks.Integration;
 using Dara.Server.Modules.Groups.Infrastructure;
+using Dara.Server.Modules.Groups.Integration;
 using Dara.Server.Modules.Identity.Infrastructure;
 using Dara.Server.Modules.Profiles.Infrastructure;
+using Dara.Server.Modules.Profiles.Integration;
 using Dara.Shared.Contracts;
 using Dara.Shared.Logging;
 using Microsoft.AspNetCore.SignalR;
@@ -58,11 +61,11 @@ public class Program
 
         builder.Services.AddScoped<TestModules>();
 
-        //builder.Services.AddScoped<IHubNotificationHandler<ProfileNameChangedIntegrationEvent>,ProfileNameChangedNotificationHandler>();
-        //builder.Services.AddScoped<IHubNotificationHandler<GroupCreatedIntegrationEvent>,GroupCreatedNotificationHandler>();
-        //builder.Services.AddScoped<IHubNotificationHandler<NewMemberJoinedGroupIntegrationEvent>,GroupMemberJoinedGroupNotificationHandler >();
-        //builder.Services.AddScoped<IHubNotificationHandler<MemberLeftGroupIntegrationEvent>,GroupMemberLeftGroupNotificationHandler>();
-        //builder.Services.AddScoped<IHubNotificationHandler<NewGroupMessageCreatedIntegrationEvent>,NewGroupMessageNotificationHandler>();
+        builder.Services.AddScoped<IHubNotificationHandler<ProfileNameChangedIntegrationEvent>,NotifyProfileNameChangedHandler>();
+        builder.Services.AddScoped<IHubNotificationHandler<GroupCreatedIntegrationEvent>,NotifyGroupCreatedHandler>();
+        builder.Services.AddScoped<IHubNotificationHandler<NewMemberJoinedGroupIntegrationEvent>,NotifyNewMemberJoinedGroupHandler>();
+        builder.Services.AddScoped<IHubNotificationHandler<MemberLeftGroupIntegrationEvent>,NotifyMemberLeftGroupHandler>();
+        builder.Services.AddScoped<IHubNotificationHandler<NewGroupMessageCreatedIntegrationEvent>,NotifyNewGroupMessageCreatedHandler>();
         
         builder.Services.AddSingleton(Channel.CreateUnbounded<IIntegrationEvent>());
         builder.Services.AddHostedService<HubNotificationsProcessor>();
@@ -71,11 +74,11 @@ public class Program
         
         var channel = app.Services.GetRequiredService<Channel<IIntegrationEvent>>();
         
-        // InMemoryEventBus.Instance.Subscribe(new ChannelWriterIntegrationEventHandler<ProfileNameChangedIntegrationEvent>(channel));
-        // InMemoryEventBus.Instance.Subscribe(new ChannelWriterIntegrationEventHandler<NewMemberJoinedGroupIntegrationEvent>(channel));
-        // InMemoryEventBus.Instance.Subscribe(new ChannelWriterIntegrationEventHandler<MemberLeftGroupIntegrationEvent>(channel));
-        // InMemoryEventBus.Instance.Subscribe(new ChannelWriterIntegrationEventHandler<GroupCreatedIntegrationEvent>(channel));
-        // InMemoryEventBus.Instance.Subscribe(new ChannelWriterIntegrationEventHandler<NewGroupMessageCreatedIntegrationEvent>(channel));
+        InMemoryEventBus.Instance.Subscribe(new ChannelWriterIntegrationEventHandler<ProfileNameChangedIntegrationEvent>(channel));
+        InMemoryEventBus.Instance.Subscribe(new ChannelWriterIntegrationEventHandler<NewMemberJoinedGroupIntegrationEvent>(channel));
+        InMemoryEventBus.Instance.Subscribe(new ChannelWriterIntegrationEventHandler<MemberLeftGroupIntegrationEvent>(channel));
+        InMemoryEventBus.Instance.Subscribe(new ChannelWriterIntegrationEventHandler<GroupCreatedIntegrationEvent>(channel));
+        InMemoryEventBus.Instance.Subscribe(new ChannelWriterIntegrationEventHandler<NewGroupMessageCreatedIntegrationEvent>(channel));
         
         app.UseAuthentication();
         app.UseAuthorization();
