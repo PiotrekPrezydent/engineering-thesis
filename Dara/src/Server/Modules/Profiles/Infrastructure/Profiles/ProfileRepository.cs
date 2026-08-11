@@ -5,20 +5,20 @@ namespace Dara.Server.Modules.Profiles.Infrastructure.Profiles;
 
 public class ProfileRepository : IProfileRepository
 {
-    private ProfilesContext _contextBase;
+    private ProfilesContext _context;
 
-    public ProfileRepository(ProfilesContext contextBase)
+    public ProfileRepository(ProfilesContext context)
     {
-        _contextBase = contextBase;
+        _context = context;
     }
 
     public async Task AddAsync(Profile profile)
     {
-        await _contextBase.Profiles.AddAsync(profile);
+        await _context.Profiles.AddAsync(profile);
     }
     
     public async Task<Profile> GetByIdAsync(ProfileId profileId)
     {
-        return await _contextBase.Profiles.FirstAsync(e => e.ProfileId == profileId);
+        return await _context.Profiles.FirstAsync(e => e.Id == profileId);
     }
 }

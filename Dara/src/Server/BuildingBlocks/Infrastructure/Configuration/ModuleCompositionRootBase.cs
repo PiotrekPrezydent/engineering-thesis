@@ -1,8 +1,6 @@
-using System.Text.Json;
 using Dara.Server.BuildingBlocks.Application.Commands;
 using Dara.Server.BuildingBlocks.Application.Events;
 using Dara.Server.BuildingBlocks.Application.Queries;
-using Dara.Server.BuildingBlocks.Domain;
 using Dara.Server.BuildingBlocks.Infrastructure.Common;
 using Dara.Server.BuildingBlocks.Infrastructure.Common.Extensions;
 using Dara.Server.BuildingBlocks.Infrastructure.Common.Types;
@@ -15,11 +13,9 @@ using Dara.Server.BuildingBlocks.Infrastructure.DataAccess;
 using Dara.Server.BuildingBlocks.Infrastructure.Mediation.Decorators;
 using Dara.Server.BuildingBlocks.Infrastructure.Mediation.HandlerResolving;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.EventBus;
-using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox.Mapping;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox.Persistence;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox.Processing;
-using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox.Persistence;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox.Processing;
 using Dara.Server.BuildingBlocks.Infrastructure.Processing.Commands;
@@ -128,7 +124,6 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
         public void Execute<TType>(ITypeKey<IIntegrationEvent> typeKey) where TType : IIntegrationEvent
         {
             var handler = new InboxWriterIntegrationEventHandler<TType>(compositionRoot);
-            Console.WriteLine("Subscribe: " + handler.GetType().Name);
             eventBus.Subscribe(handler);
         }
     }

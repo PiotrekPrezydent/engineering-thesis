@@ -1,7 +1,6 @@
 using Dara.Server.Apps.API.Extensions;
 using Dara.Server.Modules.Groups.Application;
 using Dara.Server.Modules.Groups.Application.CreateGroup;
-using Dara.Server.Modules.Groups.Application.GetValidGroup;
 using Dara.Server.Modules.Groups.Application.JoinToGroup;
 using Dara.Server.Modules.Groups.Application.LeaveGroup;
 using Dara.Server.Modules.Identity.Application;
@@ -15,14 +14,14 @@ namespace Dara.Server.Apps.API.Hubs;
 public partial class AppHub : Hub<IAppHubClient>, IAppHub
 {
     private readonly IIdentityModule _identityModule;
-    private readonly IGroupModule _groupModule;
+    private readonly IGroupsModule _groupsModule;
     private readonly IProfilesModule _profilesModule;
 
-    public AppHub(IIdentityModule identityModule, IProfilesModule profilesModule, IGroupModule groupModule)
+    public AppHub(IIdentityModule identityModule, IProfilesModule profilesModule, IGroupsModule groupsModule)
     {
         _identityModule = identityModule;
         _profilesModule = profilesModule;
-        _groupModule = groupModule;
+        _groupsModule = groupsModule;
     }
 
     public override async Task OnConnectedAsync()
@@ -48,16 +47,16 @@ public partial class AppHub : Hub<IAppHubClient>, IAppHub
     public async Task CreateGroup(string groupName)
     {
         var command = new CreateGroupCommand(Context.GuidIdentifier(), groupName);
-        await _groupModule.ExecuteCommandAsync<CreateGroupCommand,Guid>(command);
+        await _groupsModule.ExecuteCommandAsync<CreateGroupCommand,Guid>(command);
     }
 
     public async Task JoinGroup(Guid groupId, string joinCode)
     {
-        await _groupModule.ExecuteCommandAsync(new JoinToGroupCommand(groupId,Context.GuidIdentifier(),joinCode));
+        await _groupsModule.ExecuteCommandAsync(new JoinToGroupCommand(groupId,Context.GuidIdentifier(),joinCode));
     }
 
     public async Task LeaveGroup(Guid groupId)
     {
-        await _groupModule.ExecuteCommandAsync(new LeaveGroupCommand(groupId, Context.GuidIdentifier()));
+        await _groupsModule.ExecuteCommandAsync(new LeaveGroupCommand(groupId, Context.GuidIdentifier()));
     }
 }

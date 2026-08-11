@@ -1,5 +1,4 @@
 using System;
-using Dara.Shared.SourceGenerators.Common;
 
 namespace Dara.Shared.SourceGenerators.Attributes;
 

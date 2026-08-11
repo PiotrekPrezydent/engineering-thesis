@@ -5,17 +5,12 @@ using Dara.Server.BuildingBlocks.Infrastructure.Configuration.Mediation;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration.Messaging;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration.Processing;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration.References;
-using Dara.Server.BuildingBlocks.Infrastructure.Messaging.EventBus;
-using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox.Persistence;
-using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox.Persistence;
 using Dara.Server.Modules.Profiles.Application;
-using Microsoft.Extensions.Logging;
 
 namespace Dara.Server.Modules.Profiles.Infrastructure;
 
 public class ProfilesCompositionRoot : ModuleCompositionRootBase
 {
-
     protected override void ConfigureReferences(ModuleReferencesConfiguration.ModuleReferencesConfigurationBuilder builder)
     {
         builder

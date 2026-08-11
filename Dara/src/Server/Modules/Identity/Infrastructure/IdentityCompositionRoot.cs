@@ -1,16 +1,11 @@
 using Dara.Server.BuildingBlocks.Infrastructure.Common.Extensions;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration.DataAccess;
+using Dara.Server.BuildingBlocks.Infrastructure.Configuration.Mediation;
+using Dara.Server.BuildingBlocks.Infrastructure.Configuration.Messaging;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration.Processing;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration.References;
-using Dara.Server.BuildingBlocks.Infrastructure.Messaging.EventBus;
-using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox.Persistence;
-using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox.Persistence;
 using Dara.Server.Modules.Identity.Application;
-using Dara.Server.Modules.Identity.Integration;
-using Microsoft.Extensions.Logging;
-using ModuleMediationConfiguration = Dara.Server.BuildingBlocks.Infrastructure.Configuration.Mediation.ModuleMediationConfiguration;
-using ModuleMessagingConfiguration = Dara.Server.BuildingBlocks.Infrastructure.Configuration.Messaging.ModuleMessagingConfiguration;
 
 namespace Dara.Server.Modules.Identity.Infrastructure;
 

@@ -15,7 +15,7 @@ public class ChangeProfileNameCommandHandler : ICommandHandler<ChangeProfileName
 
     public async Task HandleAsync(ChangeProfileNameCommand command)
     {
-        var profile = await _profileRepository.GetByIdAsync(new ProfileId(command.ClientId));
-        profile.UpdateName(command.Name);
+        var profile = await _profileRepository.GetByIdAsync(new ProfileId(command.ProfileId));
+        profile.UpdateName(command.NewName);
     }
 }

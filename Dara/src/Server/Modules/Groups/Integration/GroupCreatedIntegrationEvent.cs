@@ -7,7 +7,7 @@ public record GroupCreatedIntegrationEvent : IntegrationEventBase
     public Guid GroupId { get; }
     public Guid GroupOwnerId { get; }
     
-    public GroupCreatedIntegrationEvent(Guid id, DateTime occurredOn, Guid groupId, Guid groupOwnerId) : base(id, occurredOn)
+    public GroupCreatedIntegrationEvent(Guid eventId, DateTime occurredOn, Guid groupId, Guid groupOwnerId) : base(eventId, occurredOn)
     {
         GroupId = groupId;
         GroupOwnerId = groupOwnerId;

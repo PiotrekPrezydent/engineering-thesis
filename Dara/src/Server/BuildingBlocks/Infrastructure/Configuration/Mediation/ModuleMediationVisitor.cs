@@ -1,11 +1,7 @@
-using Dara.Server.BuildingBlocks.Application.Events;
-using Dara.Server.BuildingBlocks.Domain;
 using Dara.Server.BuildingBlocks.Infrastructure.Common.Extensions;
 using Dara.Server.BuildingBlocks.Infrastructure.Common.Visitors;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration.References;
 using Dara.Server.BuildingBlocks.Infrastructure.Mediation.HandlerResolving;
-using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox.Mapping;
-using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox.Mapping;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Dara.Server.BuildingBlocks.Infrastructure.Configuration.Mediation;

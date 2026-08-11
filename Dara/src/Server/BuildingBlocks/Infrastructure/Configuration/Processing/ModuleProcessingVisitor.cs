@@ -1,7 +1,5 @@
 using Dara.Server.BuildingBlocks.Application.Commands;
 using Dara.Server.BuildingBlocks.Infrastructure.Common.Visitors;
-using Dara.Server.BuildingBlocks.Infrastructure.DataAccess;
-using Dara.Server.BuildingBlocks.Infrastructure.Mediation.HandlerResolving;
 using Dara.Server.BuildingBlocks.Infrastructure.Processing.Commands;
 using Dara.Server.BuildingBlocks.Infrastructure.Processing.DomainEvents;
 using Microsoft.Extensions.DependencyInjection;

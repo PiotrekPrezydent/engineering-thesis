@@ -1,8 +1,5 @@
 using System.Text.Json;
 using Dara.Server.BuildingBlocks.Application.Events;
-using Dara.Server.BuildingBlocks.Domain;
-using Dara.Server.BuildingBlocks.Domain.Events;
-using Dara.Server.BuildingBlocks.Infrastructure.DataAccess;
 using Dara.Server.BuildingBlocks.Infrastructure.Mediation.HandlerResolving;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox.Mapping;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox.Persistence;
@@ -32,6 +29,7 @@ public class OutboxProcessor : IOutboxProcessor
         
         foreach (var message in messages)
         {
+            _logger.LogInformation($"STARTING PROCESSING OUTBOX MESSAGE {message.Type} **DATA** {message.Content}");
             var type = _outboxMessagesTypeMapper.GetTypeForMessageWithTypeName(message.Type);
             var notification = JsonSerializer.Deserialize(message.Content, type) as IDomainEventNotification;
             

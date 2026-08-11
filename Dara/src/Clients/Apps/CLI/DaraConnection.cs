@@ -1,12 +1,8 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Net;
-using System.Security.Claims;
 using System.Text;
 using Dara.Shared.Common.CLI;
 using Dara.Shared.Contracts;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 using TypedSignalR.Client;
 
 namespace Dara.Clients.Apps.CLI;

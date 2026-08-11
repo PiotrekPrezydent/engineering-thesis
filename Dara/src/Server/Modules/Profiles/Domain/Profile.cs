@@ -5,17 +5,17 @@ namespace Dara.Server.Modules.Profiles.Domain;
 
 public class Profile : Entity, IAggregateRoot, IHasSnapshot<ProfileSnapshot>
 {
-    public ProfileId ProfileId { get; private set; }
+    public ProfileId Id { get; private set; }
 
     private string _name;
 
     private Profile() { }
 
-    internal Profile(ProfileId profileId, string name)
+    internal Profile(ProfileId id, string name)
     {
-        ProfileId = profileId;
+        Id = id;
         _name = name;
-        AddDomainEvent(new NewProfileCreatedDomainEvent(profileId));
+        AddDomainEvent(new ProfileCreatedDomainEvent(id));
     }
     
     public static Profile Create(ProfileId id, string name)
@@ -26,11 +26,11 @@ public class Profile : Entity, IAggregateRoot, IHasSnapshot<ProfileSnapshot>
     public void UpdateName(string name)
     {
         _name = name;
-        AddDomainEvent(new ProfileNameChangedDomainEvent(ProfileId, name));
+        AddDomainEvent(new ProfileNameChangedDomainEvent(Id, name));
     }
 
     public ProfileSnapshot GetSnapshot()
     {
-        return new ProfileSnapshot(ProfileId, _name);
+        return new ProfileSnapshot(Id, _name);
     }
 }

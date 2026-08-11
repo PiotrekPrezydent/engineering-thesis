@@ -1,4 +1,3 @@
-using Dara.Server.BuildingBlocks.Application.Queries;
 using Dara.Server.BuildingBlocks.Domain;
 using Dara.Server.BuildingBlocks.Infrastructure.Common.Types;
 using Dara.Server.BuildingBlocks.Infrastructure.Common.Visitors;

@@ -1,5 +1,3 @@
-using System;
-
 namespace Dara.Shared.SourceGenerators.BuilderClass.Methods;
 
 public class BuilderMethodFactory

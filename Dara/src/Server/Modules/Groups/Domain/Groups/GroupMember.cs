@@ -4,26 +4,24 @@ namespace Dara.Server.Modules.Groups.Domain.Groups;
 
 public class GroupMember : Entity
 {
-    public GroupMemberId MemberId { get; }
+    public GroupMemberId Id { get; private set; }
     
-    public GroupId GroupId { get; }
+    public GroupId GroupId { get; private set; }
 
-    private GroupMember()
-    {
-    }
+    private GroupMember() { }
 
-    private GroupMember(GroupId groupId, GroupMemberId memberId)
+    private GroupMember(GroupMemberId id, GroupId groupId)
     {
         GroupId = groupId;
-        MemberId = memberId;
+        Id = id;
     }
 
-    internal static GroupMember Create(GroupId groupId, GroupMemberId memberId)
+    internal static GroupMember Create(GroupMemberId memberId, GroupId groupId)
     {
-        return new GroupMember(groupId, memberId);
+        return new GroupMember(memberId, groupId);
     }
 
-    public bool IsMember(GroupId groupId)
+    public bool IsMemberOfGroup(GroupId groupId)
     {
         return GroupId == groupId;
     }

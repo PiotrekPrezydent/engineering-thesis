@@ -16,7 +16,7 @@ public record TypePlacementInfo(
     {
         get
         {
-            var current = this.ParentInfo;
+            var current = ParentInfo;
             while (current != null)
             {
                 yield return current;

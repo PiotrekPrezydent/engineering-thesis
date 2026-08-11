@@ -18,11 +18,12 @@ public class GetGroupDetailsQueryHandler : IQueryHandler<GetGroupDetailsQuery,Gr
     {
         var group = await _readModel
             .Query<Group>()
-            .Include(g=>g.Members)
-            .FirstAsync(e => e.GroupId.Value == query.GroupId);
+            .Include(g => g.Members)
+            .FirstAsync(e => e.Id.Value == query.GroupId);
         
-        var g = new GroupDetailsDto(group.GroupId.Value, group.OwnerId.Value, group.Name, group.JoinCode,
-            group.Members.Select(e=>e.MemberId.Value).ToList());
+        var snapshot = group.GetSnapshot();
+        var g = new GroupDetailsDto(snapshot.GroupId, snapshot.OwnerId, snapshot.Name, snapshot.JoinCode,
+            snapshot.Members);
         return g;
     }
 }

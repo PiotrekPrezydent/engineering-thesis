@@ -36,7 +36,7 @@ public class CLILineInterpreter
         if (_handlers.TryGetValue(commandName, out var handler))
             await handler(commandArgs);
         else
-            System.Console.WriteLine($"Command {commandName} not found");
+            Console.WriteLine($"Command {commandName} not found");
     }
     
     //this should be awaiting invoke
@@ -52,7 +52,7 @@ public class CLILineInterpreter
             var providenArgs = args.ValuesWithType().ElementsToString().EnsureText();
             var expectedArgs = method.MethodParametersAsDictionary().ElementsToString().EnsureText();
             
-            System.Console.WriteLine($"wrong parameters for method: {method.Name}\nExpected:\n{expectedArgs}\nBut provided\n{providenArgs}");
+            Console.WriteLine($"wrong parameters for method: {method.Name}\nExpected:\n{expectedArgs}\nBut provided\n{providenArgs}");
         }
         
     }

@@ -14,7 +14,9 @@ public class CreateProfileCommandHandler : ICommandHandler<CreateProfileCommand>
 
     public async Task HandleAsync(CreateProfileCommand command)
     {
-        var profileId = new ProfileId(command.ProfileId);
-        await _profileRepository.AddAsync(Profile.Create(profileId,command.Name));
+        var profile = Profile.Create(
+            new(command.ProfileId), 
+            command.Name);
+        await _profileRepository.AddAsync(profile);
     }
 }

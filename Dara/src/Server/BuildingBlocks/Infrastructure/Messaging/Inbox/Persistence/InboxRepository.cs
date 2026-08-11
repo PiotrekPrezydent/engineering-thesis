@@ -1,4 +1,3 @@
-using Dara.Server.BuildingBlocks.Infrastructure.DataAccess;
 using Microsoft.EntityFrameworkCore;
 
 namespace Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox.Persistence;

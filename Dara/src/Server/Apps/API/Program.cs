@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using System.Threading.Channels;
 using Dara.Server.Apps.API.Authentication;
 using Dara.Server.Apps.API.Hubs;
@@ -7,11 +6,9 @@ using Dara.Server.Apps.API.Tests;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.EventBus;
 using Dara.Server.BuildingBlocks.Integration;
-using Dara.Server.Modules.Groups.Application;
 using Dara.Server.Modules.Groups.Infrastructure;
-using Dara.Server.Modules.Groups.Integration;
 using Dara.Server.Modules.Identity.Infrastructure;
-
+using Dara.Server.Modules.Profiles.Infrastructure;
 using Dara.Shared.Contracts;
 using Dara.Shared.Logging;
 using Microsoft.AspNetCore.SignalR;
@@ -50,9 +47,9 @@ public class Program
         
         var modulesRoots = new IModuleCompositionRoot[]
         {
-            //new GroupCompositionRoot(),
+            new GroupsCompositionRoot(),
             new IdentityCompositionRoot(),
-           // new ProfilesCompositionRoot()
+            new ProfilesCompositionRoot()
         };
         
         

@@ -1,7 +1,6 @@
 using Dara.Server.BuildingBlocks.Application.Commands;
 using Dara.Server.BuildingBlocks.Application.Events;
 using Dara.Server.BuildingBlocks.Application.Queries;
-using Dara.Server.BuildingBlocks.Domain;
 using Dara.Server.BuildingBlocks.Domain.Events;
 using Dara.Server.BuildingBlocks.Integration;
 using Microsoft.Extensions.DependencyInjection;

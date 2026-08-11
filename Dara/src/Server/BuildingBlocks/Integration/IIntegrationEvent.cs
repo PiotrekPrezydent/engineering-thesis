@@ -2,6 +2,6 @@ namespace Dara.Server.BuildingBlocks.Integration;
 
 public interface IIntegrationEvent
 {
-    Guid Id { get; }
+    Guid EventId { get; }
     DateTime OccurredOn { get; }
 }

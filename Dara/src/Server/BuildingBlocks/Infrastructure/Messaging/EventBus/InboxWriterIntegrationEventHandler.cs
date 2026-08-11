@@ -1,7 +1,6 @@
 using System.Text.Json;
 using Dara.Server.BuildingBlocks.Application.Events;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration;
-using Dara.Server.BuildingBlocks.Infrastructure.DataAccess;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox.Mapping;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox.Persistence;
@@ -27,13 +26,12 @@ public class InboxWriterIntegrationEventHandler<TIntegrationEvent> : IIntegratio
         var repository = scope.ServiceProvider.GetRequiredService<IInboxRepository>();
         var mapper = scope.ServiceProvider.GetRequiredService<IInboxMessagesTypeMapper>();
         var signal = scope.ServiceProvider.GetRequiredService<InboxQueueSignal>();
-
         
         var data = JsonSerializer.Serialize(integrationEvent,integrationEvent.GetType());
         var type = mapper.GetTypeNameForMessageWithType(integrationEvent.GetType());
         
         var message = new InboxMessage(
-            integrationEvent.Id,
+            integrationEvent.EventId,
             integrationEvent.OccurredOn,
             type,
             data

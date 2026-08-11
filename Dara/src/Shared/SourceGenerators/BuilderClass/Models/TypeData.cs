@@ -15,7 +15,7 @@ public abstract record TypeData(string Name, string Namespace, GenericConstraint
     {
         typeFullNameAsGeneric = "";
         whereStatement = "";
-        var placement = this.GetPlacementInfoForType(targetType);
+        var placement = GetPlacementInfoForType(targetType);
         
         if (placement == null)
             return false;

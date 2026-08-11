@@ -9,12 +9,12 @@ public class GroupMessageEntityTypeConfiguration : IEntityTypeConfiguration<Grou
 {
     public void Configure(EntityTypeBuilder<GroupMessage> builder)
     {
-        builder.HasKey(e => e.MessageId);
+        builder.HasKey(e => e.Id);
         
-        builder.Property(e => e.MessageId)
+        builder.Property(e => e.Id)
             .HasConversion(id => id.Value, value => new GroupMessageId(value));
 
         builder.Property(e => e.GroupId).HasConversion(e => e.Value, value => new GroupId(value));
-        builder.Property(e=>e.Sender).HasConversion(e=>e.Value,value=>new GroupMemberId(value));
+        builder.Property(e=>e.MessageAuthorId).HasConversion(e=>e.Value,value=>new GroupMemberId(value));
     }
 }

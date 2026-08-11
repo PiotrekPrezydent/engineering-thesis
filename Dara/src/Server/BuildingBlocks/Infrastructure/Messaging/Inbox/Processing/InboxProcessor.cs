@@ -1,6 +1,4 @@
 using System.Text.Json;
-using Dara.Server.BuildingBlocks.Application;
-using Dara.Server.BuildingBlocks.Infrastructure.DataAccess;
 using Dara.Server.BuildingBlocks.Infrastructure.Mediation.HandlerResolving;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox.Mapping;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox.Persistence;
@@ -31,6 +29,7 @@ public class InboxProcessor : IInboxProcessor
         
         foreach (var message in messages)
         {
+            _logger.LogInformation($"STARTING PROCESSING INBOX MESSAGE {message.Type} **DATA** {message.Content}");
             var type = _inboxMessagesTypeMapper.GetTypeForMessageWithTypeName(message.Type);
             var integrationEvent = JsonSerializer.Deserialize(message.Content, type) as IIntegrationEvent;
             await DispatchIntegrationEventAsync((dynamic)integrationEvent!);

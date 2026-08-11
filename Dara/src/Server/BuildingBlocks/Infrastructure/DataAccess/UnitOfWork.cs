@@ -52,16 +52,14 @@ public class UnitOfWork : IUnitOfWork
             notifications.Add(notification);
         }
         
-        
         foreach (var domainEvent in domainEvents)
             await _domainEventsDispatcher.DispatchAsync((dynamic)domainEvent); //dynamic ensure that IDomainEvent is correct type for service provider
-
         
         foreach (var notification in notifications)
         {
-            Console.WriteLine("WRITE uof " + notification.GetType());
             var type = _outboxMessagesTypeMapper.GetTypeNameForMessageWithType(notification.GetType());
             var data = JsonSerializer.Serialize(notification,notification.GetType());
+            
             var message = new OutboxMessage(notification.NotificationId, notification.DomainEvent.OccuredOn,type,data);
             
             await _outboxRepository.AddAsync(message, CancellationToken.None);

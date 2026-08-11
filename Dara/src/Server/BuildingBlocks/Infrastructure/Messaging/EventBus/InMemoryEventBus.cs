@@ -22,11 +22,13 @@ public class InMemoryEventBus : IEventBus
     public async Task PublishAsync<TEvent>(TEvent @event) where TEvent : IIntegrationEvent
     {
         var eventType = typeof(TEvent);
-        
-        foreach (var handler  in _eventHandlers[eventType])
+        if (_eventHandlers.TryGetValue(eventType, out var eventHandlers))
         {
-            if (handler is IIntegrationEventHandler<TEvent> eventHandler)
-                await eventHandler.HandleAsync(@event);
+            foreach (var handler  in eventHandlers)
+            {
+                if (handler is IIntegrationEventHandler<TEvent> eventHandler)
+                    await eventHandler.HandleAsync(@event);
+            }
         }
     }
 }

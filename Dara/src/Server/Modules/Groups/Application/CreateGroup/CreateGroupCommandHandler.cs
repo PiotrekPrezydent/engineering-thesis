@@ -16,8 +16,8 @@ public class CreateGroupCommandHandler : ICommandHandler<CreateGroupCommand,Guid
     
     public async Task<Guid> HandleAsync(CreateGroupCommand command)
     {
-        var group = Group.Create(new(command.CreatorId), command.Name, $"GROUP-{counter++}");
+        var group = Group.Create(new(command.CreatorId), command.GroupName, $"GROUP-{counter++}");
         await _groupRepository.AddAsync(group);
-        return group.GroupId;
+        return group.Id;
     }
 }
