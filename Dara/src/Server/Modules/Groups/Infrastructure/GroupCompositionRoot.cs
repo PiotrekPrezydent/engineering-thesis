@@ -18,11 +18,6 @@ namespace Dara.Server.Modules.Groups.Infrastructure;
 
 public class GroupCompositionRoot : ModuleCompositionRootBase
 {
-    protected override void ConfigureLogging(ILoggingBuilder loggingBuilder)
-    {
-        loggingBuilder
-            .AddConsole();
-    }
 
     protected override void ConfigureReferences(ModuleReferencesConfiguration.ModuleReferencesConfigurationBuilder builder)
     {
@@ -35,9 +30,7 @@ public class GroupCompositionRoot : ModuleCompositionRootBase
 
     protected override void ConfigureDataAccess(ModuleDataAccessConfiguration.ModuleDataAccessConfigurationBuilder builder)
     {
-        builder
-            .WithModuleContext(GroupContext.AsTypeKey)
-            .WithUnitOfWork(StandardUnitOfWork);
+        AddStandardDataAccess<GroupContext>(builder);
     }
 
     protected override void ConfigureMediation(ModuleMediationConfiguration.ModuleMediationConfigurationBuilder builder)
@@ -47,18 +40,11 @@ public class GroupCompositionRoot : ModuleCompositionRootBase
 
     protected override void ConfigureProcessing(ModuleProcessingConfiguration.ModuleProcessingConfigurationBuilder builder)
     {
-        builder
-            .WithCommandExecutor(StandardCommandExecutor)
-            .WithDomainEventDispatcher(StandardDomainEventsDispatcher);
+        AddStandardProcessing(builder);
     }
 
     protected override void ConfigureMessaging(ModuleMessagingConfiguration.ModuleMessagingConfigurationBuilder builder)
     {
-        builder
-            .WithEventBusInstance(InMemoryEventBus.Instance)
-            .WithInboxProcessor(StandardInboxProcessor)
-            .WithOutboxProcessor(StandardOutboxProcessor)
-            .WithInboxRepository(InboxRepository<GroupContext>.AsTypeKey)
-            .WithOutboxRepository(OutboxRepository<GroupContext>.AsTypeKey);
+        AddStandardMessaging<GroupContext>(builder);
     }
 }

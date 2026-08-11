@@ -1,8 +1,9 @@
+using Dara.Server.BuildingBlocks.Infrastructure.DataAccess;
 using Microsoft.EntityFrameworkCore;
 
 namespace Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox.Persistence;
 
-public class InboxRepository<TDbcontext> : IInboxRepository where TDbcontext : DbContext 
+public class InboxRepository<TDbcontext> : IInboxRepository where TDbcontext : DbContext, IInboxContext
 {
     private readonly TDbcontext _dbContext;
 

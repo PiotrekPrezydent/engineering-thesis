@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Dara.Server.Modules.Profiles.Infrastructure;
 
-public class ProfilesContext : ModuleContext
+public class ProfilesContext : ModuleContextBase
 {
     public DbSet<Profile> Profiles { get; set; }
     

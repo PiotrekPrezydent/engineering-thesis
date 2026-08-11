@@ -1,9 +1,6 @@
-using Dara.Server.BuildingBlocks.Domain;
-using Dara.Server.BuildingBlocks.Domain.Events;
-
 namespace Dara.Server.BuildingBlocks.Application.Events;
 
-public interface IDomainEventNotificationHandler<in TDomainEvent> where TDomainEvent : IDomainEvent 
+public interface IDomainEventNotificationHandler<in TDomainNotification> where TDomainNotification : IDomainEventNotification 
 {
-    public Task HandleAsync(TDomainEvent notification);
+    public Task HandleAsync(TDomainNotification notification);
 }

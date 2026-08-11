@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Dara.Server.Modules.Groups.Infrastructure;
 
-public class GroupContext : ModuleContext
+public class GroupContext : ModuleContextBase
 {
     public DbSet<Group> Groups { get; set; }
     public DbSet<GroupMessage>  GroupMessages { get; set; }

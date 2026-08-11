@@ -16,11 +16,6 @@ namespace Dara.Server.Modules.Identity.Infrastructure;
 
 public class IdentityCompositionRoot : ModuleCompositionRootBase
 {
-    protected override void ConfigureLogging(ILoggingBuilder loggingBuilder)
-    {
-        loggingBuilder
-            .AddConsole();
-    }
 
     protected override void ConfigureReferences(ModuleReferencesConfiguration.ModuleReferencesConfigurationBuilder builder)
     {
@@ -33,9 +28,7 @@ public class IdentityCompositionRoot : ModuleCompositionRootBase
 
     protected override void ConfigureDataAccess(ModuleDataAccessConfiguration.ModuleDataAccessConfigurationBuilder builder)
     {
-        builder
-            .WithModuleContext(IdentityContext.AsTypeKey)
-            .WithUnitOfWork(StandardUnitOfWork);
+        AddStandardDataAccess<IdentityContext>(builder);
     }
 
     protected override void ConfigureMediation(ModuleMediationConfiguration.ModuleMediationConfigurationBuilder builder)
@@ -50,11 +43,6 @@ public class IdentityCompositionRoot : ModuleCompositionRootBase
 
     protected override void ConfigureMessaging(ModuleMessagingConfiguration.ModuleMessagingConfigurationBuilder builder)
     {
-        builder
-            .WithEventBusInstance(InMemoryEventBus.Instance)
-            .WithInboxProcessor(StandardInboxProcessor)
-            .WithOutboxProcessor(StandardOutboxProcessor)
-            .WithInboxRepository(InboxRepository<IdentityContext>.AsTypeKey)
-            .WithOutboxRepository(OutboxRepository<IdentityContext>.AsTypeKey);
+        AddStandardMessaging<IdentityContext>(builder);
     }
 }

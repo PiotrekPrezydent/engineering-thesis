@@ -15,10 +15,6 @@ namespace Dara.Server.Modules.Profiles.Infrastructure;
 
 public class ProfilesCompositionRoot : ModuleCompositionRootBase
 {
-    protected override void ConfigureLogging(ILoggingBuilder loggingBuilder)
-    {
-        loggingBuilder.AddConsole();
-    }
 
     protected override void ConfigureReferences(ModuleReferencesConfiguration.ModuleReferencesConfigurationBuilder builder)
     {
@@ -31,9 +27,7 @@ public class ProfilesCompositionRoot : ModuleCompositionRootBase
 
     protected override void ConfigureDataAccess(ModuleDataAccessConfiguration.ModuleDataAccessConfigurationBuilder builder)
     {
-        builder
-            .WithModuleContext(ProfilesContext.AsTypeKey)
-            .WithUnitOfWork(StandardUnitOfWork);
+        AddStandardDataAccess<ProfilesContext>(builder);
     }
 
     protected override void ConfigureMediation(ModuleMediationConfiguration.ModuleMediationConfigurationBuilder builder)
@@ -48,11 +42,6 @@ public class ProfilesCompositionRoot : ModuleCompositionRootBase
 
     protected override void ConfigureMessaging(ModuleMessagingConfiguration.ModuleMessagingConfigurationBuilder builder)
     {
-        builder
-            .WithEventBusInstance(InMemoryEventBus.Instance)
-            .WithInboxProcessor(StandardInboxProcessor)
-            .WithOutboxProcessor(StandardOutboxProcessor)
-            .WithInboxRepository(InboxRepository<ProfilesContext>.AsTypeKey)
-            .WithOutboxRepository(OutboxRepository<ProfilesContext>.AsTypeKey);
+        AddStandardMessaging<ProfilesContext>(builder);
     }
 }

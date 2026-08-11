@@ -40,9 +40,9 @@ public class HandlersResolver : IHandlersResolver
         return _serviceProvider.GetServices<IDomainEventHandler<TDomainEvent>>();
     }
 
-    public IEnumerable<IDomainEventNotificationHandler<TDomainEvent>> GetDomainEventNotificationHandlers<TDomainEvent>() where TDomainEvent : IDomainEvent
+    public IEnumerable<IDomainEventNotificationHandler<TDomainNotification>> GetDomainEventNotificationHandlers<TDomainNotification>() where TDomainNotification : IDomainEventNotification
     {
-        return _serviceProvider.GetServices<IDomainEventNotificationHandler<TDomainEvent>>();
+        return _serviceProvider.GetServices<IDomainEventNotificationHandler<TDomainNotification>>();
     }
 
     public IEnumerable<IIntegrationEventHandler<TIntegrationEvent>> GetIntegrationEventHandlers<TIntegrationEvent>() where TIntegrationEvent : IIntegrationEvent

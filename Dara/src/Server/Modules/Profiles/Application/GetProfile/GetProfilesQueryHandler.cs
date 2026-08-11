@@ -17,7 +17,8 @@ public class GetProfilesQueryHandler : IQueryHandler<GetProfilesQuery, List<Prof
     {
         var profiles = _readModel.Query<Profile>()
             .Where(e => query.ClientsIds.Contains(e.ProfileId.Value))
-            .Select(p => new ProfileDto(p.ProfileId.Value, p.Name));
+            .Select(p => p.GetSnapshot())
+            .Select(p => new ProfileDto(p.ClientId, p.ClientName));
         
         return profiles.ToList();
     }

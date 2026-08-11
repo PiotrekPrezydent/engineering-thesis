@@ -14,13 +14,13 @@ public class InboxProcessor : IInboxProcessor
 {
     private readonly IInboxRepository _inboxRepository;
     private readonly IHandlersResolver _handlersResolver;
-    private readonly IInboxTypeMapper _inboxTypeMapper;
+    private readonly IInboxMessagesTypeMapper _inboxMessagesTypeMapper;
     private readonly ILogger _logger;
 
-    public InboxProcessor(IHandlersResolver handlersResolver, IInboxTypeMapper inboxTypeMapper, ILoggerFactory logger, IInboxRepository inboxRepository, DbContext module)
+    public InboxProcessor(IHandlersResolver handlersResolver, IInboxMessagesTypeMapper inboxMessagesTypeMapper, ILoggerFactory logger, IInboxRepository inboxRepository, DbContext module)
     {
         _handlersResolver = handlersResolver;
-        _inboxTypeMapper = inboxTypeMapper;
+        _inboxMessagesTypeMapper = inboxMessagesTypeMapper;
         _inboxRepository = inboxRepository;
         _logger = logger.CreateLogger("INBOX PROCESSOR :::: " +module.GetType().Name);
     }
@@ -31,7 +31,7 @@ public class InboxProcessor : IInboxProcessor
         
         foreach (var message in messages)
         {
-            var type = _inboxTypeMapper.GetType(message.Type);
+            var type = _inboxMessagesTypeMapper.GetTypeForMessageWithTypeName(message.Type);
             var integrationEvent = JsonSerializer.Deserialize(message.Content, type) as IIntegrationEvent;
             await DispatchIntegrationEventAsync((dynamic)integrationEvent!);
             

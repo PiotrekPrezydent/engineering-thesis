@@ -1,8 +1,11 @@
 using Dara.Server.BuildingBlocks.Application.Events;
+using Dara.Server.BuildingBlocks.Infrastructure.Common;
 using Dara.Server.BuildingBlocks.Infrastructure.Common.Extensions;
 using Dara.Server.BuildingBlocks.Infrastructure.Common.Types;
 using Dara.Server.BuildingBlocks.Infrastructure.Common.Visitors;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration.References;
+using Dara.Server.BuildingBlocks.Infrastructure.DataAccess;
+using Dara.Server.BuildingBlocks.Infrastructure.DataAccess.DomainEventsMapping;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.EventBus;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox.Mapping;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox.Persistence;
@@ -25,59 +28,38 @@ public class ModuleMessagingVisitor : IVisitor<ModuleMessagingConfiguration>
         _referencesConfiguration = referencesConfiguration;
         _services = serviceCollection;
     }
+    
     public void Visit(ModuleMessagingConfiguration instance)
     {
+        _services.AddScoped(typeof(IOutboxContext),instance.OutboxContext.Value);
+        _services.AddScoped(typeof(IOutboxRepository),instance.OutboxRepository.Value);
         _services.AddTransient(typeof(IOutboxProcessor),instance.OutboxProcessor.Value);
+        
+        _services.AddScoped(typeof(IInboxContext),instance.InboxContext.Value);
+        _services.AddScoped(typeof(IInboxRepository),instance.InboxRepository.Value);
         _services.AddTransient(typeof(IInboxProcessor),instance.InboxProcessor.Value);
         
-        _services.AddScoped(typeof(IOutboxRepository),instance.OutboxRepository.Value);
-        _services.AddScoped(typeof(IInboxRepository),instance.InboxRepository.Value);
-        _services.AddScoped<IEventBus>(_=>instance.EventBusInstance);
+        var notifications = _referencesConfiguration.ApplicationAssembly
+            .GetImplementationsOfOpenGeneric(instance.DomainNotificationOpenGenericType).ToList();
 
-        var domainEventNotificationHandlers =
-            _referencesConfiguration.ApplicationAssembly.GetImplementationsOfOpenGeneric(
-                typeof(IDomainEventNotificationHandler<>)).ToList();
+        BiDictionary<Type, string> outboxMap = new();
+        Dictionary<Type, Type> notificationsMap = new();
         
-        var outboxMap = new Dictionary<string, Type>();
-        
-        foreach (var handler in domainEventNotificationHandlers)
+        foreach (var notification in notifications)
         {
-            var argument = handler.Interface.GenericTypeArguments[0];
-            outboxMap.TryAdd(argument.Name, argument);
+            var domainEventType = notification.Interface.GenericTypeArguments[0];
             
-            _services.AddTransient(handler.Interface, handler.Implementation);
+            outboxMap.Add(notification.Implementation,notification.Implementation.Name);
+            notificationsMap.Add(domainEventType, notification.Implementation);
         }
-        _services.AddSingleton<IOutboxTypeMapper>(_=>new OutboxTypeMapper(outboxMap));
         
-        var integrationEventHandlers =
-            _referencesConfiguration.ApplicationAssembly.GetImplementationsOfOpenGeneric(
-                typeof(IIntegrationEventHandler<>)).ToList();
-        
-        var inboxMap = new Dictionary<string, Type>();
-        
-        foreach (var handler in integrationEventHandlers)
-        {
-            var argument = handler.Interface.GenericTypeArguments[0];
-            inboxMap.TryAdd(argument.Name, argument);
-            _services.AddTransient(handler.Interface, handler.Implementation);
-            
-            var eventTypeKey = Activator.CreateInstance(typeof(TypeKey<>).MakeGenericType(argument)) as ITypeKey<IIntegrationEvent>;
-            eventTypeKey!.ExecuteGenericAction(new SubscribeEvent(instance.EventBusInstance,_referencesConfiguration.CompositionRoot));
-        }
-        _services.AddSingleton<IInboxTypeMapper>(_=>new InboxTypeMapper(inboxMap));
+        _services.AddSingleton<IOutboxMessagesTypeMapper>(new OutboxMessagesTypeMapper(outboxMap));
+        _services.AddSingleton<IDomainEventNotificationMapper>(new DomainEventNotificationMapper(notificationsMap));
 
         _services.AddSingleton<OutboxQueueSignal>();
         _services.AddSingleton<InboxQueueSignal>();
         _services.AddSingleton<OutboxBackgroundWorker>();
         _services.AddSingleton<InboxBackgroundWorker>();
     }
-
-    public class SubscribeEvent(IEventBus eventBus, IModuleCompositionRoot compositionRoot) : IKeyedTypeAction<IIntegrationEvent>
-    {
-        public void Execute<TType>(ITypeKey<IIntegrationEvent> typeKey) where TType : IIntegrationEvent
-        {
-            var handler = new InboxWriterIntegrationEventHandler<TType>(compositionRoot);
-            eventBus.Subscribe(handler);
-        }
-    }
+    
 }

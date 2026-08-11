@@ -24,8 +24,11 @@ public class ModuleDataAccessVisitor : IVisitor<ModuleDataAccessConfiguration>
     public void Visit(ModuleDataAccessConfiguration instance)
     {
         _serviceCollection.AddScoped(typeof(IUnitOfWork), instance.UnitOfWork.Value);
+        _serviceCollection.AddScoped(typeof(IReadModel), instance.ReadModel.Value);
         
-        instance.ModuleContext.ExecuteGenericAction(new ModuleContextRegistrator(_serviceCollection));
+        instance.ModuleContext.ExecuteGenericAction(new DbContextRegistrator(_serviceCollection));
+        
+
         
         var repositories = _referencesConfiguration.InfrastructureAssembly.GetTypes().Where(e=>typeof(IRepository).IsAssignableFrom(e)).ToList();
         foreach (var repository in repositories)
@@ -39,9 +42,9 @@ public class ModuleDataAccessVisitor : IVisitor<ModuleDataAccessConfiguration>
         
     }
     
-    public class ModuleContextRegistrator(IServiceCollection services) : IKeyedTypeAction<ModuleContext>
+    public class DbContextRegistrator(IServiceCollection services) : IKeyedTypeAction<DbContext>
     {
-        public void Execute<TType>(ITypeKey<ModuleContext> typeKey) where TType : ModuleContext
+        public void Execute<TType>(ITypeKey<DbContext> typeKey) where TType : DbContext
         {
             services.AddDbContext<TType>(options =>
             {
@@ -49,7 +52,6 @@ public class ModuleDataAccessVisitor : IVisitor<ModuleDataAccessConfiguration>
             });
             
             services.AddScoped<DbContext>(sp => sp.GetRequiredService<TType>());
-            services.AddScoped<IReadModel>(sp=>sp.GetRequiredService<TType>());
         }
     }
 }

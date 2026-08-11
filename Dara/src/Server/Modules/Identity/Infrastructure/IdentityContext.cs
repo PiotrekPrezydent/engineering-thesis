@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Dara.Server.Modules.Identity.Infrastructure;
 
-public class IdentityContext : ModuleContext
+public class IdentityContext : ModuleContextBase
 {
-    public DbSet<Client> Clients { get; set; }
+    public DbSet<ClientIdentity> Clients { get; set; }
     
     public IdentityContext(DbContextOptions options) : base(options)
     {
@@ -15,6 +15,7 @@ public class IdentityContext : ModuleContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        Console.WriteLine("IDENTITY CONTEXT");
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(IdentityContext).Assembly);
         base.OnModelCreating(modelBuilder);
     }

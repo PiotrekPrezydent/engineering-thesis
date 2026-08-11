@@ -1,7 +1,13 @@
 namespace Dara.Server.BuildingBlocks.Integration;
 
-public record IntegrationEventBase : IIntegrationEvent
+public abstract record IntegrationEventBase : IIntegrationEvent
 {
-    public Guid Id { get; } = Guid.NewGuid();
-    public DateTime OccurredOn { get; } = DateTime.UtcNow;
+    public Guid Id { get; }
+    public DateTime OccurredOn { get; }
+    
+    protected IntegrationEventBase(Guid id, DateTime occurredOn)
+    {
+        OccurredOn = occurredOn;
+        Id = id;
+    }
 }

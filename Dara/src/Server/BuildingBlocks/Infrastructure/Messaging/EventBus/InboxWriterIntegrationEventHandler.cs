@@ -3,6 +3,7 @@ using Dara.Server.BuildingBlocks.Application.Events;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration;
 using Dara.Server.BuildingBlocks.Infrastructure.DataAccess;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox;
+using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox.Mapping;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox.Persistence;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox.Processing;
 using Dara.Server.BuildingBlocks.Integration;
@@ -22,19 +23,23 @@ public class InboxWriterIntegrationEventHandler<TIntegrationEvent> : IIntegratio
     public async Task HandleAsync(TIntegrationEvent integrationEvent)
     {
         using var scope = _compositionRoot.CreateScope();
-        var inboxRepository = scope.ServiceProvider.GetRequiredService<IInboxRepository>();
+        
+        var repository = scope.ServiceProvider.GetRequiredService<IInboxRepository>();
+        var mapper = scope.ServiceProvider.GetRequiredService<IInboxMessagesTypeMapper>();
         var signal = scope.ServiceProvider.GetRequiredService<InboxQueueSignal>();
+
         
         var data = JsonSerializer.Serialize(integrationEvent,integrationEvent.GetType());
+        var type = mapper.GetTypeNameForMessageWithType(integrationEvent.GetType());
         
         var message = new InboxMessage(
             integrationEvent.Id,
             integrationEvent.OccurredOn,
-            integrationEvent.GetType().Name,
+            type,
             data
             );
         
-        await inboxRepository.SaveAsync(message, CancellationToken.None);
+        await repository.SaveAsync(message, CancellationToken.None);
         signal.NotifyNewMessage();
     }
 }

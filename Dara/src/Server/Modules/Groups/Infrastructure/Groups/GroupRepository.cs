@@ -6,20 +6,20 @@ namespace Dara.Server.Modules.Groups.Infrastructure.Groups;
 
 public class GroupRepository : IGroupRepository
 {
-    private readonly GroupContext _context;
+    private readonly GroupContext _contextBase;
 
-    public GroupRepository(GroupContext context)
+    public GroupRepository(GroupContext contextBase)
     {
-        _context = context;
+        _contextBase = contextBase;
     }
 
     public async Task AddAsync(Group group)
     {
-       await _context.Groups.AddAsync(group);
+       await _contextBase.Groups.AddAsync(group);
     }
 
     public async Task<Group> GetByIdAsync(GroupId groupId)
     {
-        return await _context.Groups.Include(g=>g.Members).FirstAsync(e=>e.GroupId == groupId);
+        return await _contextBase.Groups.Include(g=>g.Members).FirstAsync(e=>e.GroupId == groupId);
     }
 }

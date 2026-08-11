@@ -4,7 +4,7 @@ using Dara.Server.Modules.Groups.Application.CreateGroup;
 using Dara.Server.Modules.Groups.Application.JoinToGroup;
 using Dara.Server.Modules.Groups.Application.SendMessageToGroup;
 using Dara.Server.Modules.Identity.Application;
-using Dara.Server.Modules.Identity.Application.CreateClient;
+using Dara.Server.Modules.Identity.Application.CreateClientIdentity;
 using Dara.Server.Modules.Identity.Application.GetClient;
 using Dara.Server.Modules.Profiles.Application;
 using Dara.Server.Modules.Profiles.Application.ChangeProfileName;
@@ -14,40 +14,44 @@ namespace Dara.Server.Apps.API.Tests;
 public class TestModules
 {
     private readonly IIdentityModule _identityModule;
-    private readonly IProfilesModule _profilesModule;
-    private readonly IGroupModule _groupModule;
 
-    public TestModules(IIdentityModule  identityModule, IProfilesModule profilesModule, IGroupModule groupModule)
+    public TestModules(IIdentityModule identityModule)
     {
-        //_identityModule = provider.GetRequiredService<IIdentityModule>();
         _identityModule = identityModule;
-        _profilesModule = profilesModule;
-        _groupModule = groupModule;
     }
+    //private readonly IProfilesModule _profilesModule;
+    //private readonly IGroupModule _groupModule;
+
+    // public TestModules(IIdentityModule  identityModule, IProfilesModule profilesModule, IGroupModule groupModule)
+    // {
+    //     //_identityModule = provider.GetRequiredService<IIdentityModule>();
+    //     _identityModule = identityModule;
+    //     _profilesModule = profilesModule;
+    //     _groupModule = groupModule;
+    // }
 
     public async Task Start()
     {
         var clients = new List<Guid>();
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 3; i++)
         {
             Console.WriteLine("START LOOP " + i);
-            var command1 = new CreateClientCommand("TEST"+i);
+            var command1 = new CreateClientIdentityCommand("TEST"+i);
             
-            var  g = await _identityModule.ExecuteCommandAsync<CreateClientCommand, Guid>(command1);
+            var  g = await _identityModule.ExecuteCommandAsync<CreateClientIdentityCommand, Guid>(command1);
             clients.Add(g);
             Console.WriteLine("END LOOP " + i);
         }
-
-        string code = "GROUP-0";
-
-        var grid = await _groupModule.ExecuteCommandAsync<CreateGroupCommand,Guid>(new CreateGroupCommand(clients[0], "NAME"));
-        for (int i = 1; i < 10; i++)
-        {
-            await _groupModule.ExecuteCommandAsync(new JoinToGroupCommand(grid,clients[i],code));
-        }
-        
-        
-        await _groupModule.ExecuteCommandAsync(new SendMessageToGroupCommand(grid,clients[0],"SOME MESSAGE"));
+        // string code = "GROUP-0";
+        //
+        // var grid = await _groupModule.ExecuteCommandAsync<CreateGroupCommand,Guid>(new CreateGroupCommand(clients[0], "NAME"));
+        // for (int i = 1; i < 10; i++)
+        // {
+        //     await _groupModule.ExecuteCommandAsync(new JoinToGroupCommand(grid,clients[i],code));
+        // }
+        //
+        //
+        // await _groupModule.ExecuteCommandAsync(new SendMessageToGroupCommand(grid,clients[0],"SOME MESSAGE"));
         
         
         await Task.Delay(TimeSpan.FromSeconds(20));
@@ -70,19 +74,19 @@ public class TestModules
     }
 
 
-    async Task TestProfileCreation()
-    {
-        Stopwatch sw = Stopwatch.StartNew();
-        Console.WriteLine("START: " + sw.ToString());
-        
-        var command = new CreateClientCommand("TEST");
-        var g = await _identityModule.ExecuteCommandAsync<CreateClientCommand, Guid>(command);
-        Console.WriteLine("POST COMMAND GUID: " + g);
-        
-        await Task.Delay(TimeSpan.FromSeconds(2));
-
-        await _profilesModule.ExecuteCommandAsync(new ChangeProfileNameCommand(g, "1234"));
-        await Task.Delay(TimeSpan.FromSeconds(2));
-    }
+    // async Task TestProfileCreation()
+    // {
+    //     Stopwatch sw = Stopwatch.StartNew();
+    //     Console.WriteLine("START: " + sw.ToString());
+    //     
+    //     var command = new CreateClientIdentityCommand("TEST");
+    //     var g = await _identityModule.ExecuteCommandAsync<CreateClientIdentityCommand, Guid>(command);
+    //     Console.WriteLine("POST COMMAND GUID: " + g);
+    //     
+    //     await Task.Delay(TimeSpan.FromSeconds(2));
+    //
+    //     await _profilesModule.ExecuteCommandAsync(new ChangeProfileNameCommand(g, "1234"));
+    //     await Task.Delay(TimeSpan.FromSeconds(2));
+    // }
     
 }

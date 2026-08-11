@@ -14,13 +14,19 @@ using Dara.Server.BuildingBlocks.Infrastructure.Configuration.References;
 using Dara.Server.BuildingBlocks.Infrastructure.DataAccess;
 using Dara.Server.BuildingBlocks.Infrastructure.Mediation.Decorators;
 using Dara.Server.BuildingBlocks.Infrastructure.Mediation.HandlerResolving;
+using Dara.Server.BuildingBlocks.Infrastructure.Messaging.EventBus;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox;
+using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox.Mapping;
+using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox.Persistence;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox.Processing;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox;
+using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox.Persistence;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox.Processing;
 using Dara.Server.BuildingBlocks.Infrastructure.Processing.Commands;
 using Dara.Server.BuildingBlocks.Infrastructure.Processing.DomainEvents;
+using Dara.Server.BuildingBlocks.Integration;
 using Dara.Shared.Logging;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -47,7 +53,7 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
         _services = serviceProvider;
     }
 
-    public void Initialize(IServiceCollection rootServices)
+    public void Initialize(IServiceCollection rootServices, IEventBus eventBus)
     {
         IServiceCollection services = new ServiceCollection();
 
@@ -57,7 +63,6 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
         ModuleProcessingConfiguration.ModuleProcessingConfigurationBuilder processingBuilder = new();
         ModuleMessagingConfiguration.ModuleMessagingConfigurationBuilder messagingBuilder = new();
         
-        services.AddLogging(ConfigureLogging);
         ConfigureReferences(referencesBuilder);
         ConfigureDataAccess(dataAccessBuilder);
         ConfigureMediation(mediationBuilder);
@@ -80,11 +85,9 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
         processing.Accept(processingVisitor);
         messaging.Accept(messagingVisitor);
         
-        var moduleDeclaration =
-            references.InfrastructureAssembly.GetFirstImplementationOfType(references.DeclaredModuleInterface.Value);
-        
+        var moduleDeclaration = references.InfrastructureAssembly.GetFirstImplementationOfType(references.DeclaredModuleInterface.Value);
         services.AddScoped(moduleDeclaration.Interface,moduleDeclaration.Implementation);
-        services.AddSingleton(references.CompositionRoot);
+        
         services.AddLogging(e =>
         {
             e.ClearProviders();
@@ -94,10 +97,23 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
 
             }).AddConsoleFormatter<SharedLogFormatter, ConsoleFormatterOptions>();
         });
+        
+        var declaredHandlers = references.ApplicationAssembly.GetImplementationsOfOpenGeneric(typeof(IIntegrationEventHandler<>));
+        var inboxMap = new BiDictionary<Type, string>();
+        foreach (var handler in declaredHandlers)
+        {
+            var eventType = handler.Interface.GenericTypeArguments[0];
+            inboxMap.Add(eventType, eventType.Name);
             
+            var eventTypeKey = Activator.CreateInstance(typeof(TypeKey<>).MakeGenericType(eventType)) as ITypeKey<IIntegrationEvent>;
+            
+            eventTypeKey!.ExecuteGenericAction(new IntegrationEventRegistrator(references.CompositionRoot,eventBus));
+        }
         
+        services.AddSingleton<IInboxMessagesTypeMapper>(new InboxMessagesTypeMapper(inboxMap));
         
-        
+        services.AddSingleton(eventBus);
+        services.AddSingleton(references.CompositionRoot);
         
         SetServiceProvider(services.BuildServiceProvider());
         
@@ -107,7 +123,15 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
         rootServices.AddSingleton<IHostedService>(_ => _services.GetRequiredService<InboxBackgroundWorker>());
     }
 
-    protected abstract void ConfigureLogging(ILoggingBuilder loggingBuilder);
+    class IntegrationEventRegistrator(IModuleCompositionRoot compositionRoot, IEventBus eventBus) : IKeyedTypeAction<IIntegrationEvent>
+    {
+        public void Execute<TType>(ITypeKey<IIntegrationEvent> typeKey) where TType : IIntegrationEvent
+        {
+            var handler = new InboxWriterIntegrationEventHandler<TType>(compositionRoot);
+            Console.WriteLine("Subscribe: " + handler.GetType().Name);
+            eventBus.Subscribe(handler);
+        }
+    }
 
     protected abstract void ConfigureReferences(ModuleReferencesConfiguration.ModuleReferencesConfigurationBuilder builder);
     
@@ -118,41 +142,49 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
     protected abstract void ConfigureProcessing(ModuleProcessingConfiguration.ModuleProcessingConfigurationBuilder builder);
     
     protected abstract void ConfigureMessaging(ModuleMessagingConfiguration.ModuleMessagingConfigurationBuilder builder);
-
-
+    
+    protected void AddStandardDataAccess<TContext>(ModuleDataAccessConfiguration.ModuleDataAccessConfigurationBuilder builder) where TContext : DbContext, IReadModel
+    {
+        builder
+            .WithUnitOfWork(ITypeKey<UnitOfWork>.Instance)
+            .WithReadModel(ITypeKey<TContext>.Instance)
+            .WithModuleContext(ITypeKey<TContext>.Instance);
+    }
+    
     protected void AddStandardMediation(ModuleMediationConfiguration.ModuleMediationConfigurationBuilder builder)
     {
-        builder.ConfigureMediationOpenTypes(e => e
-                .AddRange(StandardMediationOpenTypes))
+        builder
+            .ConfigureMediationOpenTypes(e => e
+                .Add(typeof(ICommandHandler<>))
+                .Add(typeof(ICommandHandler<,>))
+                .Add(typeof(IQueryHandler<,>))
+                .Add(typeof(IDomainEventHandler<>))
+                .Add(typeof(IDomainEventNotificationHandler<>))
+                .Add(typeof(IIntegrationEventHandler<>)))
             .ConfigureTypeWiseDecorators(e => e
                 .Add(typeof(CommandHandlerUnitOfWorkDecorator<,>))
                 .Add(typeof(CommandHandlerUnitOfWorkDecorator<>)))
-            .WithHandlersResolver(StandardHandlersResolver);
+            .WithHandlersResolver(ITypeKey<HandlersResolver>.Instance);
     }
 
     protected void AddStandardProcessing(ModuleProcessingConfiguration.ModuleProcessingConfigurationBuilder builder)
     {
         builder
-            .WithCommandExecutor(StandardCommandExecutor)
-            .WithDomainEventDispatcher(StandardDomainEventsDispatcher);
+            .WithCommandExecutor(ITypeKey<CommandExecutor>.Instance)
+            .WithDomainEventDispatcher(ITypeKey<DomainEventsDispatcher>.Instance);
     }
-    
-    protected static IReadOnlyList<Type> StandardMediationOpenTypes => new List<Type>
+
+    protected void AddStandardMessaging<TContext>(ModuleMessagingConfiguration.ModuleMessagingConfigurationBuilder builder) where TContext : DbContext, IInboxContext, IOutboxContext
     {
-        typeof(ICommandHandler<>),
-        typeof(ICommandHandler<,>),
-        typeof(IQueryHandler<,>),
-        typeof(IDomainEventHandler<>),
-    };
-    
-    protected static ITypeKey<DomainEventsDispatcher> StandardDomainEventsDispatcher => new TypeKey<DomainEventsDispatcher>();
-    protected static ITypeKey<CommandExecutor> StandardCommandExecutor => new TypeKey<CommandExecutor>();
-    protected static ITypeKey<HandlersResolver> StandardHandlersResolver => new TypeKey<HandlersResolver>();
-    protected static ITypeKey<UnitOfWork> StandardUnitOfWork => new TypeKey<UnitOfWork>();
-    
-    protected static ITypeKey<OutboxProcessor> StandardOutboxProcessor => new TypeKey<OutboxProcessor>();
-    
-    protected static ITypeKey<InboxProcessor> StandardInboxProcessor => new TypeKey<InboxProcessor>();
+        builder
+            .WithDomainNotificationOpenGenericType(typeof(IDomainEventNotification<>))
+            .WithInboxContext(ITypeKey<TContext>.Instance)
+            .WithInboxRepository(ITypeKey<InboxRepository<TContext>>.Instance)
+            .WithInboxProcessor(ITypeKey<InboxProcessor>.Instance)
+            .WithOutboxContext(ITypeKey<TContext>.Instance)
+            .WithOutboxRepository(ITypeKey<OutboxRepository<TContext>>.Instance)
+            .WithOutboxProcessor(ITypeKey<OutboxProcessor>.Instance);
+    }
 }
 
 

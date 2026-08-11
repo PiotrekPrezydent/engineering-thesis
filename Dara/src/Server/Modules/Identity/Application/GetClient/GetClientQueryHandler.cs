@@ -16,7 +16,7 @@ public class GetClientQueryHandler : IQueryHandler<GetClientQuery, Guid?>
     
     public async Task<Guid?> HandleAsync(GetClientQuery query)
     {
-        var client = await  _readModel.Query<Client>().FirstOrDefaultAsync(e=>e.ClientIdentifier == query.ClientIdentifier);
+        var client = await  _readModel.Query<ClientIdentity>().FirstOrDefaultAsync(e=>e.IsIdentifiedBy(query.ClientIdentifier));
         if (client == null)
             return null;
 

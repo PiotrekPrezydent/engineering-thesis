@@ -18,7 +18,7 @@ public class GetProfileQueryHandler : IQueryHandler<GetProfileQuery, ProfileDto>
     public async Task<ProfileDto> HandleAsync(GetProfileQuery query)
     {
         var profile = await _readModel.Query<Profile>().FirstAsync(e=>e.ProfileId.Value ==  query.ClientId);
-        
-        return new ProfileDto(profile.ProfileId.Value, profile.Name);
+        var snapshot = profile.GetSnapshot();
+        return new ProfileDto(snapshot.ClientId, snapshot.ClientName);
     }
 }

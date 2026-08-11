@@ -3,19 +3,19 @@ using Dara.Server.Modules.Profiles.Domain.Events;
 
 namespace Dara.Server.Modules.Profiles.Domain;
 
-public class Profile : Entity, IAggregateRoot
+public class Profile : Entity, IAggregateRoot, IHasSnapshot<ProfileSnapshot>
 {
     public ProfileId ProfileId { get; private set; }
-    
-    public string Name { get; private set; }
+
+    private string _name;
 
     private Profile() { }
 
     internal Profile(ProfileId profileId, string name)
     {
         ProfileId = profileId;
-        Name = name;
-        AddDomainEvent(new ProfileCreatedDomainEvent(profileId));
+        _name = name;
+        AddDomainEvent(new NewProfileCreatedDomainEvent(profileId));
     }
     
     public static Profile Create(ProfileId id, string name)
@@ -25,7 +25,12 @@ public class Profile : Entity, IAggregateRoot
 
     public void UpdateName(string name)
     {
-        Name = name;
+        _name = name;
         AddDomainEvent(new ProfileNameChangedDomainEvent(ProfileId, name));
+    }
+
+    public ProfileSnapshot GetSnapshot()
+    {
+        return new ProfileSnapshot(ProfileId, _name);
     }
 }

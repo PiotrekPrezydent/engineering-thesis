@@ -1,6 +1,8 @@
 using System.Text.Json;
+using Dara.Server.BuildingBlocks.Application.Events;
 using Dara.Server.BuildingBlocks.Domain;
 using Dara.Server.BuildingBlocks.Domain.Events;
+using Dara.Server.BuildingBlocks.Infrastructure.DataAccess.DomainEventsMapping;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox.Mapping;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox.Persistence;
@@ -14,16 +16,18 @@ public class UnitOfWork : IUnitOfWork
 {
     private readonly DbContext _context;
     private readonly IDomainEventsDispatcher _domainEventsDispatcher;
-    private readonly IOutboxTypeMapper _outboxTypeMapper;
+    private readonly IDomainEventNotificationMapper _domainEventNotificationMapper;
+    private readonly IOutboxMessagesTypeMapper _outboxMessagesTypeMapper;
     private readonly IOutboxRepository _outboxRepository;
     private readonly OutboxQueueSignal _outboxQueueSignal;
     
-    public UnitOfWork(DbContext context, IDomainEventsDispatcher domainEventsDispatcher, IOutboxTypeMapper outboxTypeMapper, IOutboxRepository outboxRepository, OutboxQueueSignal outboxQueueSignal)
+    public UnitOfWork(DbContext context, IDomainEventsDispatcher domainEventsDispatcher, IOutboxMessagesTypeMapper outboxMessagesTypeMapper, IOutboxRepository outboxRepository, OutboxQueueSignal outboxQueueSignal, IDomainEventNotificationMapper domainEventNotificationMapper)
     {
         _domainEventsDispatcher = domainEventsDispatcher;
-        _outboxTypeMapper = outboxTypeMapper;
+        _outboxMessagesTypeMapper = outboxMessagesTypeMapper;
         _outboxRepository = outboxRepository;
         _outboxQueueSignal = outboxQueueSignal;
+        _domainEventNotificationMapper = domainEventNotificationMapper;
         _context = context;
     }
 
@@ -33,18 +37,32 @@ public class UnitOfWork : IUnitOfWork
         var domainEvents = entities.SelectMany(e => e.Entity.DomainEvents).ToList();
         foreach(var entity in entities)
             entity.Entity.ClearDomainEvents();
+
+        var notifications = new List<IDomainEventNotification<IDomainEvent>>();
+        foreach (var domainEvent in domainEvents)
+        {
+            var notificationType = _domainEventNotificationMapper.GetNotificationTypeForDomainEvent(domainEvent.GetType());
+            if(notificationType == null)
+                continue;
+            
+            var notification = Activator.CreateInstance(notificationType, domainEvent.EventId, domainEvent) as IDomainEventNotification<IDomainEvent>;
+            if(notification == null)
+                continue;
+            
+            notifications.Add(notification);
+        }
+        
         
         foreach (var domainEvent in domainEvents)
             await _domainEventsDispatcher.DispatchAsync((dynamic)domainEvent); //dynamic ensure that IDomainEvent is correct type for service provider
 
-        foreach (var domainEvent in domainEvents)
+        
+        foreach (var notification in notifications)
         {
-            if(!_outboxTypeMapper.CanHandleType(domainEvent.GetType()))
-                continue;
-            
-            var type = _outboxTypeMapper.GetName(domainEvent.GetType());
-            var data = JsonSerializer.Serialize(domainEvent,domainEvent.GetType());
-            var message = new OutboxMessage(domainEvent.Id,domainEvent.OccuredOn,type,data);
+            Console.WriteLine("WRITE uof " + notification.GetType());
+            var type = _outboxMessagesTypeMapper.GetTypeNameForMessageWithType(notification.GetType());
+            var data = JsonSerializer.Serialize(notification,notification.GetType());
+            var message = new OutboxMessage(notification.NotificationId, notification.DomainEvent.OccuredOn,type,data);
             
             await _outboxRepository.AddAsync(message, CancellationToken.None);
         }
@@ -55,3 +73,5 @@ public class UnitOfWork : IUnitOfWork
         return 0;
     }
 }
+
+

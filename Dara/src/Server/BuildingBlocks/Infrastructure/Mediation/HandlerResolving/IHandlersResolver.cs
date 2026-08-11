@@ -17,8 +17,8 @@ public interface IHandlersResolver
     public IEnumerable<IDomainEventHandler<TDomainEvent>> GetDomainEventHandlers<TDomainEvent>()
         where TDomainEvent : IDomainEvent;
     
-    public IEnumerable<IDomainEventNotificationHandler<TDomainEvent>> GetDomainEventNotificationHandlers<TDomainEvent>() 
-        where TDomainEvent : IDomainEvent;
+    public IEnumerable<IDomainEventNotificationHandler<TDomainEventNotification>> GetDomainEventNotificationHandlers<TDomainEventNotification>() 
+        where TDomainEventNotification : IDomainEventNotification;
     
     public IEnumerable<IIntegrationEventHandler<TIntegrationEvent>> GetIntegrationEventHandlers<TIntegrationEvent>() 
         where TIntegrationEvent : IIntegrationEvent;

@@ -2,6 +2,6 @@ namespace Dara.Server.BuildingBlocks.Domain.Events;
 
 public interface IDomainEvent
 {
-    Guid Id { get; }
+    Guid EventId { get; }
     DateTime OccuredOn { get; }
 }

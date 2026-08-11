@@ -5,20 +5,20 @@ namespace Dara.Server.Modules.Groups.Infrastructure.GroupMessages;
 
 public class GroupMessageRepository : IGroupMessageRepository
 {
-    private GroupContext _context;
+    private GroupContext _contextBase;
 
-    public GroupMessageRepository(GroupContext context)
+    public GroupMessageRepository(GroupContext contextBase)
     {
-        _context = context;
+        _contextBase = contextBase;
     }
 
     public async Task AddAsync(GroupMessage groupMessage)
     {
-        await _context.GroupMessages.AddAsync(groupMessage);
+        await _contextBase.GroupMessages.AddAsync(groupMessage);
     }
 
     public async Task<GroupMessage> GetByIdAsync(GroupMessageId groupMessageId)
     {
-        return await _context.GroupMessages.FirstAsync(e=>e.MessageId == groupMessageId);
+        return await _contextBase.GroupMessages.FirstAsync(e=>e.MessageId == groupMessageId);
     }
 }

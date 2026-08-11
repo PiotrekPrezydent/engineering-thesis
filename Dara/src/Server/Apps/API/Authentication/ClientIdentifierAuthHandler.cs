@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using Dara.Server.Modules.Identity.Application;
-using Dara.Server.Modules.Identity.Application.CreateClient;
+using Dara.Server.Modules.Identity.Application.CreateClientIdentity;
 using Dara.Server.Modules.Identity.Application.GetClient;
 using Dara.Shared.Contracts;
 using Microsoft.AspNetCore.Authentication;
@@ -39,7 +39,7 @@ public class ClientIdentifierAuthHandler :  AuthenticationHandler<Authentication
             var clientId = await _identityModule.ExecuteQueryAsync<GetClientQuery, Guid?>(new GetClientQuery(identifier.ToString()));
             
             if(clientId == null)
-                clientId = await _identityModule.ExecuteCommandAsync<CreateClientCommand, Guid>(new CreateClientCommand(identifier.ToString()));
+                clientId = await _identityModule.ExecuteCommandAsync<CreateClientIdentityCommand, Guid>(new CreateClientIdentityCommand(identifier.ToString()));
             
             claims.Add(new Claim(ClaimTypes.NameIdentifier, clientId.ToString()));
             

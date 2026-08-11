@@ -8,8 +8,6 @@ public abstract class Entity
     public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
     readonly List<IDomainEvent> _domainEvents = new();
     
-    protected Entity(){}
-        
     public void ClearDomainEvents()
     {
         _domainEvents.Clear();

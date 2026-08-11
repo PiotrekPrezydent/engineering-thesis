@@ -9,8 +9,11 @@ namespace Dara.Server.BuildingBlocks.Infrastructure.Configuration.DataAccess;
 [GenerateBuilder]
 public partial class ModuleDataAccessConfiguration : IVisitable<ModuleDataAccessConfiguration>
 {
-    [ObsoleteMethodOnRepeatedType(typeof(ModuleContext))]
-    public ITypeKey<ModuleContext> ModuleContext { get; set; }
+    [ObsoleteMethodOnRepeatedType(typeof(DbContext))]
+    public ITypeKey<DbContext> ModuleContext { get; set; }
+    
+    [ObsoleteMethodOnRepeatedType(typeof(IReadModel))]
+    public ITypeKey<IReadModel> ReadModel { get; set; }
     
     [ObsoleteMethodOnRepeatedType(typeof(IUnitOfWork))]
     public ITypeKey<IUnitOfWork> UnitOfWork { get; set; }
