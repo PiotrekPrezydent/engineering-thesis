@@ -2,6 +2,7 @@ using System.Text.Json;
 using Dara.Server.BuildingBlocks.Application.Events;
 using Dara.Server.BuildingBlocks.Domain;
 using Dara.Server.BuildingBlocks.Domain.Events;
+using Dara.Server.BuildingBlocks.Infrastructure.Common.Extensions;
 using Dara.Server.BuildingBlocks.Infrastructure.DataAccess.DomainEventsMapping;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox.Mapping;

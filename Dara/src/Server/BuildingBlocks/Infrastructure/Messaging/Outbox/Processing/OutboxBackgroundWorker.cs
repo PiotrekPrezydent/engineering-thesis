@@ -1,4 +1,7 @@
+using Dara.Server.BuildingBlocks.Infrastructure.Common.Extensions;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration;
+using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox.Persistence;
+using Dara.Shared.Logging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -16,27 +19,40 @@ public class OutboxBackgroundWorker : BackgroundService
     {
         _compositionRoot = compositionRoot;
         _outboxQueueSignal = outboxQueueSignal;
-        using var scope = _compositionRoot.CreateScope();
-        var module = scope.ServiceProvider.GetRequiredService<DbContext>();
-        _logger = logger.CreateLogger("OUTBOX WORKER ::: " + module.GetType().Name);
+        
+        _logger = logger.CreateLogger("OUTBOX WORKER ::: " + _compositionRoot.GetModuleName());
     }
     
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("STARTED OUTBOX PROCESSOR SERVICE");
-        stoppingToken.Register(() =>
-        {
-            _logger.LogInformation("Stopping token called");
-        });
         
         while (!stoppingToken.IsCancellationRequested)
         {
             _logger.LogInformation("OUTBOX LOOP");
             try
             {
-                using var scope = _compositionRoot.CreateScope();
-                var processor = scope.ServiceProvider.GetRequiredService<IOutboxProcessor>();
-                await processor.ProcessOutboxAsync(stoppingToken);
+                IReadOnlyList<Guid> pendingIds;
+                await using (var fetchScope = _compositionRoot.CreateAsyncScope())
+                {
+                    var repository = fetchScope.ServiceProvider.GetRequiredService<IOutboxRepository>();
+                    pendingIds = await repository.GetPendingMessagesAsync(20, stoppingToken);
+                }
+                foreach (var messageId in pendingIds)
+                {
+                    await using (var messageScope = _compositionRoot.CreateAsyncScope())
+                    {
+                        try
+                        {
+                            var messageProcessor = messageScope.ServiceProvider.GetRequiredService<IOutboxMessageProcessor>();
+                            await messageProcessor.ProcessSingleMessageAsync(messageId, stoppingToken);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "Failed to process message {MessageId}. Skipping to next.", messageId);
+                        }
+                    }
+                }
                 
                 using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
                 timeoutCts.CancelAfter(TimeSpan.FromSeconds(30));

@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using Dara.Server.BuildingBlocks.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -8,6 +9,11 @@ namespace Dara.Server.BuildingBlocks.Infrastructure.Common.Extensions;
 
 public static class EntityTypeBuilderExtensions
 {
+    extension<T>(T) where T : Entity
+    {
+        public static string DbTableName => typeof(T).Name + "s";
+    }
+    
     public static EntityTypeBuilder<TEntity> ResolvePrivateFields<TEntity>(this EntityTypeBuilder<TEntity> builder) where TEntity : class
     {
         var bindingFlags = BindingFlags.Instance | BindingFlags.NonPublic;

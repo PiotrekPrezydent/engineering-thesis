@@ -16,10 +16,6 @@ public class ProfilesContext : ModuleContextBase
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ProfilesContext).Assembly);
-
-        modelBuilder.Entity<Profile>().HasData(
-            SeedProfiles.SeedAllProfiles()
-        );
         
         base.OnModelCreating(modelBuilder);
     }

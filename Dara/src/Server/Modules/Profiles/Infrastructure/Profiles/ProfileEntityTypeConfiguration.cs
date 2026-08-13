@@ -9,6 +9,8 @@ public class ProfileEntityTypeConfiguration : IEntityTypeConfiguration<Profile>
 {
     public void Configure(EntityTypeBuilder<Profile> builder)
     {
+        builder.ToTable(Profile.DbTableName);
+        
         builder
             .HasKey(u => u.Id);
 
@@ -18,7 +20,5 @@ public class ProfileEntityTypeConfiguration : IEntityTypeConfiguration<Profile>
                 id => id.Value,
                 value => new ProfileId(value)
             );
-
-        builder.ResolvePrivateFields();
     }
 }

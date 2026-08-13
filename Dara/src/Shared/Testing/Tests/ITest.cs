@@ -1,4 +1,4 @@
-namespace Dara.Shared.Testing;
+namespace Dara.Shared.Testing.Tests;
 
 public interface ITest
 {

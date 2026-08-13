@@ -8,14 +8,14 @@ public class User : Entity, IAggregateRoot
 {
     public UserId Id { get; private set; }
 
-    private string _identifier;
+    public string Identifier { get; private set; }
 
     private User() { }
 
     internal User(string identifier)
     {
         Id = new UserId(Guid.NewGuid());
-        _identifier = identifier;
+        Identifier = identifier;
         
         AddDomainEvent(new NewUserCreatedDomainEvent(Id));
     }
@@ -25,11 +25,8 @@ public class User : Entity, IAggregateRoot
         return new(identifier);
     }
     
-    public string Identifier => _identifier;
-    
-
     public bool IsIdentifiedBy(string identifier)
     {
-        return _identifier == identifier;
+        return Identifier == identifier;
     }
 }

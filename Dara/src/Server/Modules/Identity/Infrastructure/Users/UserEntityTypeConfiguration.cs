@@ -9,6 +9,8 @@ public class UserEntityTypeConfiguration : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
+        builder.ToTable(User.DbTableName);
+        
         builder
             .HasKey(u => u.Id);
 
@@ -18,7 +20,5 @@ public class UserEntityTypeConfiguration : IEntityTypeConfiguration<User>
                 id => id.Value,
                 value => new UserId(value)
                 );
-        
-        builder.ResolvePrivateFields();
     }
 }

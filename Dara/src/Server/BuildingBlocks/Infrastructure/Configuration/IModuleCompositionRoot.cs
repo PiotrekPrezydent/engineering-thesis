@@ -7,5 +7,7 @@ public interface IModuleCompositionRoot
 {
     public void Initialize(IServiceCollection rootServices, IEventBus eventBus);
     public IServiceScope CreateScope();
+    
+    public AsyncServiceScope CreateAsyncScope();
 }
 

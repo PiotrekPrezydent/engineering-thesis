@@ -1,9 +1,9 @@
 using Dara.Server.Apps.API.Extensions;
 using Dara.Server.Modules.Groups.Application;
-using Dara.Server.Modules.Groups.Application.CreateGroup;
-using Dara.Server.Modules.Groups.Application.JoinToGroup;
-using Dara.Server.Modules.Groups.Application.LeaveGroup;
-using Dara.Server.Modules.Groups.Application.SendGroupMessage;
+using Dara.Server.Modules.Groups.Application.Groups.CreateGroup;
+using Dara.Server.Modules.Groups.Application.Groups.JoinToGroup;
+using Dara.Server.Modules.Groups.Application.Groups.LeaveGroup;
+using Dara.Server.Modules.Groups.Application.Messages.SendGroupMessage;
 using Dara.Server.Modules.Identity.Application;
 using Dara.Server.Modules.Profiles.Application;
 using Dara.Server.Modules.Profiles.Application.ChangeProfileName;
@@ -47,7 +47,7 @@ public partial class AppHub : Hub<IAppHubClient>, IAppHub
 
     public async Task CreateGroup(string groupName)
     {
-        var command = new CreateGroupCommand(Context.GuidIdentifier(), groupName);
+        var command = new CreateGroupCommand(Context.GuidIdentifier(), groupName,"DEFAULT-CODE"+Random.Shared.Next());
         await _groupsModule.ExecuteCommandAsync<CreateGroupCommand,Guid>(command);
     }
 

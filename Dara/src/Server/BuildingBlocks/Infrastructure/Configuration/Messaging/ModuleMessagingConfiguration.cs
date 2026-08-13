@@ -13,23 +13,17 @@ public partial class ModuleMessagingConfiguration : IVisitable<ModuleMessagingCo
 {
     public Type DomainNotificationOpenGenericType { get; set; }
     
-    [ObsoleteMethodOnRepeatedType(typeof(IOutboxContext))]
-    public ITypeKey<IOutboxContext> OutboxContext { get; set; }
-    
     [ObsoleteMethodOnRepeatedType(typeof(IOutboxRepository))]
     public ITypeKey<IOutboxRepository> OutboxRepository { get; set; }
     
-    [ObsoleteMethodOnRepeatedType(typeof(IOutboxProcessor))]
-    public ITypeKey<IOutboxProcessor> OutboxProcessor { get; set; }
-    
-    [ObsoleteMethodOnRepeatedType(typeof(IInboxContext))]
-    public ITypeKey<IInboxContext> InboxContext { get; set; }
+    [ObsoleteMethodOnRepeatedType(typeof(IOutboxMessageProcessor))]
+    public ITypeKey<IOutboxMessageProcessor> OutboxProcessor { get; set; }
 
     [ObsoleteMethodOnRepeatedType(typeof(IInboxRepository))]
     public ITypeKey<IInboxRepository> InboxRepository { get; set; }
     
-    [ObsoleteMethodOnRepeatedType(typeof(IInboxProcessor))]
-    public ITypeKey<IInboxProcessor> InboxProcessor { get; set; }
+    [ObsoleteMethodOnRepeatedType(typeof(IInboxMessageProcessor))]
+    public ITypeKey<IInboxMessageProcessor> InboxProcessor { get; set; }
     
 
     

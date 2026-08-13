@@ -1,4 +1,11 @@
+using System.Text.Json;
+using Dara.Server.BuildingBlocks.Application.Events;
+using Dara.Server.BuildingBlocks.Infrastructure.Common.Extensions;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration;
+using Dara.Server.BuildingBlocks.Infrastructure.Mediation.HandlerResolving;
+using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox.Mapping;
+using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox.Persistence;
+using Dara.Server.BuildingBlocks.Integration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -12,14 +19,12 @@ public class InboxBackgroundWorker : BackgroundService
     private readonly IModuleCompositionRoot _compositionRoot;
     private readonly ILogger _logger;
 
-
-    public InboxBackgroundWorker(InboxQueueSignal inboxQueueSignal, IModuleCompositionRoot compositionRoot, ILoggerFactory logger)
+    public InboxBackgroundWorker(InboxQueueSignal inboxQueueSignal,IModuleCompositionRoot compositionRoot, ILoggerFactory logger)
     {
         _inboxQueueSignal = inboxQueueSignal;
         _compositionRoot = compositionRoot;
-        using var scope = _compositionRoot.CreateScope();
-        var module = scope.ServiceProvider.GetRequiredService<DbContext>();
-        _logger = logger.CreateLogger("INBOX WORKER ::: " + module.GetType().Name);
+        
+        _logger = logger.CreateLogger("INBOX WORKER ::: " + _compositionRoot.GetModuleName());
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -30,9 +35,28 @@ public class InboxBackgroundWorker : BackgroundService
             _logger.LogInformation("INBOX LOOP");
             try
             {
-                using var scope = _compositionRoot.CreateScope();
-                var processor = scope.ServiceProvider.GetRequiredService<IInboxProcessor>();
-                await processor.ProcessInboxAsync(stoppingToken);
+                IReadOnlyList<Guid> pendingIds;
+                await using (var fetchScope = _compositionRoot.CreateAsyncScope())
+                {
+                    var repository = fetchScope.ServiceProvider.GetRequiredService<IInboxRepository>();
+                    pendingIds = await repository.GetPendingMessagesAsync(20, stoppingToken);
+                }
+                
+                foreach (var messageId in pendingIds)
+                {
+                    await using (var messageScope = _compositionRoot.CreateAsyncScope())
+                    {
+                        try
+                        {
+                            var messageProcessor = messageScope.ServiceProvider.GetRequiredService<IInboxMessageProcessor>();
+                            await messageProcessor.ProcessSingleMessageAsync(messageId, stoppingToken);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "Failed to process message {MessageId}. Skipping to next.", messageId);
+                        }
+                    }
+                }
                 
                 using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
                 timeoutCts.CancelAfter(TimeSpan.FromSeconds(30));
@@ -44,6 +68,7 @@ public class InboxBackgroundWorker : BackgroundService
                 {
                     _logger.LogInformation("INBOX TIMEOUT");
                 }
+                
             }
             catch (Exception ex)
             {
@@ -51,5 +76,12 @@ public class InboxBackgroundWorker : BackgroundService
                 await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
             }
         }
+    }
+    
+    async Task DispatchIntegrationEventAsync<TIntegrationEvent>(IServiceProvider currentServiceProvider, TIntegrationEvent integrationEvent) where TIntegrationEvent : IIntegrationEvent
+    {
+        var handlers = currentServiceProvider.GetServices<IIntegrationEventHandler<TIntegrationEvent>>();
+        foreach (var handler in handlers)
+            await handler.HandleAsync(integrationEvent);
     }
 }

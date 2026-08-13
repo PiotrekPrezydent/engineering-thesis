@@ -6,6 +6,7 @@ using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox.Mapping;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox.Persistence;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox.Processing;
 using Dara.Server.BuildingBlocks.Integration;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Dara.Server.BuildingBlocks.Infrastructure.Messaging.EventBus;
@@ -24,6 +25,7 @@ public class InboxWriterIntegrationEventHandler<TIntegrationEvent> : IIntegratio
         using var scope = _compositionRoot.CreateScope();
         
         var repository = scope.ServiceProvider.GetRequiredService<IInboxRepository>();
+        var context = scope.ServiceProvider.GetRequiredService<DbContext>();
         var mapper = scope.ServiceProvider.GetRequiredService<IInboxMessagesTypeMapper>();
         var signal = scope.ServiceProvider.GetRequiredService<InboxQueueSignal>();
         
@@ -37,7 +39,9 @@ public class InboxWriterIntegrationEventHandler<TIntegrationEvent> : IIntegratio
             data
             );
         
-        await repository.SaveAsync(message, CancellationToken.None);
+        await repository.AddAsync(message, CancellationToken.None);
+        await context.SaveChangesAsync(CancellationToken.None);
+        
         signal.NotifyNewMessage();
     }
 }

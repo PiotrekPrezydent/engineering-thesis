@@ -1,7 +1,7 @@
 using Dara.Server.Apps.API.Hubs;
 using Dara.Server.Apps.API.Processing;
 using Dara.Server.Modules.Groups.Application;
-using Dara.Server.Modules.Groups.Application.GetGroupDetails;
+using Dara.Server.Modules.Groups.Application.Groups.GetGroupDetails;
 using Dara.Server.Modules.Groups.Integration;
 using Dara.Server.Modules.Profiles.Application;
 using Dara.Server.Modules.Profiles.Application.GetProfile;

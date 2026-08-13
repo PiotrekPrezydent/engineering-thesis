@@ -1,13 +1,14 @@
 using Dara.Server.BuildingBlocks.Domain;
+using Dara.Server.Modules.Groups.Domain.Members;
 
 namespace Dara.Server.Modules.Groups.Domain.Groups.Rules;
 
 public class OnlyActualGroupMemberCanSendMessageRule : IBuisnessRule
 {
     private readonly IReadOnlyList<GroupMember> _members;
-    private readonly GroupMemberId _memberId;
+    private readonly MemberId _memberId;
     
-    public OnlyActualGroupMemberCanSendMessageRule(IReadOnlyList<GroupMember> members, GroupMemberId memberId)
+    public OnlyActualGroupMemberCanSendMessageRule(IReadOnlyList<GroupMember> members, MemberId memberId)
     {
         _members = members;
         _memberId = memberId;
@@ -16,6 +17,6 @@ public class OnlyActualGroupMemberCanSendMessageRule : IBuisnessRule
     public string Message => "Only actual group member can send message";
     public bool IsBroken()
     {
-        return _members.All(e=>e.Id != _memberId);
+        return _members.All(e=>e.MemberId != _memberId);
     }
 }

@@ -1,7 +1,7 @@
 using Dara.Server.Apps.API.Hubs;
 using Dara.Server.Apps.API.Processing;
 using Dara.Server.Modules.Groups.Application;
-using Dara.Server.Modules.Groups.Application.GetGroupDetails;
+using Dara.Server.Modules.Groups.Application.Groups.GetGroupDetails;
 using Dara.Server.Modules.Groups.Integration;
 using Dara.Server.Modules.Profiles.Application;
 using Dara.Server.Modules.Profiles.Application.GetProfile;
@@ -26,9 +26,9 @@ public class NotifyMemberLeftGroupHandler : IHubNotificationHandler<MemberLeftGr
 
     public async Task HandleAsync(MemberLeftGroupIntegrationEvent notification, CancellationToken cancellationToken)
     {
-        var client = _context.Clients.User(notification.GroupMemberId.ToString());
+        var client = _context.Clients.User(notification.MemberId.ToString());
         var group = await _groupModule.ExecuteQueryAsync<GetGroupDetailsQuery, GroupDetailsDto>(new GetGroupDetailsQuery(notification.GroupId));
-        var clientProfile = await _profilesModule.ExecuteQueryAsync<GetProfileQuery, ProfileDto>(new GetProfileQuery(notification.GroupMemberId));
+        var clientProfile = await _profilesModule.ExecuteQueryAsync<GetProfileQuery, ProfileDto>(new GetProfileQuery(notification.MemberId));
         var memberLeftNotification =
             new GroupMemberLeftGroupNotification(notification.GroupId, new(clientProfile.ProfileId, clientProfile.Name));
         

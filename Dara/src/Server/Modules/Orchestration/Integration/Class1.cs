@@ -1,4 +1,4 @@
-﻿namespace Dara.Server.Modules.Identity.Integration;
+﻿namespace Dara.Server.Modules.Orchestration.Integration;
 
 public class Class1
 {

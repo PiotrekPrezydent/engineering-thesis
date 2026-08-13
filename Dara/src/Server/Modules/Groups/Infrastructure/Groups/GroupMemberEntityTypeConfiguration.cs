@@ -1,4 +1,6 @@
+using Dara.Server.BuildingBlocks.Infrastructure.Common.Extensions;
 using Dara.Server.Modules.Groups.Domain.Groups;
+using Dara.Server.Modules.Groups.Domain.Members;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -8,12 +10,16 @@ public class GroupMemberEntityTypeConfiguration :  IEntityTypeConfiguration<Grou
 {
     public void Configure(EntityTypeBuilder<GroupMember> builder)
     {
-        builder.HasKey(gm => new { gm.GroupId, MemberId = gm.Id });
+        builder.ToTable(GroupMember.DbTableName);
         
-        builder.Property(gm => gm.GroupId)
-            .HasConversion(id => id.Value, value => new GroupId(value));
+        builder.HasKey(x => new { x.GroupId, x.MemberId });
         
-        builder.Property(gm => gm.Id)
-            .HasConversion(id => id.Value, value => new GroupMemberId(value));
+        builder.Property(x => x.GroupId).HasConversion(id => id.Value, v => new GroupId(v));
+        builder.Property(x => x.MemberId).HasConversion(id => id.Value, v => new MemberId(v));
+        
+        builder.HasOne(x => x.Member)
+            .WithMany()
+            .HasForeignKey(x => x.MemberId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

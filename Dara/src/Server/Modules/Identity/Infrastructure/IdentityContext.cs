@@ -18,9 +18,9 @@ public class IdentityContext : ModuleContextBase
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(IdentityContext).Assembly);
         
-        modelBuilder.Entity<User>().HasData(
-            SeedUsers.SeedAllUsers()
-        );
+        // modelBuilder.Entity<User>().HasData(
+        //     IdentitySeed.SeedAllUsers()
+        // );
         
         base.OnModelCreating(modelBuilder);
     }

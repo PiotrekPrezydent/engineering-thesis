@@ -24,11 +24,12 @@ class Program
         ITest[] tests =
         [
             new CallFakeToolTest(),
-            new CallCorrentUserToolTest()
+            new CallCorrentUserToolTest(),
+            new CheckFunctionDeclarationTest()
         ];
         
         var apiSelection = apis[1];
-        var testSelection = tests[1];
+        var testSelection = tests[2];
         
         await testSelection.Run(apiSelection);
     }

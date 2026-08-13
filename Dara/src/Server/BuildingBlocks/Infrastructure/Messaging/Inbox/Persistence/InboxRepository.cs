@@ -2,36 +2,27 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox.Persistence;
 
-public class InboxRepository<TDbcontext> : IInboxRepository where TDbcontext : DbContext, IInboxContext
+public class InboxRepository<TDbcontext> : IInboxRepository where TDbcontext : DbContext
 {
-    private readonly TDbcontext _dbContext;
+    private readonly TDbcontext _context;
 
-    public InboxRepository(TDbcontext dbContext)
+    public InboxRepository(TDbcontext context)
     {
-        _dbContext = dbContext;
+        _context = context;
     }
 
-    public async Task<IReadOnlyList<InboxMessage>> GetPendingMessagesAsync(CancellationToken ct)
+    public async Task<IReadOnlyList<Guid>> GetPendingMessagesAsync(int batchSize, CancellationToken ct)
     {
-        return await _dbContext.Set<InboxMessage>()
+        return await _context.Set<InboxMessage>()
             .Where(m => m.ProcessedDate == null)
             .OrderBy(m => m.OccurredOn)
+            .Select(m=>m.Id)
+            .Take(batchSize)
             .ToListAsync(ct);
     }
 
-    public async Task MarkAsCompletedAsync(Guid messageId, CancellationToken ct)
+    public async Task AddAsync(InboxMessage message, CancellationToken ct)
     {
-        var message = await _dbContext.Set<InboxMessage>().FindAsync(new object[] { messageId }, ct);
-        if (message != null)
-        {
-            message.ProcessedDate = DateTime.UtcNow;
-            await _dbContext.SaveChangesAsync(ct);
-        }
-    }
-
-    public async Task SaveAsync(InboxMessage message, CancellationToken ct)
-    {
-        await _dbContext.Set<InboxMessage>().AddAsync(message, ct);
-        await _dbContext.SaveChangesAsync(ct);
+        await _context.Set<InboxMessage>().AddAsync(message, ct);
     }
 }

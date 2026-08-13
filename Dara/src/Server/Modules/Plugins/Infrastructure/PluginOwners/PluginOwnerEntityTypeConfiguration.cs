@@ -1,3 +1,4 @@
+using Dara.Server.BuildingBlocks.Infrastructure.Common.Extensions;
 using Dara.Server.Modules.Plugins.Domain.PluginOwners;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -8,6 +9,8 @@ public class PluginOwnerEntityTypeConfiguration : IEntityTypeConfiguration<Plugi
 {
     public void Configure(EntityTypeBuilder<PluginOwner> builder)
     {
+        builder.ToTable(PluginOwner.DbTableName);
+        
         builder.HasKey(o => o.Id);
         
         builder.Property(o => o.Id)
@@ -15,12 +18,12 @@ public class PluginOwnerEntityTypeConfiguration : IEntityTypeConfiguration<Plugi
                 id => id.Value, 
                 value => new PluginOwnerId(value));
 
-        builder.HasMany(o => o.Plugins)
-            .WithOne()
-            .HasForeignKey(p => p.OwnerId);
+        builder.HasMany(x => x.Plugins)
+            .WithOne(x => x.Owner)
+            .HasForeignKey(x => x.OwnerId)
+            .OnDelete(DeleteBehavior.Cascade);
         
-        builder.Metadata.FindNavigation(nameof(PluginOwner.Plugins))
-            ?.SetPropertyAccessMode(PropertyAccessMode.Field);
-        
+        builder.Navigation(x => x.Plugins)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

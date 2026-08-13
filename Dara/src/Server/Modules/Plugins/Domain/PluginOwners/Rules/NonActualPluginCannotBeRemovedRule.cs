@@ -5,18 +5,18 @@ namespace Dara.Server.Modules.Plugins.Domain.PluginOwners.Rules;
 
 public class NonActualPluginCannotBeRemovedRule : IBuisnessRule
 {
-    private readonly Plugin _pluginToAdd;
     private readonly IReadOnlyList<Plugin> _currentPlugins;
-
-    public NonActualPluginCannotBeRemovedRule(Plugin pluginToAdd, IReadOnlyList<Plugin> currentPlugins)
+    private readonly PluginId _pluginToRemove;
+    
+    public NonActualPluginCannotBeRemovedRule(IReadOnlyList<Plugin> currentPlugins, PluginId pluginToRemove)
     {
-        _pluginToAdd = pluginToAdd;
+        _pluginToRemove = pluginToRemove;
         _currentPlugins = currentPlugins;
     }
 
     public string Message => nameof(NonActualPluginCannotBeRemovedRule);
     public bool IsBroken()
     {
-        return !_currentPlugins.Contains(_pluginToAdd);
+        return _currentPlugins.All(e=>e.Id != _pluginToRemove);
     }
 }

@@ -25,13 +25,11 @@ public class ModuleMessagingVisitor : IVisitor<ModuleMessagingConfiguration>
     
     public void Visit(ModuleMessagingConfiguration instance)
     {
-        _services.AddScoped(typeof(IOutboxContext),instance.OutboxContext.Value);
         _services.AddScoped(typeof(IOutboxRepository),instance.OutboxRepository.Value);
-        _services.AddTransient(typeof(IOutboxProcessor),instance.OutboxProcessor.Value);
+        _services.AddTransient(typeof(IOutboxMessageProcessor),instance.OutboxProcessor.Value);
         
-        _services.AddScoped(typeof(IInboxContext),instance.InboxContext.Value);
         _services.AddScoped(typeof(IInboxRepository),instance.InboxRepository.Value);
-        _services.AddTransient(typeof(IInboxProcessor),instance.InboxProcessor.Value);
+        _services.AddTransient(typeof(IInboxMessageProcessor),instance.InboxProcessor.Value);
         
         var notifications = _referencesConfiguration.ApplicationAssembly
             .GetImplementationsOfOpenGeneric(instance.DomainNotificationOpenGenericType).ToList();

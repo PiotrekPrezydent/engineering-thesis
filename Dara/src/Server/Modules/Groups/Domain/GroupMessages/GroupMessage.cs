@@ -1,32 +1,31 @@
 using Dara.Server.BuildingBlocks.Domain;
 using Dara.Server.Modules.Groups.Domain.GroupMessages.Events;
 using Dara.Server.Modules.Groups.Domain.Groups;
+using Dara.Server.Modules.Groups.Domain.Members;
 
 namespace Dara.Server.Modules.Groups.Domain.GroupMessages;
 
 public class GroupMessage : Entity, IAggregateRoot
 {
-    public GroupMessageId Id { get; init; }
-    
-    public GroupId GroupId { get; init; }
-    
-    public GroupMemberId MessageAuthorId { get; init; }
+    public GroupMessageId Id { get; private set; }
+    public GroupId GroupId { get; private set; }
+    public MemberId AuthorId { get; private set; }
     
     public string Content { get; init; }
 
-    private GroupMessage(GroupId groupId, GroupMemberId messageAuthorId, string content)
+    private GroupMessage(GroupId groupId, MemberId authorId, string content)
     {
         Id = new GroupMessageId(Guid.NewGuid());
         
         GroupId = groupId;
-        MessageAuthorId = messageAuthorId;
+        AuthorId = authorId;
         Content = content;
         
-        AddDomainEvent(new NewGroupMessageCreatedDomainEvent(Id, GroupId, MessageAuthorId, Content));
+        AddDomainEvent(new NewGroupMessageCreatedDomainEvent(Id, GroupId, AuthorId, Content));
     }
 
-    internal static GroupMessage Create(GroupId groupId, GroupMemberId messageAuthorId, string content)
+    internal static GroupMessage Create(GroupId groupId, MemberId authorId, string content)
     {
-        return new GroupMessage(groupId, messageAuthorId, content);
+        return new GroupMessage(groupId, authorId, content);
     }
 }

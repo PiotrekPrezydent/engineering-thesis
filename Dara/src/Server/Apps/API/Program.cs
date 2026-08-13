@@ -3,7 +3,7 @@ using Dara.Server.Apps.API.Authentication;
 using Dara.Server.Apps.API.Hubs;
 using Dara.Server.Apps.API.Notifications;
 using Dara.Server.Apps.API.Processing;
-using Dara.Server.Apps.API.Tests;
+using Dara.Server.Apps.API.Services;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.EventBus;
 using Dara.Server.BuildingBlocks.Integration;
@@ -51,8 +51,8 @@ public class Program
         
         var modulesRoots = new IModuleCompositionRoot[]
         {
-            new GroupsCompositionRoot(),
             new IdentityCompositionRoot(),
+            new GroupsCompositionRoot(),
             new ProfilesCompositionRoot(),
             new PluginsCompositionRoot(),
         };
@@ -60,10 +60,10 @@ public class Program
         
         foreach (var module in modulesRoots)
             module.Initialize(builder.Services, InMemoryEventBus.Instance);
-
-        builder.Services.AddScoped<TestModules>();
-        builder.Services.AddScoped<LogMockData>();
-
+        
+        builder.Services.AddScoped<LogModulesDataService>();
+        builder.Services.AddHostedService<StartupService>();
+        
         builder.Services.AddScoped<IHubNotificationHandler<ProfileNameChangedIntegrationEvent>,NotifyProfileNameChangedHandler>();
         builder.Services.AddScoped<IHubNotificationHandler<GroupCreatedIntegrationEvent>,NotifyGroupCreatedHandler>();
         builder.Services.AddScoped<IHubNotificationHandler<NewMemberJoinedGroupIntegrationEvent>,NotifyNewMemberJoinedGroupHandler>();
@@ -95,11 +95,13 @@ public class Program
         //     //await Task.Delay(200000);
         // }
         
-        using (var scope = app.Services.CreateScope())
-        {
-            var logger = scope.ServiceProvider.GetRequiredService<LogMockData>();
-            await logger.LogDataAsync();
-        }
+        // using (var scope = app.Services.CreateScope())
+        // {
+        //     await app.StartAsync();
+        //     var logger = scope.ServiceProvider.GetRequiredService<LogMockData>();
+        //     await logger.LogDataAsync();
+        //     await app.StopAsync();
+        // }
         
         app.MapHub<AppHub>(Connections.HubName);
         app.Run();

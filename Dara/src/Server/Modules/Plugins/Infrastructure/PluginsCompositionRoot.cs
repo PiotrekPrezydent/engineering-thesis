@@ -10,7 +10,6 @@ using Dara.Server.BuildingBlocks.Infrastructure.DataAccess;
 using Dara.Server.Modules.Plugins.Application;
 using Dara.Server.Modules.Plugins.Domain.PluginOwners;
 using Dara.Server.Modules.Plugins.Domain.PluginOwners.Plugins;
-using Dara.Server.Modules.Plugins.Infrastructure.PluginOwners;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Dara.Server.Modules.Plugins.Infrastructure;
@@ -46,48 +45,48 @@ public class PluginsCompositionRoot : ModuleCompositionRootBase
         AddStandardMessaging<PluginsContext>(builder);
     }
 
-    protected override void OnServiceProviderCreated(IServiceProvider serviceProvider)
-    {
-        var context = serviceProvider.GetRequiredService<PluginsContext>();
-        context.Database.EnsureCreated();
-
-        context.PluginOwners.AddRange(
-            SeedPluginOwner(SharedSeedGuids.User1, 
-                ("AudioControl", "", PluginFunctionsSeeds.GetAudioControlFunctions()),
-                ("PowerManagement","",PluginFunctionsSeeds.GetPowerManagementFunctions()),
-                ("CrossDeviceHandoff","",PluginFunctionsSeeds.GetCrossDeviceHandoffFunctions()),
-                ("VoiceInteraction","",PluginFunctionsSeeds.GetVoiceInteractionFunctions())
-            ),
-            SeedPluginOwner(SharedSeedGuids.User2, 
-                ("Telephony", "", PluginFunctionsSeeds.GetTelephonyFunctions()),
-                ("DeviceLocator", "", PluginFunctionsSeeds.GetDeviceLocatorFunctions()),
-                ("RemoteSensor","",PluginFunctionsSeeds.GetRemoteSensorFunctions()),
-                ("RemoteAuthentication","",PluginFunctionsSeeds.GetRemoteAuthenticationFunctions()),
-                ("NotificationSync","",PluginFunctionsSeeds.GetNotificationSyncFunctions()),
-                ("CrossDeviceHandoff","",PluginFunctionsSeeds.GetCrossDeviceHandoffFunctions())
-            ),
-            SeedPluginOwner(SharedSeedGuids.User3, 
-                ("AudioControl", "", PluginFunctionsSeeds.GetAudioControlFunctions()),
-                ("VoiceInteraction","",PluginFunctionsSeeds.GetVoiceInteractionFunctions()),
-                ("RemoteSensor","",PluginFunctionsSeeds.GetRemoteSensorFunctions())
-            ),
-            SeedPluginOwner(SharedSeedGuids.User4, 
-                ("PowerManagement", "", PluginFunctionsSeeds.GetPowerManagementFunctions())
-            ),
-            SeedPluginOwner(SharedSeedGuids.User5, 
-                ("AudioControl", "",PluginFunctionsSeeds.GetAudioControlFunctions()), 
-                ("CrossDeviceHandoff", "", PluginFunctionsSeeds.GetCrossDeviceHandoffFunctions())
-            )
-        );
-        
-        context.SaveChanges();
-    }
+    // protected override void OnServiceProviderCreated(IServiceProvider serviceProvider)
+    // {
+    //     var context = serviceProvider.GetRequiredService<PluginsContext>();
+    //     context.Database.EnsureCreated();
+    //
+    //     context.PluginsConfigurations.AddRange(
+    //         SeedPluginOwner(SharedSeedGuids.User1, 
+    //             ("AudioControl", "", PluginsSeed.GetAudioControlFunctions()),
+    //             ("PowerManagement","",PluginsSeed.GetPowerManagementFunctions()),
+    //             ("CrossDeviceHandoff","",PluginsSeed.GetCrossDeviceHandoffFunctions()),
+    //             ("VoiceInteraction","",PluginsSeed.GetVoiceInteractionFunctions())
+    //         ),
+    //         SeedPluginOwner(SharedSeedGuids.User2, 
+    //             ("Telephony", "", PluginsSeed.GetTelephonyFunctions()),
+    //             ("DeviceLocator", "", PluginsSeed.GetDeviceLocatorFunctions()),
+    //             ("RemoteSensor","",PluginsSeed.GetRemoteSensorFunctions()),
+    //             ("RemoteAuthentication","",PluginsSeed.GetRemoteAuthenticationFunctions()),
+    //             ("NotificationSync","",PluginsSeed.GetNotificationSyncFunctions()),
+    //             ("CrossDeviceHandoff","",PluginsSeed.GetCrossDeviceHandoffFunctions())
+    //         ),
+    //         SeedPluginOwner(SharedSeedGuids.User3, 
+    //             ("AudioControl", "", PluginsSeed.GetAudioControlFunctions()),
+    //             ("VoiceInteraction","",PluginsSeed.GetVoiceInteractionFunctions()),
+    //             ("RemoteSensor","",PluginsSeed.GetRemoteSensorFunctions())
+    //         ),
+    //         SeedPluginOwner(SharedSeedGuids.User4, 
+    //             ("PowerManagement", "", PluginsSeed.GetPowerManagementFunctions())
+    //         ),
+    //         SeedPluginOwner(SharedSeedGuids.User5, 
+    //             ("AudioControl", "",PluginsSeed.GetAudioControlFunctions()), 
+    //             ("CrossDeviceHandoff", "", PluginsSeed.GetCrossDeviceHandoffFunctions())
+    //         )
+    //     );
+    //     
+    //     context.SaveChanges();
+    // }
     
-    PluginOwner SeedPluginOwner(Guid ownerId, params (string name, string description, ImmutableArray<PluginFunction> functions)[] plugins)
+    PluginOwner SeedPluginOwner(Guid ownerId, params (string name, string description, List<PluginFunction> functions)[] plugins)
     {
-        var owner = PluginOwner.Create(new PluginOwnerId(ownerId));
+        var owner = PluginOwner.CreateDefault(new PluginOwnerId(ownerId));
         foreach (var plugin in plugins)
-            owner.RegisterPlugin(plugin.name, plugin.description, plugin.functions);
+            owner.AddPlugin(plugin.name, plugin.description, plugin.functions);
         
         owner.ClearDomainEvents();
         return owner;

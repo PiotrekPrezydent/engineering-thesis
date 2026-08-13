@@ -44,6 +44,14 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
         return _services.CreateScope();
     }
 
+    public AsyncServiceScope CreateAsyncScope()
+    {
+        if(_services == null)
+            throw  new InvalidOperationException($"{GetType().FullName} is not initialized.");
+        
+        return _services.CreateAsyncScope();
+    }
+
     private void SetServiceProvider(IServiceProvider serviceProvider)
     {
         _services = serviceProvider;
@@ -178,16 +186,14 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
             .WithDomainEventDispatcher(ITypeKey<DomainEventsDispatcher>.Instance);
     }
 
-    protected void AddStandardMessaging<TContext>(ModuleMessagingConfiguration.ModuleMessagingConfigurationBuilder builder) where TContext : DbContext, IInboxContext, IOutboxContext
+    protected void AddStandardMessaging<TContext>(ModuleMessagingConfiguration.ModuleMessagingConfigurationBuilder builder) where TContext : DbContext
     {
         builder
             .WithDomainNotificationOpenGenericType(typeof(IDomainEventNotification<>))
-            .WithInboxContext(ITypeKey<TContext>.Instance)
             .WithInboxRepository(ITypeKey<InboxRepository<TContext>>.Instance)
-            .WithInboxProcessor(ITypeKey<InboxProcessor>.Instance)
-            .WithOutboxContext(ITypeKey<TContext>.Instance)
+            .WithInboxProcessor(ITypeKey<InboxMessageProcessor>.Instance)
             .WithOutboxRepository(ITypeKey<OutboxRepository<TContext>>.Instance)
-            .WithOutboxProcessor(ITypeKey<OutboxProcessor>.Instance);
+            .WithOutboxProcessor(ITypeKey<OutboxMessageProcessor>.Instance);
     }
 }
 

@@ -1,6 +1,7 @@
 using Dara.Server.BuildingBlocks.Application.Queries;
 using Dara.Server.BuildingBlocks.Infrastructure.DataAccess;
 using Dara.Server.Modules.Profiles.Domain;
+using Microsoft.EntityFrameworkCore;
 
 namespace Dara.Server.Modules.Profiles.Application.GetProfile;
 
@@ -15,11 +16,9 @@ public class GetProfilesQueryHandler : IQueryHandler<GetProfilesQuery, List<Prof
 
     public async Task<List<ProfileDto>> HandleAsync(GetProfilesQuery query)
     {
-        var profiles = _readModel.Query<Profile>()
-            .Where(e => e.Id.MatchAny(query.ProfilesIds))
-            .Select(p => p.GetSnapshot())
-            .Select(p => new ProfileDto(p.ProfileId, p.Name));
+        var profiles = await _readModel.Query<Profile>().Where(e => e.Id.MatchAny(query.ProfilesIds)).ToListAsync();
+       
         
-        return profiles.ToList();
+        return profiles.Select(p => new ProfileDto(p.Id.Value, p.Name)).ToList();
     }
 }

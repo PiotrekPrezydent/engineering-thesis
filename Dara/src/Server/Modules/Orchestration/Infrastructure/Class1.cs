@@ -1,4 +1,4 @@
-﻿namespace Dara.Server.Modules.Identity.Infrastructure;
+﻿namespace Dara.Server.Modules.Orchestration.Infrastructure;
 
 public class Class1
 {
