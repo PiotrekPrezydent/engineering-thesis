@@ -14,6 +14,8 @@ public class OutboxBackgroundWorker : BackgroundService
     private readonly OutboxQueueSignal _outboxQueueSignal;
     private readonly IModuleCompositionRoot _compositionRoot;
     private readonly ILogger _logger;
+    private int outboxLoops = 0;
+    private int processorCalls = 0;
     
     public OutboxBackgroundWorker(IModuleCompositionRoot compositionRoot, ILoggerFactory logger, OutboxQueueSignal outboxQueueSignal)
     {
@@ -29,7 +31,7 @@ public class OutboxBackgroundWorker : BackgroundService
         
         while (!stoppingToken.IsCancellationRequested)
         {
-            _logger.LogInformation("OUTBOX LOOP");
+            _logger.LogInformation("OUTBOX LOOP : " + outboxLoops++);
             try
             {
                 IReadOnlyList<Guid> pendingIds;
@@ -44,6 +46,7 @@ public class OutboxBackgroundWorker : BackgroundService
                     {
                         try
                         {
+                            _logger.LogInformation("Processor call: " + processorCalls++);
                             var messageProcessor = messageScope.ServiceProvider.GetRequiredService<IOutboxMessageProcessor>();
                             await messageProcessor.ProcessSingleMessageAsync(messageId, stoppingToken);
                         }

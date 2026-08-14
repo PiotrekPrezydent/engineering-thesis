@@ -104,6 +104,16 @@ public class Program
         //     await logger.LogDataAsync();
         //     await app.StopAsync();
         // }
+
+        await app.StartAsync();
+        await Task.Delay(TimeSpan.FromSeconds(5));
+        foreach (var modulesRoot in modulesRoots)
+        {
+           var cast = (ModuleCompositionRootBase)modulesRoot;
+           cast.LogBenchmark();
+        }
+
+        await app.StopAsync();
         
         app.MapHub<AppHub>(Connections.HubName);
         app.Run();

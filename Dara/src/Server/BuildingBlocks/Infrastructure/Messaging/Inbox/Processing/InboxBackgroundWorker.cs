@@ -18,13 +18,15 @@ public class InboxBackgroundWorker : BackgroundService
     private readonly InboxQueueSignal _inboxQueueSignal;
     private readonly IModuleCompositionRoot _compositionRoot;
     private readonly ILogger _logger;
+    private int inboxLoops = 0;
+    private int processorCalls = 0;
 
     public InboxBackgroundWorker(InboxQueueSignal inboxQueueSignal,IModuleCompositionRoot compositionRoot, ILoggerFactory logger)
     {
         _inboxQueueSignal = inboxQueueSignal;
         _compositionRoot = compositionRoot;
         
-        _logger = logger.CreateLogger("INBOX WORKER ::: " + _compositionRoot.GetModuleName());
+        _logger = logger.CreateLogger("INBOX WORKER");
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -32,7 +34,7 @@ public class InboxBackgroundWorker : BackgroundService
         _logger.LogInformation("STARTED INBOX WORKER SERVICE");
         while (!stoppingToken.IsCancellationRequested)
         {
-            _logger.LogInformation("INBOX LOOP");
+            _logger.LogInformation("INBOX LOOP : " + inboxLoops++);
             try
             {
                 IReadOnlyList<Guid> pendingIds;
@@ -48,6 +50,7 @@ public class InboxBackgroundWorker : BackgroundService
                     {
                         try
                         {
+                            _logger.LogInformation("Processor call: " + processorCalls++);
                             var messageProcessor = messageScope.ServiceProvider.GetRequiredService<IInboxMessageProcessor>();
                             await messageProcessor.ProcessSingleMessageAsync(messageId, stoppingToken);
                         }

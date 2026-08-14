@@ -23,7 +23,7 @@ public class InboxMessageProcessor : IInboxMessageProcessor
         _handlersResolver = handlersResolver;
         _typeMapper = typeMapper;
         
-        _logger = loggerFactory.CreateLogger("INBOX MESSAGE PROCESSOR :::: " + _context.GetModuleName());
+        _logger = loggerFactory.CreateLogger("INBOX MESSAGE PROCESSOR");
     }
 
     public async Task ProcessSingleMessageAsync(Guid messageId, CancellationToken stoppingToken)
@@ -32,7 +32,7 @@ public class InboxMessageProcessor : IInboxMessageProcessor
         if (message == null || message.ProcessedDate != null)
             return;
         
-        _logger.LogInformation($"STARTING PROCESSING INBOX MESSAGE {message.Type} **DATA** {message.Content}");
+        _logger.LogInformation($"STARTING PROCESSING INBOX MESSAGE {message.Type}");
         
         var type = _typeMapper.GetTypeForMessageWithTypeName(message.Type);
         var integrationEvent = JsonSerializer.Deserialize(message.Content, type) as IIntegrationEvent;

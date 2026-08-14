@@ -10,7 +10,7 @@ public class ModuleLoggerProvider : ILoggerProvider
     private readonly string _moduleName;
     private readonly ConcurrentQueue<ModuleLogEntry> _logQueue;
     private readonly Timer _timer;
-    private readonly TimeSpan _interval = TimeSpan.FromSeconds(5);
+    private readonly TimeSpan _interval = TimeSpan.FromSeconds(2);
     private DateTime _lastFlushTime;
     
     private int _isFlushing = 0;
@@ -69,7 +69,7 @@ public class ModuleLoggerProvider : ILoggerProvider
             sb.Append(" ######## ");
             sb.Append(InSquareBrackers(_lastFlushTime.ToString("HH:mm:ss.ffffff"), TimeColor));
             sb.Append(" -------- ");
-            sb.Append(InSquareBrackers(DateTime.Now.ToString("HH:mm:ss.ffffff"), TimeColor));
+            sb.Append(InSquareBrackers(DateTime.UtcNow.ToString("HH:mm:ss.ffffff"), TimeColor));
             sb.AppendLine();
             
             var groupedLogs = currentLogs.GroupBy(l => l.Category);

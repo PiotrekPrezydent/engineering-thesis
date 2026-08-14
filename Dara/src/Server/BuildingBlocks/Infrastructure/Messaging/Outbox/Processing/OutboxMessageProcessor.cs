@@ -33,7 +33,7 @@ public class OutboxMessageProcessor : IOutboxMessageProcessor
         if (message == null || message.ProcessedDate != null)
             return;
 
-        _logger.LogInformation($"STARTING PROCESSING OUTBOX MESSAGE {message.Type} **DATA** {message.Content}");
+        _logger.LogInformation($"STARTING PROCESSING OUTBOX MESSAGE {message.Type}");
         
         var type = _typeMapper.GetTypeForMessageWithTypeName(message.Type);
         var notification = JsonSerializer.Deserialize(message.Content, type) as IDomainEventNotification;
