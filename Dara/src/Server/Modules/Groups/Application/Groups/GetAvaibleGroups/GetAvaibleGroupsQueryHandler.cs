@@ -3,23 +3,22 @@ using Dara.Server.BuildingBlocks.Infrastructure.DataAccess;
 using Dara.Server.Modules.Groups.Domain.Groups;
 using Microsoft.EntityFrameworkCore;
 
-namespace Dara.Server.Modules.Groups.Application.Groups.GetAllGroups;
+namespace Dara.Server.Modules.Groups.Application.Groups.GetAvaibleGroups;
 
-public class GetAllGroupsQueryHandler : IQueryHandler<GetAllGroupsQuery,List<GroupDto>>
+public class GetAvaibleGroupsQueryHandler : IQueryHandler<GetAvaibleGroupsQuery,List<AvaibleGroupDto>>
 {
     private readonly IReadModel _readModel;
 
-    public GetAllGroupsQueryHandler(IReadModel readModel)
+    public GetAvaibleGroupsQueryHandler(IReadModel readModel)
     {
         _readModel = readModel;
     }
 
-    public async Task<List<GroupDto>> HandleAsync(GetAllGroupsQuery query)
+    public async Task<List<AvaibleGroupDto>> HandleAsync(GetAvaibleGroupsQuery query)
     {
         return await _readModel
             .Query<Group>()
-            .Include(g=>g.Members)
-            .Select(e=>new GroupDto(e.Id.Value, e.Name))
+            .Select(e=>new AvaibleGroupDto(e.Id.Value, e.Name))
             .ToListAsync();
     }
 }

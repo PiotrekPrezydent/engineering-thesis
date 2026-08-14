@@ -30,10 +30,10 @@ public class Group : Entity, IAggregateRoot
         CreatorId = creatorId;
         _members = new List<GroupMember> { GroupMember.Create(creatorId, Id) };
         
-        AddDomainEvent(new GroupCreatedDomainEvent(Id, CreatorId));
+        AddDomainEvent(new NewGroupCreatedDomainEvent(Id, CreatorId));
     }
 
-    public static Group Create(MemberId creatorId, string name, string joinCode)
+    public static Group CreateNewGroup(MemberId creatorId, string name, string joinCode)
     {
         return new Group(creatorId, name, joinCode);
     }
@@ -45,7 +45,7 @@ public class Group : Entity, IAggregateRoot
         
         _members.Add(GroupMember.Create(memberId, Id));
         
-        AddDomainEvent(new NewMemberJoinedGroupDomainEvent(Id, memberId));
+        AddDomainEvent(new MemberJoinedGroupDomainEvent(Id, memberId));
     }
 
     public void LeaveGroup(MemberId memberId)

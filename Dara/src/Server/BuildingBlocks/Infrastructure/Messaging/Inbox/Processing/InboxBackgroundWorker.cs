@@ -17,24 +17,27 @@ public class InboxBackgroundWorker : BackgroundService
 {    
     private readonly InboxQueueSignal _inboxQueueSignal;
     private readonly IModuleCompositionRoot _compositionRoot;
-    private readonly ILogger _logger;
-    private int inboxLoops = 0;
-    private int processorCalls = 0;
+    private readonly ILogger<InboxBackgroundWorker> _logger;
+    
+    private int _inboxWorkerLoops = 0;
+    private int _inboxProcessorCalls = 0;
+    private int _inboxTimeoutCount = 0;
 
-    public InboxBackgroundWorker(InboxQueueSignal inboxQueueSignal,IModuleCompositionRoot compositionRoot, ILoggerFactory logger)
+    public InboxBackgroundWorker(InboxQueueSignal inboxQueueSignal, IModuleCompositionRoot compositionRoot, ILogger<InboxBackgroundWorker> logger)
     {
         _inboxQueueSignal = inboxQueueSignal;
         _compositionRoot = compositionRoot;
-        
-        _logger = logger.CreateLogger("INBOX WORKER");
+
+        _logger = logger;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-    {   
-        _logger.LogInformation("STARTED INBOX WORKER SERVICE");
+    {
+        _logger.LogInformation("SERVICE STARTED");
+        
         while (!stoppingToken.IsCancellationRequested)
         {
-            _logger.LogInformation("INBOX LOOP : " + inboxLoops++);
+            _inboxWorkerLoops++;
             try
             {
                 IReadOnlyList<Guid> pendingIds;
@@ -50,7 +53,7 @@ public class InboxBackgroundWorker : BackgroundService
                     {
                         try
                         {
-                            _logger.LogInformation("Processor call: " + processorCalls++);
+                            _inboxProcessorCalls++;
                             var messageProcessor = messageScope.ServiceProvider.GetRequiredService<IInboxMessageProcessor>();
                             await messageProcessor.ProcessSingleMessageAsync(messageId, stoppingToken);
                         }
@@ -69,7 +72,7 @@ public class InboxBackgroundWorker : BackgroundService
                 }
                 catch (OperationCanceledException) when (!stoppingToken.IsCancellationRequested)
                 {
-                    _logger.LogInformation("INBOX TIMEOUT");
+                    _inboxTimeoutCount++;
                 }
                 
             }
@@ -80,11 +83,10 @@ public class InboxBackgroundWorker : BackgroundService
             }
         }
     }
-    
-    async Task DispatchIntegrationEventAsync<TIntegrationEvent>(IServiceProvider currentServiceProvider, TIntegrationEvent integrationEvent) where TIntegrationEvent : IIntegrationEvent
+
+    public override void Dispose()
     {
-        var handlers = currentServiceProvider.GetServices<IIntegrationEventHandler<TIntegrationEvent>>();
-        foreach (var handler in handlers)
-            await handler.HandleAsync(integrationEvent);
+        _logger.LogDebug($"DISPOSING OUTBOX BACKGROUOND WORKER \n\tMAIN LOOPS: {_inboxWorkerLoops} \n\tPROCESSOR CALLS: {_inboxProcessorCalls} \n\tTIMEOUTS: {_inboxTimeoutCount}");
+        base.Dispose();
     }
 }

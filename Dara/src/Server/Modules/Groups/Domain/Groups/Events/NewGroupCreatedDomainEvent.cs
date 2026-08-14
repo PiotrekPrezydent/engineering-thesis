@@ -3,4 +3,4 @@ using Dara.Server.Modules.Groups.Domain.Members;
 
 namespace Dara.Server.Modules.Groups.Domain.Groups.Events;
 
-public record GroupCreatedDomainEvent(GroupId GroupId, MemberId CreatorId) : DomainEventBase;
+public record NewGroupCreatedDomainEvent(GroupId GroupId, MemberId CreatorId) : DomainEventBase;

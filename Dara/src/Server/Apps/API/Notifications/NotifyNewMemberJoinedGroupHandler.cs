@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Dara.Server.Apps.API.Notifications;
 
-public class NotifyNewMemberJoinedGroupHandler : IHubNotificationHandler<NewMemberJoinedGroupIntegrationEvent>
+public class NotifyNewMemberJoinedGroupHandler : IHubNotificationHandler<MemberJoinedGroupIntegrationEvent>
 {
     private readonly IGroupsModule _groupModule;
     private readonly IProfilesModule _profilesModule;
@@ -25,7 +25,7 @@ public class NotifyNewMemberJoinedGroupHandler : IHubNotificationHandler<NewMemb
         _context = context;
     }
 
-    public async Task HandleAsync(NewMemberJoinedGroupIntegrationEvent notification, CancellationToken cancellationToken)
+    public async Task HandleAsync(MemberJoinedGroupIntegrationEvent notification, CancellationToken cancellationToken)
     {
         var client = _context.Clients.User(notification.MemberId.ToString());
         var group = await _groupModule.ExecuteQueryAsync<GetGroupDetailsQuery,GroupDetailsDto>(new GetGroupDetailsQuery(notification.GroupId));

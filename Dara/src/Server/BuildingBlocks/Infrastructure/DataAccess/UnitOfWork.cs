@@ -67,7 +67,9 @@ public class UnitOfWork : IUnitOfWork
         }
         
         await _context.SaveChangesAsync();
-        _outboxQueueSignal.NotifyNewMessage();
+        //fix for too many outbox calls
+        if(notifications.Any())
+            _outboxQueueSignal.NotifyNewMessage();
         
         return 0;
     }

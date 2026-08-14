@@ -21,7 +21,7 @@ public class GroupMessage : Entity, IAggregateRoot
         AuthorId = authorId;
         Content = content;
         
-        AddDomainEvent(new NewGroupMessageCreatedDomainEvent(Id, GroupId, AuthorId, Content));
+        AddDomainEvent(new GroupMessageAddedDomainEvent(Id, GroupId, AuthorId, Content));
     }
 
     internal static GroupMessage Create(GroupId groupId, MemberId authorId, string content)

@@ -1,6 +1,6 @@
 using System.Text;
 using Dara.Server.Modules.Groups.Application;
-using Dara.Server.Modules.Groups.Application.Groups.GetAllGroups;
+using Dara.Server.Modules.Groups.Application.Groups.GetAvaibleGroups;
 using Dara.Server.Modules.Groups.Application.Groups.GetGroupDetails;
 using Dara.Server.Modules.Identity.Application;
 using Dara.Server.Modules.Identity.Application.GetUser;
@@ -69,7 +69,7 @@ public class LogModulesDataService
         _logger.LogInformation(sb.ToString());
         sb.Clear();
         
-        var groups = await _groupsModule.ExecuteQueryAsync<GetAllGroupsQuery, List<GroupDto>>(new());
+        var groups = await _groupsModule.ExecuteQueryAsync<GetAvaibleGroupsQuery, List<AvaibleGroupDto>>(new());
         sb.AppendLine("\nGROUPS :::: \n");
         foreach (var group in groups)
         {

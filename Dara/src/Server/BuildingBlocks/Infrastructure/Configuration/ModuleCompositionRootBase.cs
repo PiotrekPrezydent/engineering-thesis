@@ -90,8 +90,8 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
         var inboxAvg = inboxMessages.Any() ? inboxData.Ticks / inboxMessages.Count() : int.MinValue;
         var inboxSecs =inboxMessages.Any() ? inboxData.TotalSeconds / inboxMessages.Count() : int.MinValue;
         
-        logger.LogInformation("OUTBOX AVERAGE TICKS : " + outboxAvg.ToString() + " --- " + outboxSecs + " --- " + outboxMessages.Count());
-        logger.LogInformation("INBOX AVERAGE TICKS : " + inboxAvg.ToString() + " --- " + inboxSecs + " --- " + inboxMessages.Count());
+        logger.LogDebug("OUTBOX AVERAGE TICKS : " + outboxAvg.ToString() + " --- " + outboxSecs + " --- " + outboxMessages.Count());
+        logger.LogDebug("INBOX AVERAGE TICKS : " + inboxAvg.ToString() + " --- " + inboxSecs + " --- " + inboxMessages.Count());
         
         /*
          [01:40:27] [INF] [OUTBOX MESSAGE PROCESSOR :::: Identity] [Identity]
@@ -182,27 +182,11 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
         
         var moduleDeclaration = references.InfrastructureAssembly.GetFirstImplementationOfType(references.DeclaredModuleInterface.Value);
         services.AddScoped(moduleDeclaration.Interface,moduleDeclaration.Implementation);
-
-        DateTime startTime = DateTime.UtcNow;
+        
         services.AddLogging(e =>
         {
             e.ClearProviders();
             e.AddProvider(new ModuleLoggerProvider(this.GetModuleName()));
-            e.AddFilter((category, level) =>
-            {
-                if (DateTime.UtcNow - startTime < TimeSpan.FromSeconds(2))
-                {
-                    if (category != null && category.StartsWith("Microsoft.EntityFrameworkCore"))
-                    {
-                        return false;
-                    }
-                }
-
-                if (level < LogLevel.Information)
-                    return false;
-
-                return true;
-            });
         });
         
         
@@ -222,21 +206,6 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
         
         services.AddSingleton(eventBus);
         services.AddSingleton(references.CompositionRoot);
-
-        services.AddLogging(e =>
-        {
-            e.ClearProviders();
-            e.AddProvider(new ModuleLoggerProvider(this.GetModuleName()));
-        });
-
-        // services.AddLogging(e =>
-        // {
-        //     e.ClearProviders();
-        //     e.AddConsole(options =>
-        //     {
-        //         options.FormatterName = nameof(SharedLogFormatter);
-        //     }).AddConsoleFormatter<SharedLogFormatter, ConsoleFormatterOptions>();
-        // });
         
         SetServiceProvider(services.BuildServiceProvider());
 

@@ -16,7 +16,7 @@ public class PublishNewMemberJoinedGroupNotificationHandler : IDomainEventNotifi
     public async Task HandleAsync(NewMemberJoinedGroupNotification notification)
     {
         await _eventBus.PublishAsync(
-            new NewMemberJoinedGroupIntegrationEvent(notification.NotificationId,
+            new MemberJoinedGroupIntegrationEvent(notification.NotificationId,
                 notification.DomainEvent.OccuredOn,
                 notification.DomainEvent.GroupId,
                 notification.DomainEvent.MemberId));

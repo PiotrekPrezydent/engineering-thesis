@@ -4,18 +4,18 @@ using Dara.Server.Modules.Groups.Integration;
 
 namespace Dara.Server.Modules.Groups.Application.Messages.SendGroupMessage;
 
-public class PublishNewGroupMessageCreatedNotificationHandler : IDomainEventNotificationHandler<NewGroupMessageCreatedNotification>
+public class PublishGroupMessageAddedNotificationHandler : IDomainEventNotificationHandler<GroupMessageAddedNotification>
 {
     private readonly IEventBus _eventBus;
 
-    public PublishNewGroupMessageCreatedNotificationHandler(IEventBus eventBus)
+    public PublishGroupMessageAddedNotificationHandler(IEventBus eventBus)
     {
         _eventBus = eventBus;
     }
 
-    public async Task HandleAsync(NewGroupMessageCreatedNotification notification)
+    public async Task HandleAsync(GroupMessageAddedNotification notification)
     {
-        await _eventBus.PublishAsync(new NewGroupMessageCreatedIntegrationEvent(notification.NotificationId,
+        await _eventBus.PublishAsync(new GroupMessageAddedIntegrationEvent(notification.NotificationId,
             notification.DomainEvent.OccuredOn,
             notification.DomainEvent.MessageId,
             notification.DomainEvent.GroupId,

@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Dara.Server.Apps.API.Notifications;
 
-public class NotifyNewGroupMessageCreatedHandler : IHubNotificationHandler<NewGroupMessageCreatedIntegrationEvent>
+public class NotifyNewGroupMessageCreatedHandler : IHubNotificationHandler<GroupMessageAddedIntegrationEvent>
 {
     private readonly IGroupsModule _groupModule;
     private readonly IProfilesModule _profilesModule;
@@ -22,7 +22,7 @@ public class NotifyNewGroupMessageCreatedHandler : IHubNotificationHandler<NewGr
         _context = context;
     }
 
-    public async Task HandleAsync(NewGroupMessageCreatedIntegrationEvent notification, CancellationToken cancellationToken)
+    public async Task HandleAsync(GroupMessageAddedIntegrationEvent notification, CancellationToken cancellationToken)
     {
         var group = await _groupModule.ExecuteQueryAsync<GetGroupDetailsQuery,GroupDetailsDto>(new GetGroupDetailsQuery(notification.GroupId));
         foreach (var member in group.Members)

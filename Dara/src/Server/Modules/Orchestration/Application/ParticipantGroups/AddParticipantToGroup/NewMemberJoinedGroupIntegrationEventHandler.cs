@@ -4,7 +4,7 @@ using Dara.Server.Modules.Groups.Integration;
 
 namespace Dara.Server.Modules.Orchestration.Application.ParticipantGroups.AddParticipantToGroup;
 
-public class NewMemberJoinedGroupIntegrationEventHandler : IIntegrationEventHandler<NewMemberJoinedGroupIntegrationEvent>
+public class NewMemberJoinedGroupIntegrationEventHandler : IIntegrationEventHandler<MemberJoinedGroupIntegrationEvent>
 {
     private readonly IInternalCommandExecutor _commandExecutor;
 
@@ -13,7 +13,7 @@ public class NewMemberJoinedGroupIntegrationEventHandler : IIntegrationEventHand
         _commandExecutor = commandExecutor;
     }
 
-    public async Task HandleAsync(NewMemberJoinedGroupIntegrationEvent integrationEvent)
+    public async Task HandleAsync(MemberJoinedGroupIntegrationEvent integrationEvent)
     {
         await _commandExecutor.ExecuteAsync(new AddParticipantToGroupCommand(integrationEvent.GroupId,integrationEvent.MemberId));
     }

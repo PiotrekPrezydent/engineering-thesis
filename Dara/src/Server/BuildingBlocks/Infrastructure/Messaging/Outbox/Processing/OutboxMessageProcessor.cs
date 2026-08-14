@@ -15,16 +15,16 @@ public class OutboxMessageProcessor : IOutboxMessageProcessor
     private readonly IHandlersResolver _handlersResolver;
     private readonly IOutboxMessagesTypeMapper _typeMapper;
     
-    private readonly ILogger _logger;
+    private readonly ILogger<OutboxMessageProcessor> _logger;
 
 
-    public OutboxMessageProcessor(DbContext context, IHandlersResolver handlersResolver, IOutboxMessagesTypeMapper typeMapper,  ILoggerFactory loggerFactory)
+    public OutboxMessageProcessor(DbContext context, IHandlersResolver handlersResolver, IOutboxMessagesTypeMapper typeMapper,  ILogger<OutboxMessageProcessor> logger)
     {
         _context = context;
         _handlersResolver = handlersResolver;
         _typeMapper = typeMapper;
         
-        _logger = loggerFactory.CreateLogger("OUTBOX MESSAGE PROCESSOR :::: " + _context.GetModuleName());
+        _logger = logger;
     }
 
     public async Task ProcessSingleMessageAsync(Guid messageId, CancellationToken stoppingToken)
@@ -33,7 +33,7 @@ public class OutboxMessageProcessor : IOutboxMessageProcessor
         if (message == null || message.ProcessedDate != null)
             return;
 
-        _logger.LogInformation($"STARTING PROCESSING OUTBOX MESSAGE {message.Type}");
+        _logger.LogDebug($"STARTING PROCESSING MESSAGE: {messageId} \n\tWITH TYPE: {message.Type} \n\tWITH CONTENT: {message.Content}");
         
         var type = _typeMapper.GetTypeForMessageWithTypeName(message.Type);
         var notification = JsonSerializer.Deserialize(message.Content, type) as IDomainEventNotification;
@@ -43,7 +43,7 @@ public class OutboxMessageProcessor : IOutboxMessageProcessor
         
         await _context.SaveChangesAsync(stoppingToken);
         
-        _logger.LogInformation($"PROCESSED OUTBOX MESSAGE {message.Type} IN {(message.ProcessedDate! - message.OccurredOn).Value.TotalSeconds}");
+        _logger.LogDebug($"PROCESSED MESSAGE {messageId} IN {(message.ProcessedDate! - message.OccurredOn).Value.TotalSeconds}");
     }
     
     async Task DispatchDomainEventNotificationAsync<TDomainEventNotification>(TDomainEventNotification notification) where TDomainEventNotification : IDomainEventNotification

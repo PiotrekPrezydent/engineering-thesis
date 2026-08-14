@@ -13,25 +13,27 @@ public class OutboxBackgroundWorker : BackgroundService
 {
     private readonly OutboxQueueSignal _outboxQueueSignal;
     private readonly IModuleCompositionRoot _compositionRoot;
-    private readonly ILogger _logger;
-    private int outboxLoops = 0;
-    private int processorCalls = 0;
+    private readonly ILogger<OutboxBackgroundWorker> _logger;
     
-    public OutboxBackgroundWorker(IModuleCompositionRoot compositionRoot, ILoggerFactory logger, OutboxQueueSignal outboxQueueSignal)
+    private int _outboxWorkerLoops = 0;
+    private int _outboxProcessorCalls = 0;
+    private int _outboxTimeoutCount = 0;
+    
+    public OutboxBackgroundWorker(IModuleCompositionRoot compositionRoot, ILogger<OutboxBackgroundWorker> logger, OutboxQueueSignal outboxQueueSignal)
     {
         _compositionRoot = compositionRoot;
         _outboxQueueSignal = outboxQueueSignal;
-        
-        _logger = logger.CreateLogger("OUTBOX WORKER ::: " + _compositionRoot.GetModuleName());
+
+        _logger = logger;
     }
     
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("STARTED OUTBOX PROCESSOR SERVICE");
+        _logger.LogInformation("SERVICE STARTED");
         
         while (!stoppingToken.IsCancellationRequested)
         {
-            _logger.LogInformation("OUTBOX LOOP : " + outboxLoops++);
+            _outboxWorkerLoops++;
             try
             {
                 IReadOnlyList<Guid> pendingIds;
@@ -46,7 +48,7 @@ public class OutboxBackgroundWorker : BackgroundService
                     {
                         try
                         {
-                            _logger.LogInformation("Processor call: " + processorCalls++);
+                            _outboxProcessorCalls++;
                             var messageProcessor = messageScope.ServiceProvider.GetRequiredService<IOutboxMessageProcessor>();
                             await messageProcessor.ProcessSingleMessageAsync(messageId, stoppingToken);
                         }
@@ -65,7 +67,7 @@ public class OutboxBackgroundWorker : BackgroundService
                 }
                 catch (OperationCanceledException) when (!stoppingToken.IsCancellationRequested)
                 {
-                    _logger.LogInformation("OUTBOX TIMEOUT");
+                    _outboxTimeoutCount++;
                 }
             }
             catch (Exception ex)
@@ -74,5 +76,11 @@ public class OutboxBackgroundWorker : BackgroundService
                 await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
             }
         }
+    }
+
+    public override void Dispose()
+    {
+        _logger.LogDebug($"DISPOSING OUTBOX BACKGROUOND WORKER \n\tMAIN LOOPS: {_outboxWorkerLoops} \n\tPROCESSOR CALLS: {_outboxProcessorCalls} \n\tTIMEOUTS: {_outboxTimeoutCount}");
+        base.Dispose();
     }
 }

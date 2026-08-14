@@ -15,15 +15,15 @@ public class InboxMessageProcessor : IInboxMessageProcessor
     private readonly IHandlersResolver _handlersResolver;
     private readonly IInboxMessagesTypeMapper _typeMapper;
     
-    private readonly ILogger _logger;
+    private readonly ILogger<InboxMessageProcessor> _logger;
 
-    public InboxMessageProcessor(DbContext context, IHandlersResolver handlersResolver, IInboxMessagesTypeMapper typeMapper, ILoggerFactory loggerFactory)
+    public InboxMessageProcessor(DbContext context, IHandlersResolver handlersResolver, IInboxMessagesTypeMapper typeMapper, ILogger<InboxMessageProcessor> logger)
     {
         _context = context;
         _handlersResolver = handlersResolver;
         _typeMapper = typeMapper;
-        
-        _logger = loggerFactory.CreateLogger("INBOX MESSAGE PROCESSOR");
+
+        _logger = logger;
     }
 
     public async Task ProcessSingleMessageAsync(Guid messageId, CancellationToken stoppingToken)
@@ -32,7 +32,7 @@ public class InboxMessageProcessor : IInboxMessageProcessor
         if (message == null || message.ProcessedDate != null)
             return;
         
-        _logger.LogInformation($"STARTING PROCESSING INBOX MESSAGE {message.Type}");
+        _logger.LogDebug($"STARTING PROCESSING MESSAGE: {messageId} \n\tWITH TYPE: {message.Type} \n\tWITH CONTENT: {message.Content}");
         
         var type = _typeMapper.GetTypeForMessageWithTypeName(message.Type);
         var integrationEvent = JsonSerializer.Deserialize(message.Content, type) as IIntegrationEvent;
@@ -42,7 +42,7 @@ public class InboxMessageProcessor : IInboxMessageProcessor
         
         await _context.SaveChangesAsync(stoppingToken);
         
-        _logger.LogInformation($"PROCESSED INBOX MESSAGE {message.Type} IN {(message.ProcessedDate! - message.OccurredOn).Value.TotalSeconds}");
+        _logger.LogDebug($"PROCESSED MESSAGE {messageId} IN {(message.ProcessedDate! - message.OccurredOn).Value.TotalSeconds}");
     }
 
     async Task DispatchIntegrationEventAsync<TIntegrationEvent>(TIntegrationEvent integrationEvent) where TIntegrationEvent : IIntegrationEvent

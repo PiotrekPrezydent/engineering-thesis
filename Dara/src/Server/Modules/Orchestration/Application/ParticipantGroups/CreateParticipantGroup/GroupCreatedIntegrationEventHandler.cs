@@ -5,7 +5,7 @@ using Dara.Server.Modules.Orchestration.Domain.ParticipantGroups;
 
 namespace Dara.Server.Modules.Orchestration.Application.ParticipantGroups.CreateParticipantGroup;
 
-public class GroupCreatedIntegrationEventHandler : IIntegrationEventHandler<GroupCreatedIntegrationEvent>
+public class GroupCreatedIntegrationEventHandler : IIntegrationEventHandler<NewGroupCreatedIntegrationEvent>
 {
     private readonly IInternalCommandExecutor _commandExecutor;
 
@@ -14,7 +14,7 @@ public class GroupCreatedIntegrationEventHandler : IIntegrationEventHandler<Grou
         _commandExecutor = commandExecutor;
     }
 
-    public async Task HandleAsync(GroupCreatedIntegrationEvent integrationEvent)
+    public async Task HandleAsync(NewGroupCreatedIntegrationEvent integrationEvent)
     {
         await _commandExecutor.ExecuteAsync(
             new CreateParticipantGroupCommand(integrationEvent.GroupId, integrationEvent.GroupOwnerId));

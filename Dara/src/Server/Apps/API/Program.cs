@@ -67,10 +67,10 @@ public class Program
         builder.Services.AddHostedService<StartupService>();
         
         builder.Services.AddScoped<IHubNotificationHandler<ProfileNameChangedIntegrationEvent>,NotifyProfileNameChangedHandler>();
-        builder.Services.AddScoped<IHubNotificationHandler<GroupCreatedIntegrationEvent>,NotifyGroupCreatedHandler>();
-        builder.Services.AddScoped<IHubNotificationHandler<NewMemberJoinedGroupIntegrationEvent>,NotifyNewMemberJoinedGroupHandler>();
+        builder.Services.AddScoped<IHubNotificationHandler<NewGroupCreatedIntegrationEvent>,NotifyGroupCreatedHandler>();
+        builder.Services.AddScoped<IHubNotificationHandler<MemberJoinedGroupIntegrationEvent>,NotifyNewMemberJoinedGroupHandler>();
         builder.Services.AddScoped<IHubNotificationHandler<MemberLeftGroupIntegrationEvent>,NotifyMemberLeftGroupHandler>();
-        builder.Services.AddScoped<IHubNotificationHandler<NewGroupMessageCreatedIntegrationEvent>,NotifyNewGroupMessageCreatedHandler>();
+        builder.Services.AddScoped<IHubNotificationHandler<GroupMessageAddedIntegrationEvent>,NotifyNewGroupMessageCreatedHandler>();
         
         builder.Services.AddSingleton(Channel.CreateUnbounded<IIntegrationEvent>());
         builder.Services.AddHostedService<HubNotificationsProcessor>();
@@ -80,10 +80,10 @@ public class Program
         var channel = app.Services.GetRequiredService<Channel<IIntegrationEvent>>();
         
         InMemoryEventBus.Instance.Subscribe(new ChannelWriterIntegrationEventHandler<ProfileNameChangedIntegrationEvent>(channel));
-        InMemoryEventBus.Instance.Subscribe(new ChannelWriterIntegrationEventHandler<NewMemberJoinedGroupIntegrationEvent>(channel));
+        InMemoryEventBus.Instance.Subscribe(new ChannelWriterIntegrationEventHandler<MemberJoinedGroupIntegrationEvent>(channel));
         InMemoryEventBus.Instance.Subscribe(new ChannelWriterIntegrationEventHandler<MemberLeftGroupIntegrationEvent>(channel));
-        InMemoryEventBus.Instance.Subscribe(new ChannelWriterIntegrationEventHandler<GroupCreatedIntegrationEvent>(channel));
-        InMemoryEventBus.Instance.Subscribe(new ChannelWriterIntegrationEventHandler<NewGroupMessageCreatedIntegrationEvent>(channel));
+        InMemoryEventBus.Instance.Subscribe(new ChannelWriterIntegrationEventHandler<NewGroupCreatedIntegrationEvent>(channel));
+        InMemoryEventBus.Instance.Subscribe(new ChannelWriterIntegrationEventHandler<GroupMessageAddedIntegrationEvent>(channel));
         
         app.UseAuthentication();
         app.UseAuthorization();

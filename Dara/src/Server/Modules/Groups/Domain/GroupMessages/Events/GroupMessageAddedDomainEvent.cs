@@ -4,4 +4,4 @@ using Dara.Server.Modules.Groups.Domain.Members;
 
 namespace Dara.Server.Modules.Groups.Domain.GroupMessages.Events;
 
-public record NewGroupMessageCreatedDomainEvent(GroupMessageId MessageId, GroupId GroupId, MemberId AuthorId, string Content) : DomainEventBase;
+public record GroupMessageAddedDomainEvent(GroupMessageId MessageId, GroupId GroupId, MemberId AuthorId, string Content) : DomainEventBase;

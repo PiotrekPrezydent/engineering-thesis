@@ -1,7 +1,6 @@
 using Dara.Server.Modules.Groups.Application;
-using Dara.Server.Modules.Groups.Application.Groups.CreateGroup;
+using Dara.Server.Modules.Groups.Application.Groups.CreateNewGroup;
 using Dara.Server.Modules.Groups.Application.Groups.JoinToGroup;
-using Dara.Server.Modules.Groups.Application.Messages.SendGroupMessage;
 using Dara.Server.Modules.Identity.Application;
 using Dara.Server.Modules.Identity.Application.CreateUser;
 using Dara.Server.Modules.Plugins.Application;
@@ -94,7 +93,7 @@ public class StartupService : IHostedLifecycleService
         //wait for pending inbox/outbox messagess to process
         await Task.Delay(TimeSpan.FromSeconds(2));
         
-        //await _logModulesDataService.LogDataAsync();
+        await _logModulesDataService.LogDataAsync();
 
     }
     
@@ -109,7 +108,7 @@ public class StartupService : IHostedLifecycleService
     
     async Task<Guid> SetupGroupAsync(Guid creatorId, string name,string joinCode, params Guid[] membersIds)
     {
-        var group = await _groupsModule.ExecuteCommandAsync<CreateGroupCommand, Guid>(new CreateGroupCommand(creatorId,name,joinCode));
+        var group = await _groupsModule.ExecuteCommandAsync<CreateNewGroupCommand, Guid>(new CreateNewGroupCommand(creatorId,name,joinCode));
         foreach (var memberId in membersIds)
         {
             await _groupsModule.ExecuteCommandAsync(new JoinToGroupCommand(group, memberId, joinCode));
