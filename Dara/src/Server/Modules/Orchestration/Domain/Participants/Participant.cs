@@ -1,4 +1,5 @@
 using Dara.Server.BuildingBlocks.Domain;
+using Dara.Server.Modules.Orchestration.Domain.ParticipantGroups;
 using Dara.Server.Modules.Orchestration.Domain.Participants.Functions;
 
 namespace Dara.Server.Modules.Orchestration.Domain.Participants;
@@ -8,17 +9,17 @@ public class Participant : Entity, IAggregateRoot
     public ParticipantId Id { get; private set; }
     public string Name { get; private set; }
     
-    public IReadOnlyList<ParticipantGroupId> Groups => _groups.AsReadOnly();
-    private List<ParticipantGroupId> _groups;
-    
     public IReadOnlyList<Function> Functions  => _functions.AsReadOnly();
     private List<Function> _functions;
+
+    private Participant()
+    {
+    }
 
     private Participant(ParticipantId id, string name)
     {
         Id = id;
         Name = name;
-        _groups = new();
         _functions = new();
     }
 
@@ -32,25 +33,14 @@ public class Participant : Entity, IAggregateRoot
         Name = name;
     }
 
-    public void AddGroup(ParticipantGroupId group)
+    public void AddFunction(FunctionId id, string name, string description, string returnTypeName, IReadOnlyList<FunctionParameter> parameters)
     {
-        _groups.Add(group);
-    }
-    
-    public void RemoveGroup(ParticipantGroupId group)
-    {
-        _groups.Remove(group);
-    }
-    
-    public bool IsMemberOfGroup(ParticipantGroupId group) => _groups.Contains(group);
-
-    public void AddFunction(Function function)
-    {
-        _functions.Add(function);
+        _functions.Add(Function.Create(id, name, description, returnTypeName, parameters));
     }
 
-    public void RemoveFunction(Function function)
+    public void RemoveFunction(FunctionId id)
     {
+        var function = _functions.Single(f => f.Id == id);
         _functions.Remove(function);
     }
 }

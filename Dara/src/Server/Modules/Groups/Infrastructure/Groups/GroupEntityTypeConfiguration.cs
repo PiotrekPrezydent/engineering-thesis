@@ -15,8 +15,8 @@ public class GroupEntityTypeConfiguration : IEntityTypeConfiguration<Group>
         
         builder.HasKey(g => g.Id);
 
-        builder.Property(x => x.Id).HasConversion(id => id.Value, v => new GroupId(v));
-        builder.Property(x => x.CreatorId).HasConversion(id => id.Value, v => new MemberId(v));
+        //builder.Property(x => x.Id).HasConversion(id => id.Value, v => new GroupId(v));
+        //builder.Property(x => x.CreatorId).HasConversion(id => id.Value, v => new MemberId(v));
         
         builder.HasMany(x => x.Members)
             .WithOne(m => m.Group)

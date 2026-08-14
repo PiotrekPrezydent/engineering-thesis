@@ -10,6 +10,7 @@ using Dara.Server.BuildingBlocks.Integration;
 using Dara.Server.Modules.Groups.Infrastructure;
 using Dara.Server.Modules.Groups.Integration;
 using Dara.Server.Modules.Identity.Infrastructure;
+using Dara.Server.Modules.Orchestration.Infrastructure;
 using Dara.Server.Modules.Plugins.Infrastructure;
 using Dara.Server.Modules.Profiles.Infrastructure;
 using Dara.Server.Modules.Profiles.Integration;
@@ -30,10 +31,10 @@ public class Program
             .ClearProviders()
             .AddConsole(options =>
             {
-                options.FormatterName = nameof(SharedLogFormatter);
+                //options.FormatterName = nameof(SharedLogFormatter);
             });
         
-        builder.Logging.AddConsoleFormatter<SharedLogFormatter, ConsoleFormatterOptions>();
+        //builder.Logging.AddConsoleFormatter<SharedLogFormatter, ConsoleFormatterOptions>();
         
         builder.Services.AddMemoryCache();
         
@@ -55,6 +56,7 @@ public class Program
             new GroupsCompositionRoot(),
             new ProfilesCompositionRoot(),
             new PluginsCompositionRoot(),
+            new OrchestrationCompositionRoot()
         };
         
         

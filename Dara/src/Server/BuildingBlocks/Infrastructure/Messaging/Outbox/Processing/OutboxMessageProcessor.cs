@@ -29,7 +29,6 @@ public class OutboxMessageProcessor : IOutboxMessageProcessor
 
     public async Task ProcessSingleMessageAsync(Guid messageId, CancellationToken stoppingToken)
     {
-        
         var message = await _context.Set<OutboxMessage>().FindAsync([messageId], stoppingToken);
         if (message == null || message.ProcessedDate != null)
             return;

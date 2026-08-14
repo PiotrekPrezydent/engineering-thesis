@@ -1,8 +1,4 @@
-using System.Text;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
-
-namespace Dara.Shared.Logging;
+namespace Dara.Server.BuildingBlocks.Infrastructure.Configuration.Logging;
 
 public static class AnsiColors
 {
@@ -27,13 +23,4 @@ public static class AnsiColors
     public const string Bold = "\x1b[1m";
     public const string Underline = "\x1b[4m";
     public const string Reset = "\x1b[0m";
-}
-
-public static class SharedLogsIdsRanges
-{
-    public const int DotnetStart = int.MinValue;
-    public const int DotnetEnd = 10000;
-    
-    public const int SharedStart = 1000000;
-    public const int SharedEnd = 1009999;
 }

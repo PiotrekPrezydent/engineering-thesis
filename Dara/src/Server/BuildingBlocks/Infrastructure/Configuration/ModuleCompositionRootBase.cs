@@ -5,6 +5,7 @@ using Dara.Server.BuildingBlocks.Infrastructure.Common;
 using Dara.Server.BuildingBlocks.Infrastructure.Common.Extensions;
 using Dara.Server.BuildingBlocks.Infrastructure.Common.Types;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration.DataAccess;
+using Dara.Server.BuildingBlocks.Infrastructure.Configuration.Logging;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration.Mediation;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration.Messaging;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration.Processing;
@@ -91,16 +92,29 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
         
         var moduleDeclaration = references.InfrastructureAssembly.GetFirstImplementationOfType(references.DeclaredModuleInterface.Value);
         services.AddScoped(moduleDeclaration.Interface,moduleDeclaration.Implementation);
-        
+
+        DateTime startTime = DateTime.UtcNow;
         services.AddLogging(e =>
         {
             e.ClearProviders();
-            e.AddConsole(options =>
+            e.AddProvider(new ModuleLoggerProvider(this.GetModuleName()));
+            e.AddFilter((category, level) =>
             {
-                options.FormatterName = nameof(SharedLogFormatter);
+                if (DateTime.UtcNow - startTime < TimeSpan.FromSeconds(2))
+                {
+                    if (category != null && category.StartsWith("Microsoft.EntityFrameworkCore"))
+                    {
+                        return false;
+                    }
+                }
 
-            }).AddConsoleFormatter<SharedLogFormatter, ConsoleFormatterOptions>();
+                if (level < LogLevel.Information)
+                    return false;
+
+                return true;
+            });
         });
+        
         
         var declaredHandlers = references.ApplicationAssembly.GetImplementationsOfOpenGeneric(typeof(IIntegrationEventHandler<>));
         var inboxMap = new BiDictionary<Type, string>();
@@ -118,6 +132,21 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
         
         services.AddSingleton(eventBus);
         services.AddSingleton(references.CompositionRoot);
+
+        services.AddLogging(e =>
+        {
+            e.ClearProviders();
+            e.AddProvider(new ModuleLoggerProvider(this.GetModuleName()));
+        });
+
+        // services.AddLogging(e =>
+        // {
+        //     e.ClearProviders();
+        //     e.AddConsole(options =>
+        //     {
+        //         options.FormatterName = nameof(SharedLogFormatter);
+        //     }).AddConsoleFormatter<SharedLogFormatter, ConsoleFormatterOptions>();
+        // });
         
         SetServiceProvider(services.BuildServiceProvider());
 

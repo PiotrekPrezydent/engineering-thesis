@@ -1,6 +1,7 @@
 using Dara.Server.Modules.Groups.Application;
 using Dara.Server.Modules.Groups.Application.Groups.CreateGroup;
 using Dara.Server.Modules.Groups.Application.Groups.JoinToGroup;
+using Dara.Server.Modules.Groups.Application.Messages.SendGroupMessage;
 using Dara.Server.Modules.Identity.Application;
 using Dara.Server.Modules.Identity.Application.CreateUser;
 using Dara.Server.Modules.Plugins.Application;
@@ -55,9 +56,9 @@ public class StartupService : IHostedLifecycleService
         await SetupProfileAsync(user4, "Room-101-Computer-01");
         await SetupProfileAsync(user5, "Room-101-Computer-02");
         
-        await SetupGroupAsync(user1, "group-1","group-1-jc", user2,user3,user4,user5);
-        await SetupGroupAsync(user2, "group-2","group-2-jc", user3,user4,user5);
-        await SetupGroupAsync(user3, "group-3","group-3-jc", user4,user5);
+        var group1 = await SetupGroupAsync(user1, "group-1","group-1-jc", user2,user3,user4,user5);
+        var group2 = await SetupGroupAsync(user2, "group-2","group-2-jc", user3,user4,user5);
+        var group3 = await SetupGroupAsync(user3, "group-3","group-3-jc", user4,user5);
 
         await SetupPluginsAsync(user1,
             SamplePlugins.CameraPlugin(),
@@ -88,10 +89,13 @@ public class StartupService : IHostedLifecycleService
             SamplePlugins.DisplayPlugin(),
             SamplePlugins.NotificationsPlugin(),
             SamplePlugins.SystemControlPlugin());
-            
+
         
-        await _logModulesDataService.LogDataAsync();
-       
+        //wait for pending inbox/outbox messagess to process
+        await Task.Delay(TimeSpan.FromSeconds(2));
+        
+        //await _logModulesDataService.LogDataAsync();
+
     }
     
     public Task StoppingAsync(CancellationToken cancellationToken) => Task.CompletedTask;
@@ -103,13 +107,15 @@ public class StartupService : IHostedLifecycleService
         await _profilesModule.ExecuteCommandAsync(new ChangeProfileNameCommand(profileId, profileName));
     }
     
-    async Task SetupGroupAsync(Guid creatorId, string name,string joinCode, params Guid[] membersIds)
+    async Task<Guid> SetupGroupAsync(Guid creatorId, string name,string joinCode, params Guid[] membersIds)
     {
         var group = await _groupsModule.ExecuteCommandAsync<CreateGroupCommand, Guid>(new CreateGroupCommand(creatorId,name,joinCode));
         foreach (var memberId in membersIds)
         {
             await _groupsModule.ExecuteCommandAsync(new JoinToGroupCommand(group, memberId, joinCode));
         }
+
+        return group;
     }
 
     async Task SetupPluginsAsync(Guid ownerId, params PluginDescriptor[] plugins)

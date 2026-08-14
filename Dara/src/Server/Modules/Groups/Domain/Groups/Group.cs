@@ -31,7 +31,6 @@ public class Group : Entity, IAggregateRoot
         _members = new List<GroupMember> { GroupMember.Create(creatorId, Id) };
         
         AddDomainEvent(new GroupCreatedDomainEvent(Id, CreatorId));
-        AddDomainEvent(new NewMemberJoinedGroupDomainEvent(Id, CreatorId));
     }
 
     public static Group Create(MemberId creatorId, string name, string joinCode)

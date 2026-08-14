@@ -5,7 +5,7 @@ namespace Dara.Shared.Logging;
 public static partial class SharedLogMessages
 {
     [LoggerMessage(
-        LogLevel.Debug,
+        LogLevel.Information,
         EventName = "MethodCall",
         EventId = SharedLogsIdsRanges.SharedStart + 1,
         Message = "Called method: {methodName} with parameters: {parameters}")]

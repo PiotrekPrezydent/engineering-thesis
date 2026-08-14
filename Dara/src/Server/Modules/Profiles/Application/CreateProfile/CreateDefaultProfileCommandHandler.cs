@@ -14,7 +14,6 @@ public class CreateDefaultProfileCommandHandler : ICommandHandler<CreateDefaultP
 
     public async Task HandleAsync(CreateDefaultProfileCommand command)
     {
-        Console.WriteLine("CREATE PRO");
         var profile = Profile.CreateDefault(new(command.ProfileId));
         await _profileRepository.AddAsync(profile);
     }

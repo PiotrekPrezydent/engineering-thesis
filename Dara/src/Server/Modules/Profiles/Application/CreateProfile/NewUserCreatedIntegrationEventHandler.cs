@@ -16,7 +16,6 @@ public class NewUserCreatedIntegrationEventHandler : IIntegrationEventHandler<Ne
 
     public async Task HandleAsync(NewUserCreatedIntegrationEvent integrationEvent)
     {
-        Console.WriteLine("HANDL PRO");
         await _commandExecutor.ExecuteAsync(new CreateDefaultProfileCommand(integrationEvent.CreatedUserId));
     }
 }

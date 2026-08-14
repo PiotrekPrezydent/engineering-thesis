@@ -14,13 +14,23 @@ public class Function : Entity
     public string ReturnTypeName { get; private set; }
     
     public IReadOnlyList<FunctionParameter> Parameters { get; private set; }
-    
-    public Function(FunctionId id, string name, string description, string returnTypeName, IReadOnlyList<FunctionParameter> parameters)
+
+    private Function()
+    {
+    }
+
+    private Function(FunctionId id, string name, string description, string returnTypeName, IReadOnlyList<FunctionParameter> parameters)
     {
         Id = id;
         Name = name;
         Description = description;
         ReturnTypeName = returnTypeName;
         Parameters = parameters;
+    }
+
+    internal static Function Create(FunctionId id, string name, string description, string returnTypeName,
+        IReadOnlyList<FunctionParameter> parameters)
+    {
+        return new Function(id, name, description, returnTypeName, parameters);
     }
 }

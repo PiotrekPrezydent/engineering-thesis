@@ -10,6 +10,7 @@
       <ProjectReference Include="..\..\..\BuildingBlocks\Application\Dara.Server.BuildingBlocks.Application.csproj" />
       <ProjectReference Include="..\..\Groups\Integration\Dara.Server.Modules.Groups.Integration.csproj" />
       <ProjectReference Include="..\..\Identity\Integration\Dara.Server.Modules.Identity.Integration.csproj" />
+      <ProjectReference Include="..\..\Plugins\Integration\Dara.Server.Modules.Plugins.Integration.csproj" />
       <ProjectReference Include="..\..\Profiles\Integration\Dara.Server.Modules.Profiles.Integration.csproj" />
       <ProjectReference Include="..\Domain\Dara.Server.Modules.Orchestration.Domain.csproj" />
     </ItemGroup>

@@ -1,3 +1,6 @@
+using System.CodeDom.Compiler;
+using System.Collections.Concurrent;
+using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Logging.Console;
@@ -6,13 +9,32 @@ namespace Dara.Shared.Logging;
 
 public class SharedLogFormatter : ConsoleFormatter
 {
-    public SharedLogFormatter(string name = "SharedLogFormatter" ) : base(name) { }
+    public SharedLogFormatter(string name = "SharedLogFormatter") : base(name)
+    {
+        _timer = new Timer(Flush, null, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(5));
+    }
 
     protected static Dictionary<(int Start, int End), string> _eventTypes = new()
     {
         [(SharedLogsIdsRanges.DotnetStart, SharedLogsIdsRanges.DotnetEnd)] = "DOTNET",
         [(SharedLogsIdsRanges.SharedStart,  SharedLogsIdsRanges.SharedEnd)] = "SHARED",
     };
+    private readonly Timer _timer;
+    private readonly ConcurrentQueue<string> _queue = new();
+    
+    private void Flush(object? state)
+    {
+        if (_queue.IsEmpty) return;
+        
+        var sb = new StringBuilder();
+        
+        while (_queue.TryDequeue(out var logMessage))
+        {
+            sb.Append(logMessage);
+        }
+        
+        Console.Write(sb.ToString());
+    }
     
     public override void Write<TState>(in LogEntry<TState> logEntry, IExternalScopeProvider? scopeProvider, TextWriter textWriter)
     {
@@ -23,6 +45,7 @@ public class SharedLogFormatter : ConsoleFormatter
         string timeColor = AnsiColors.Cyan;
         string categoryColor = AnsiColors.Yellow;
         string logLevelColor = GetLogLevelColor(logEntry.LogLevel);
+        
         
         string fullClassName = logEntry.Category;
         string logCategory = GetEventTypeById(logEntry.EventId.Id);
@@ -46,6 +69,7 @@ public class SharedLogFormatter : ConsoleFormatter
         
         textWriter.WriteLine($"{AnsiColors.Red}{logEntry.Exception.GetType().Name}: {logEntry.Exception.Message}");
         textWriter.WriteLine(logEntry.Exception.StackTrace + AnsiColors.Reset);
+
     }
 
     public static void AddEventTypeRange(int startRange, int endRange, string name)
