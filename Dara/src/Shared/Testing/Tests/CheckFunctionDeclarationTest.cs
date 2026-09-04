@@ -12,8 +12,8 @@ public class CheckFunctionDeclarationTest : ITest
         var funcs = new List<AIFunction>
         {
             AIFunctionFactory.Create(M1),
-            AIFunctionFactory.Create(M2),
-            AIFunctionFactory.Create(M3)
+            //AIFunctionFactory.Create(M2),
+            //AIFunctionFactory.Create(M3)
         };
 
         foreach (var func in funcs)
@@ -22,10 +22,20 @@ public class CheckFunctionDeclarationTest : ITest
         }
     }
 
+    private int a;
+    public int B;
+    public int C  { get; set; }
 
-    public void M1()
+    MyEnum[] M1(CheckFunctionDeclarationTest dd = default)
     {
-        
+        return Array.Empty<MyEnum>();
+    }
+
+    enum MyEnum
+    {
+        Value1,
+        Value2,
+        Value3
     }
 
     public void M2(string[] args)

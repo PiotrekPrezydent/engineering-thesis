@@ -17,13 +17,5 @@ public class PluginOwnerEntityTypeConfiguration : IEntityTypeConfiguration<Plugi
             .HasConversion(
                 id => id.Value, 
                 value => new PluginOwnerId(value));
-
-        builder.HasMany(x => x.Plugins)
-            .WithOne(x => x.Owner)
-            .HasForeignKey(x => x.OwnerId)
-            .OnDelete(DeleteBehavior.Cascade);
-        
-        builder.Navigation(x => x.Plugins)
-            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

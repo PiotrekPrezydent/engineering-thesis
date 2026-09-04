@@ -15,4 +15,8 @@
       <ProjectReference Include="..\Domain\Dara.Server.Modules.Orchestration.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="AgentRuns\CreateAgentRun\" />
+    </ItemGroup>
+
 </Project>

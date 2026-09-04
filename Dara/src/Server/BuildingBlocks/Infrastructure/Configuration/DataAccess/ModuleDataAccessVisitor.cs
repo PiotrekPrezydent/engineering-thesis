@@ -41,7 +41,7 @@ public class ModuleDataAccessVisitor : IVisitor<ModuleDataAccessConfiguration>
         
     }
     
-    public class DbContextRegistrator(IServiceCollection services) : IKeyedTypeAction<DbContext>
+    public class DbContextRegistrator(IServiceCollection services) : ITypeKeyAction<DbContext>
     {
         public void Execute<TType>(ITypeKey<DbContext> typeKey) where TType : DbContext
         {

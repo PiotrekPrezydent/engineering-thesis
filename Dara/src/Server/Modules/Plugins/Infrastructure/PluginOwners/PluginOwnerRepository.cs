@@ -19,6 +19,6 @@ public class PluginOwnerRepository : IPluginOwnerRepository
 
     public async Task<PluginOwner> GetByIdAsync(PluginOwnerId pluginOwnerId)
     {
-        return await _context.PluginOwners.Include(p=>p.Plugins).FirstAsync(e=>e.Id == pluginOwnerId);
+        return await _context.PluginOwners.FirstAsync(e=>e.Id == pluginOwnerId);
     }
 }

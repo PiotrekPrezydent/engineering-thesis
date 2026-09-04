@@ -5,7 +5,6 @@ using Dara.Server.Modules.Groups.Application.Groups.GetGroupDetails;
 using Dara.Server.Modules.Identity.Application;
 using Dara.Server.Modules.Identity.Application.GetUser;
 using Dara.Server.Modules.Plugins.Application;
-using Dara.Server.Modules.Plugins.Application.GetPlugins;
 using Dara.Server.Modules.Profiles.Application;
 using Dara.Server.Modules.Profiles.Application.GetProfile;
 
@@ -39,30 +38,30 @@ public class LogModulesDataService
         foreach (var user in users)
         {
             var profile = await _profilesModule.ExecuteQueryAsync<GetProfileQuery,ProfileDto>(new GetProfileQuery(user.userId));
-            var plugins = await _pluginsModule.ExecuteQueryAsync<GetPluginsQuery,List<PluginDto>>(new GetPluginsQuery(user.userId));
+            //var plugins = await _pluginsModule.ExecuteQueryAsync<GetPluginsQuery,List<PluginDto>>(new GetPluginsQuery(user.userId));
             userDetails.Add(user.userId, ("IDENTIFIER: " + user.userIdentifier, "PROFILE-NAME: " + profile.Name));
             
             sb.AppendLine($"ID : {user.userId}");
             sb.AppendLine($"IDENTIFIER : {user.userIdentifier}");
             sb.AppendLine($"PROFILE-NAME : {profile.Name}");
-            sb.AppendLine($"PLUGINS : {plugins.Count}");
-            foreach (var plugin in plugins)
-            {
-                sb.AppendLine();
-                sb.AppendLine($"PLUGIN NAME : {plugin.PluginData.Name} DESCRIPTION : {plugin.PluginData.Description} FUNCTIONS : {plugin.Functions.Count}");
-                foreach (var function in plugin.Functions)
-                {
-                    sb.AppendLine($"\tFUNCTION NAME: {function.FunctionData.Name} --- DESCRIPTION: {function.FunctionData.Description} --- RETURN TYPE: {function.FunctionData.ReturnTypeName}");
-                    foreach (var parameter in function.Parameters)
-                    {
-                        sb.AppendLine(
-                            $"\t\tPARAMETER NAME: {parameter.ParameterData.Name} --- DESCRIPTION: {parameter.ParameterData.Description} --- TYPE: {parameter.ParameterData.TypeName}");
-                    }
-                    sb.AppendLine();
-                }
-
-                sb.AppendLine();
-            }
+            //sb.AppendLine($"PLUGINS : {plugins.Count}");
+            // foreach (var plugin in plugins)
+            // {
+            //     sb.AppendLine();
+            //     sb.AppendLine($"PLUGIN NAME : {plugin.PluginData.Name} DESCRIPTION : {plugin.PluginData.Description} FUNCTIONS : {plugin.Functions.Count}");
+            //     foreach (var function in plugin.Functions)
+            //     {
+            //         sb.AppendLine($"\tFUNCTION NAME: {function.FunctionData.Name} --- DESCRIPTION: {function.FunctionData.Description} --- RETURN TYPE: {function.FunctionData.ReturnTypeName}");
+            //         foreach (var parameter in function.Parameters)
+            //         {
+            //             sb.AppendLine(
+            //                 $"\t\tPARAMETER NAME: {parameter.ParameterData.Name} --- DESCRIPTION: {parameter.ParameterData.Description} --- TYPE: {parameter.ParameterData.TypeName}");
+            //         }
+            //         sb.AppendLine();
+            //     }
+            //
+            //     sb.AppendLine();
+            // }
             sb.AppendLine();
             sb.AppendLine();
         }

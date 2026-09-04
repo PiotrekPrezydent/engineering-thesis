@@ -7,10 +7,10 @@ public interface ITypeKey<out T> where T : class
     public static ITypeKey<T> Instance { get; } = new TypeKey<T>();
     public Type Value => typeof(T);
     
-    public void ExecuteGenericAction(IKeyedTypeAction<T> action)
+    public void ExecuteGenericAction(ITypeKeyAction<T> keyAction)
     {
         
-        action.Execute<T>(this);
+        keyAction.Execute<T>(this);
     }
 }
 public class TypeKey<T> : ITypeKey<T> where T : class;

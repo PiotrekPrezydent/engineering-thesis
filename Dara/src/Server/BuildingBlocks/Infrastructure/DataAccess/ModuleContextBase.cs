@@ -18,11 +18,11 @@ public class ModuleContextBase : DbContext, IReadModel
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
         base.ConfigureConventions(configurationBuilder);
-        
+
         var name = GetType().Assembly.GetName().Name!;
         var dotIndex = name.LastIndexOf('.');
         var domainAssembly = AppDomain.CurrentDomain.Load(name.Substring(0, dotIndex+1)+"Domain");
-        
+
         var typedIdTypes = domainAssembly.GetTypes()
             .Where(t => t.IsSubclassOf(typeof(BaseEntityId)) && !t.IsAbstract);
         foreach (var type in typedIdTypes)
@@ -30,7 +30,7 @@ public class ModuleContextBase : DbContext, IReadModel
             var converterType = typeof(StronglyTypedIdConverter<>).MakeGenericType(type);
             configurationBuilder.Properties(type).HaveConversion(converterType);
         }
-   
+
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

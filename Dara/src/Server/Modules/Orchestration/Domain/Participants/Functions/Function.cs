@@ -9,7 +9,7 @@ public class Function : Entity
     public Participant Participant { get; private set; }
     public ParticipantId ParticipantId { get; private set; }
     
-    public string Name { get => Participant.Name + "_" + field; private set; }
+    public string Name { get; private set; }
     public string Description { get; private set; }
     public string ReturnTypeName { get; private set; }
     
@@ -32,5 +32,10 @@ public class Function : Entity
         IReadOnlyList<FunctionParameter> parameters)
     {
         return new Function(id, name, description, returnTypeName, parameters);
+    }
+
+    internal FunctionSnapshot ToSnapshot()
+    {
+        return new FunctionSnapshot(Id.Value, ParticipantId.Value,  Name, Description, ReturnTypeName, Parameters);
     }
 }

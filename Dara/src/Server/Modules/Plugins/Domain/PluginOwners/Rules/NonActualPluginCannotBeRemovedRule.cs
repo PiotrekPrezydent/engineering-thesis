@@ -1,5 +1,5 @@
 using Dara.Server.BuildingBlocks.Domain;
-using Dara.Server.Modules.Plugins.Domain.PluginOwners.Plugins;
+using Dara.Server.Modules.Plugins.Domain.Plugins;
 
 namespace Dara.Server.Modules.Plugins.Domain.PluginOwners.Rules;
 

@@ -199,7 +199,7 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
             
             var eventTypeKey = Activator.CreateInstance(typeof(TypeKey<>).MakeGenericType(eventType)) as ITypeKey<IIntegrationEvent>;
             
-            eventTypeKey!.ExecuteGenericAction(new IntegrationEventRegistrator(references.CompositionRoot,eventBus));
+            eventTypeKey!.ExecuteGenericAction(new InboxWriterIntegrationEventRegistrator(references.CompositionRoot,eventBus));
         }
         
         services.AddSingleton<IInboxMessagesTypeMapper>(new InboxMessagesTypeMapper(inboxMap));
@@ -220,7 +220,7 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
         rootServices.AddSingleton<IHostedService>(_ => _services.GetRequiredService<InboxBackgroundWorker>());
     }
 
-    class IntegrationEventRegistrator(IModuleCompositionRoot compositionRoot, IEventBus eventBus) : IKeyedTypeAction<IIntegrationEvent>
+    class InboxWriterIntegrationEventRegistrator(IModuleCompositionRoot compositionRoot, IEventBus eventBus) : ITypeKeyAction<IIntegrationEvent>
     {
         public void Execute<TType>(ITypeKey<IIntegrationEvent> typeKey) where TType : IIntegrationEvent
         {

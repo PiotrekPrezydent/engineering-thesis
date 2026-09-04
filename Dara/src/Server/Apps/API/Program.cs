@@ -1,23 +1,22 @@
+using System.Collections.Immutable;
+using System.Reflection;
 using System.Threading.Channels;
 using Dara.Server.Apps.API.Authentication;
 using Dara.Server.Apps.API.Hubs;
-using Dara.Server.Apps.API.Notifications;
 using Dara.Server.Apps.API.Processing;
 using Dara.Server.Apps.API.Services;
+using Dara.Server.BuildingBlocks.Infrastructure.Common.Extensions;
+using Dara.Server.BuildingBlocks.Infrastructure.Common.Types;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.EventBus;
 using Dara.Server.BuildingBlocks.Integration;
 using Dara.Server.Modules.Groups.Infrastructure;
-using Dara.Server.Modules.Groups.Integration;
 using Dara.Server.Modules.Identity.Infrastructure;
 using Dara.Server.Modules.Orchestration.Infrastructure;
 using Dara.Server.Modules.Plugins.Infrastructure;
 using Dara.Server.Modules.Profiles.Infrastructure;
-using Dara.Server.Modules.Profiles.Integration;
 using Dara.Shared.Contracts;
-using Dara.Shared.Logging;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Logging.Console;
 
 namespace Dara.Server.Apps.API;
 
@@ -27,28 +26,23 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
         
-        builder.Logging
-            .ClearProviders()
-            .AddConsole(options =>
-            {
-                //options.FormatterName = nameof(SharedLogFormatter);
-            });
-        
-        //builder.Logging.AddConsoleFormatter<SharedLogFormatter, ConsoleFormatterOptions>();
-        
         builder.Services.AddMemoryCache();
         
-        builder.Services
-            .AddSignalR(options =>
-            {
-                options.AddFilter<AppHubFilter>();
-            });
+        builder.Services.AddSignalR(options => 
+        { 
+            options.AddFilter<AppHubFilter>();
+        });
         
-        builder.Services
-            .AddAuthentication(options =>
-            {
-                options.AddScheme<ClientIdentifierAuthHandler>(nameof(ClientIdentifierAuthHandler),null);
-            });
+        builder.Services.AddAuthentication(options =>
+        {
+            options.AddScheme<ClientIdentifierAuthHandler>(nameof(ClientIdentifierAuthHandler),null);
+        });
+        
+        AddNotificationHandlersInAssembly(builder.Services, Assembly.GetExecutingAssembly());
+        
+        builder.Services.AddScoped<LogModulesDataService>();
+        builder.Services.AddHostedService<StartupSeedService>();
+        builder.Services.AddHostedService<HubNotificationsProcessor>();
         
         var modulesRoots = new IModuleCompositionRoot[]
         {
@@ -59,63 +53,52 @@ public class Program
             new OrchestrationCompositionRoot()
         };
         
-        
         foreach (var module in modulesRoots)
             module.Initialize(builder.Services, InMemoryEventBus.Instance);
         
-        builder.Services.AddScoped<LogModulesDataService>();
-        builder.Services.AddHostedService<StartupService>();
-        
-        builder.Services.AddScoped<IHubNotificationHandler<ProfileNameChangedIntegrationEvent>,NotifyProfileNameChangedHandler>();
-        builder.Services.AddScoped<IHubNotificationHandler<NewGroupCreatedIntegrationEvent>,NotifyGroupCreatedHandler>();
-        builder.Services.AddScoped<IHubNotificationHandler<MemberJoinedGroupIntegrationEvent>,NotifyNewMemberJoinedGroupHandler>();
-        builder.Services.AddScoped<IHubNotificationHandler<MemberLeftGroupIntegrationEvent>,NotifyMemberLeftGroupHandler>();
-        builder.Services.AddScoped<IHubNotificationHandler<GroupMessageAddedIntegrationEvent>,NotifyNewGroupMessageCreatedHandler>();
-        
-        builder.Services.AddSingleton(Channel.CreateUnbounded<IIntegrationEvent>());
-        builder.Services.AddHostedService<HubNotificationsProcessor>();
-        
         var app = builder.Build();
-        
-        var channel = app.Services.GetRequiredService<Channel<IIntegrationEvent>>();
-        
-        InMemoryEventBus.Instance.Subscribe(new ChannelWriterIntegrationEventHandler<ProfileNameChangedIntegrationEvent>(channel));
-        InMemoryEventBus.Instance.Subscribe(new ChannelWriterIntegrationEventHandler<MemberJoinedGroupIntegrationEvent>(channel));
-        InMemoryEventBus.Instance.Subscribe(new ChannelWriterIntegrationEventHandler<MemberLeftGroupIntegrationEvent>(channel));
-        InMemoryEventBus.Instance.Subscribe(new ChannelWriterIntegrationEventHandler<NewGroupCreatedIntegrationEvent>(channel));
-        InMemoryEventBus.Instance.Subscribe(new ChannelWriterIntegrationEventHandler<GroupMessageAddedIntegrationEvent>(channel));
         
         app.UseAuthentication();
         app.UseAuthorization();
-        
-        // using (var scope = app.Services.CreateScope())
+        // await app.StartAsync();
+        // await Task.Delay(TimeSpan.FromSeconds(5));
+        // foreach (var modulesRoot in modulesRoots)
         // {
-        //     app.Start();
-        //     var test = scope.ServiceProvider.GetRequiredService<TestModules>();
-        //     await test.Start();
-        //
-        //     //await Task.Delay(200000);
+        //    var cast = (ModuleCompositionRootBase)modulesRoot;
+        //    cast.LogBenchmark();
+        //    
         // }
-        
-        // using (var scope = app.Services.CreateScope())
-        // {
-        //     await app.StartAsync();
-        //     var logger = scope.ServiceProvider.GetRequiredService<LogMockData>();
-        //     await logger.LogDataAsync();
-        //     await app.StopAsync();
-        // }
-
-        await app.StartAsync();
-        await Task.Delay(TimeSpan.FromSeconds(5));
-        foreach (var modulesRoot in modulesRoots)
-        {
-           var cast = (ModuleCompositionRootBase)modulesRoot;
-           cast.LogBenchmark();
-        }
-
-        await app.StopAsync();
+        // await app.StopAsync();
         
         app.MapHub<AppHub>(Connections.HubName);
         app.Run();
+    }
+
+    static void AddNotificationHandlersInAssembly(IServiceCollection services, Assembly assembly)
+    {
+        var channel = Channel.CreateUnbounded<IIntegrationEvent>();
+        services.AddSingleton(channel);
+        services.AddSingleton<IEventBus>(InMemoryEventBus.Instance);
+        
+        var handlers = assembly.GetImplementationsOfOpenGeneric(typeof(IHubNotificationHandler<>));
+        
+        foreach (var handler in handlers)
+        {
+            var eventType = handler.Interface.GenericTypeArguments[0];
+            var eventTypeKey = Activator.CreateInstance(typeof(TypeKey<>).MakeGenericType(eventType)) as ITypeKey<IIntegrationEvent>;
+            
+            services.AddScoped(handler.Interface, handler.Implementation);
+            
+            eventTypeKey!.ExecuteGenericAction(new ChannelWriterIntegrationEventRegistrator(channel, InMemoryEventBus.Instance));
+        }
+    }
+    
+    class ChannelWriterIntegrationEventRegistrator(Channel<IIntegrationEvent> channel, IEventBus eventBus) : ITypeKeyAction<IIntegrationEvent>
+    {
+        public void Execute<TType>(ITypeKey<IIntegrationEvent> typeKey) where TType : IIntegrationEvent
+        {
+            var handler = new ChannelWriterIntegrationEventHandler<TType>(channel);
+            eventBus.Subscribe(handler);
+        }
     }
 }

@@ -9,7 +9,7 @@ public class InboxMessageEntityTypeConfiguration : IEntityTypeConfiguration<Inbo
     public void Configure(EntityTypeBuilder<InboxMessage> builder)
     {
         builder.ToTable(nameof(InboxMessage)+"s");
-        
+
         builder.HasKey(x => x.Id);
         builder.Property(x=>x.Id).ValueGeneratedNever();
     }

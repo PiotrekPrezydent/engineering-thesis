@@ -7,6 +7,12 @@
     <ProjectReference Include="..\Domain\Dara.Server.Modules.Plugins.Domain.csproj" />
     <ProjectReference Include="..\Integration\Dara.Server.Modules.Plugins.Integration.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="PluginOwners\" />
+    <Folder Include="Plugins\GetAllPlugins\" />
+    <Folder Include="Plugins\RemovePlugin\" />
+  </ItemGroup>
   
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>

@@ -1,5 +1,4 @@
 using Dara.Server.BuildingBlocks.Domain;
-using Dara.Server.Modules.Orchestration.Domain.ParticipantGroups;
 using Dara.Server.Modules.Orchestration.Domain.Participants.Functions;
 
 namespace Dara.Server.Modules.Orchestration.Domain.Participants;
@@ -42,5 +41,18 @@ public class Participant : Entity, IAggregateRoot
     {
         var function = _functions.Single(f => f.Id == id);
         _functions.Remove(function);
+    }
+
+    public ParticipantSnapshot ToSnapshot()
+    {
+        return new ParticipantSnapshot(
+            Id.Value,
+            Name,
+            Functions.Select(e => e.ToSnapshot()).ToList());
+    }
+
+    public IReadOnlyList<FunctionSnapshot> FunctionSnapshots()
+    {
+       return Functions.Select(e => e.ToSnapshot()).ToList();
     }
 }
