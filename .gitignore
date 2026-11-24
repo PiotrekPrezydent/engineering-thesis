@@ -18,6 +18,16 @@
 *.cb2
 .*.lb
 
+# ide and os files
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.swp
+.DS_Store
+Thumbs.db
+
 ## Intermediate documents:
 *.dvi
 *.xdv
