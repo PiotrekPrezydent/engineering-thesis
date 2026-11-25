@@ -21,5 +21,16 @@ public interface IAppHubClient
 
     public Task OnGroupMessageReceived(GroupMessageReceivedNotification notification);
 
-    public Task OnPluginRegistered();
+    public Task OnPluginsRegistered(PluginsRegisteredNotification notification);
+
+    // agent run notifications go only to the author of the prompt
+    public Task OnAgentRunStarted(AgentRunStartedNotification notification);
+
+    public Task OnExecutionPlanCreated(ExecutionPlanCreatedNotification notification);
+
+    public Task OnExecutionPlanGenerationFailed(ExecutionPlanGenerationFailedNotification notification);
+
+    public Task OnExecutionPlanApproved(ExecutionPlanApprovedNotification notification);
+
+    public Task OnAgentRunRejected(AgentRunRejectedNotification notification);
 }

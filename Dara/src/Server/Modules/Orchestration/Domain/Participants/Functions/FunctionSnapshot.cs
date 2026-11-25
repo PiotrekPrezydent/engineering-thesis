@@ -1,3 +1,5 @@
+using Dara.Server.Modules.Orchestration.Domain.Participants.Functions.Descriptions;
+
 namespace Dara.Server.Modules.Orchestration.Domain.Participants.Functions;
 
-public record FunctionSnapshot(Guid FunctionId, Guid ParticipantId, string Name, string Description, string ReturnTypeName, IReadOnlyList<FunctionParameter> Parameters);
+public record FunctionSnapshot(Guid FunctionId, Guid PluginId, FunctionDescription Description);

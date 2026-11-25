@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>Dara.Server.SystemTests</RootNamespace>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="xunit.v3" Version="4.0.3" />
+        <!-- the client side of the client-server tests, the same packages as the cli -->
+        <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.5" />
+        <PackageReference Include="TypedSignalR.Client" Version="1.17.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="Xunit" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\Apps\API\Dara.Server.Apps.API.csproj" />
+        <ProjectReference Include="..\..\BuildingBlocks\Infrastructure\Dara.Server.BuildingBlocks.Infrastructure.csproj" />
+        <ProjectReference Include="..\..\Modules\Identity\Infrastructure\Dara.Server.Modules.Identity.Infrastructure.csproj" />
+        <ProjectReference Include="..\..\Modules\Profiles\Infrastructure\Dara.Server.Modules.Profiles.Infrastructure.csproj" />
+        <ProjectReference Include="..\..\Modules\Groups\Infrastructure\Dara.Server.Modules.Groups.Infrastructure.csproj" />
+        <ProjectReference Include="..\..\Modules\Plugins\Infrastructure\Dara.Server.Modules.Plugins.Infrastructure.csproj" />
+        <ProjectReference Include="..\..\Modules\Orchestration\Infrastructure\Dara.Server.Modules.Orchestration.Infrastructure.csproj" />
+        <ProjectReference Include="..\..\..\Shared\Contracts\Dara.Shared.Contracts.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <!-- the scripted model of the orchestration tests, shared without a reference to a test project -->
+        <Compile Include="..\..\Modules\Orchestration\Tests\IntegrationTests\Fakes\*.cs" LinkBase="Fakes" />
+    </ItemGroup>
+
+</Project>

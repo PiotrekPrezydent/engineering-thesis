@@ -15,7 +15,7 @@ public class CreateGroupCommandHandler : ICommandHandler<CreateGroupCommand>
 
     public async Task HandleAsync(CreateGroupCommand command)
     {
-        var group = Group.CreateDefault(new GroupId(command.GroupId), new ParticipantId(command.CreatorId));
+        var group = Group.CreateDefault(new GroupId(command.GroupId), new ParticipantId(command.OwnerId));
         await _repository.AddAsync(group);
     }
 }

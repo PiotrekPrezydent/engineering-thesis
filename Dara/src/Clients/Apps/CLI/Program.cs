@@ -1,6 +1,6 @@
-﻿using System.Collections.Immutable;
-using System.Text.Json;
-using Dara.Shared.Contracts;
+﻿using System.Text.Json;
+using Dara.Shared.Contracts.Functions;
+using Dara.Shared.Contracts.Plugins;
 using Dara.Shared.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -35,18 +35,21 @@ class Program
 
     static async Task TestPlugins()
     {
-        PluginData data = new(
+        PluginManifest data = new(
             "SomeName", 
             "SomeDesc", 
+            "1.0.0",
+            new string('0', 64),
             [
-                new PluginFunctionData("Fun1", "fun1desc", "rettype", 
+                new FunctionDescription("Fun1", "fun1desc",
                 [
-                    new PluginFunctionParameterData("parnam", "pardesc", "party"),
-                    new PluginFunctionParameterData("nm", "desc", "ttd")
-                ])
+                    new PropertyDescription("parnam", new TypeDescription(TypeKind.String, Description: "pardesc"), true),
+                    new PropertyDescription("nm", new TypeDescription(TypeKind.Integer, Default: "5"), false)
+                ],
+                new TypeDescription(TypeKind.String))
             ]);
         
-        var json = JsonSerializer.Serialize(data,typeof(PluginData));
+        var json = JsonSerializer.Serialize(data);
         Console.WriteLine(json);
         
         await Task.Delay(TimeSpan.FromSeconds(5));

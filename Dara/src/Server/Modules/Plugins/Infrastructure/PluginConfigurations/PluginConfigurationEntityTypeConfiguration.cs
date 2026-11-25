@@ -11,6 +11,17 @@ public class PluginConfigurationEntityTypeConfiguration : IEntityTypeConfigurati
     {
         builder.ToTable(PluginConfiguration.DbTableName);
         
-        builder.HasKey(p => p.Id); ;
+        builder.HasKey(p => p.Id);
+
+        // one configuration per plugin
+        builder.HasIndex(p => p.PluginId).IsUnique();
+
+        builder.HasMany(p => p.FunctionConfigurations)
+            .WithOne(f => f.PluginConfiguration)
+            .HasForeignKey(f => f.PluginConfigurationId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Navigation(p => p.FunctionConfigurations)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

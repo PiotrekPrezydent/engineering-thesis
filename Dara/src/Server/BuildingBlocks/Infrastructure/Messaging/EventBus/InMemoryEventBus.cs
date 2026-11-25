@@ -3,10 +3,9 @@ using Dara.Server.BuildingBlocks.Integration;
 
 namespace Dara.Server.BuildingBlocks.Infrastructure.Messaging.EventBus;
 
+// one bus per host, created by the host and passed to every module
 public class InMemoryEventBus : IEventBus
 {
-    public static InMemoryEventBus Instance { get; } = new InMemoryEventBus();
-    
     readonly IDictionary<Type, List<IIntegrationEventHandler>> _eventHandlers = new Dictionary<Type, List<IIntegrationEventHandler>>();
     
     public void Subscribe<TEvent>(IIntegrationEventHandler<TEvent> handler) where TEvent : IIntegrationEvent

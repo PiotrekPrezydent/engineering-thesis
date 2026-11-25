@@ -9,6 +9,12 @@
     <ItemGroup>
       <ProjectReference Include="..\..\..\BuildingBlocks\Infrastructure\Dara.Server.BuildingBlocks.Infrastructure.csproj" />
       <ProjectReference Include="..\Application\Dara.Server.Modules.Orchestration.Application.csproj" />
+      <ProjectReference Include="..\..\..\..\Shared\Contracts\Dara.Shared.Contracts.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Google.GenAI" Version="2.2.0" />
+      <PackageReference Include="Microsoft.Extensions.AI" Version="10.11.0" />
     </ItemGroup>
 
 </Project>

@@ -21,4 +21,9 @@ public class PluginOwnerRepository : IPluginOwnerRepository
     {
         return await _context.PluginOwners.FirstAsync(e=>e.Id == pluginOwnerId);
     }
+
+    public async Task<PluginOwner?> FindByIdAsync(PluginOwnerId pluginOwnerId)
+    {
+        return await _context.PluginOwners.FirstOrDefaultAsync(e => e.Id == pluginOwnerId);
+    }
 }

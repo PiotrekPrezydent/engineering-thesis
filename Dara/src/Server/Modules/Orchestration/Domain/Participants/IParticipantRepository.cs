@@ -7,4 +7,8 @@ public interface IParticipantRepository : IRepository
     public Task AddAsync(Participant participant);
     
     public Task<Participant> GetByIdAsync(ParticipantId id);
+
+    public Task<Participant?> FindByIdAsync(ParticipantId id);
+
+    public Task<IReadOnlyList<Participant>> GetByIdsAsync(IReadOnlyCollection<ParticipantId> ids);
 }

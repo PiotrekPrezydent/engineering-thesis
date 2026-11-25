@@ -1,28 +1,22 @@
 using Dara.Server.BuildingBlocks.Application.Events;
-using Dara.Server.BuildingBlocks.Infrastructure.DataAccess;
 using Dara.Server.Modules.Plugins.Domain.PluginConfigurations;
-using Dara.Server.Modules.Plugins.Domain.Plugins;
 using Dara.Server.Modules.Plugins.Domain.Plugins.Events;
-using Microsoft.EntityFrameworkCore;
 
-namespace Dara.Server.Modules.Plugins.Application.PluginConfigurations.CreatePluginConfiguration;
+namespace Dara.Server.Modules.Plugins.Application.PluginConfigurations;
 
+// runs before the plugin is saved, so it takes the function ids from the event instead of reading the plugin
 public class PluginAddedDomainEventHandler : IDomainEventHandler<PluginAddedDomainEvent>
 {
-    private readonly IReadModel _readModel;
     private readonly IPluginConfigurationRepository _pluginConfigurationRepository;
 
-    public PluginAddedDomainEventHandler(IReadModel readModel, IPluginConfigurationRepository pluginConfigurationRepository)
+    public PluginAddedDomainEventHandler(IPluginConfigurationRepository pluginConfigurationRepository)
     {
-        _readModel = readModel;
         _pluginConfigurationRepository = pluginConfigurationRepository;
     }
 
     public async Task HandleAsync(PluginAddedDomainEvent domainEvent)
     {
-        var plugin = await _readModel.Query<Plugin>().FirstAsync(e => e.Id.Match(domainEvent.PluginId));
-
-        var configuration = PluginConfiguration.Create(plugin.Id, plugin.Functions.Select(e => e.Id).ToList());
+        var configuration = PluginConfiguration.Create(domainEvent.PluginOwnerId, domainEvent.PluginId, domainEvent.FunctionIds);
         await _pluginConfigurationRepository.AddAsync(configuration);
     }
 }

@@ -45,7 +45,8 @@ public class ModuleLoggerProvider : ILoggerProvider
     const string ModuleColor = AnsiColors.Yellow;
     const string CategoryColor = AnsiColors.BrightMagenta;
 
-    private int maxTextSize => (int)(Console.WindowWidth * 0.6);
+    // redirected output (tests) has no console window to measure
+    private int maxTextSize => Console.IsOutputRedirected ? 200 : (int)(Console.WindowWidth * 0.6);
 
     public string InSquareBrackers(string text, string color) => $"{color}[{text}]{AnsiColors.Reset}";
     

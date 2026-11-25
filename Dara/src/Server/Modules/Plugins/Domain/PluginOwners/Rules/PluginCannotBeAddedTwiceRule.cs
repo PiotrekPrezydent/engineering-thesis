@@ -6,18 +6,18 @@ namespace Dara.Server.Modules.Plugins.Domain.PluginOwners.Rules;
 public class PluginCannotBeAddedTwiceRule : IBuisnessRule
 {
     private readonly IReadOnlyList<Plugin> _currentPlugins;
-    private readonly Plugin _pluginToAdd;
+    private readonly PluginHash _hash;
 
 
-    public PluginCannotBeAddedTwiceRule(IReadOnlyList<Plugin> currentPlugins, Plugin pluginToAdd)
+    public PluginCannotBeAddedTwiceRule(IReadOnlyList<Plugin> currentPlugins, PluginHash hash)
     {
         _currentPlugins = currentPlugins;
-        _pluginToAdd = pluginToAdd;
+        _hash = hash;
     }
 
-    public string Message => nameof(PluginCannotBeAddedTwiceRule);
+    public string Message => "Plugin with this hash is already added";
     public bool IsBroken()
     {
-        return _currentPlugins.Any(e=>e.Id == _pluginToAdd.Id);
+        return _currentPlugins.Any(e => e.Hash == _hash);
     }
 }

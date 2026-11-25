@@ -21,4 +21,14 @@ public class ParticipantRepository : IParticipantRepository
     {
         return await _context.Participants.Include(p=>p.Functions).FirstAsync(x => x.Id == id);
     }
+
+    public async Task<Participant?> FindByIdAsync(ParticipantId id)
+    {
+        return await _context.Participants.Include(p => p.Functions).FirstOrDefaultAsync(x => x.Id == id);
+    }
+
+    public async Task<IReadOnlyList<Participant>> GetByIdsAsync(IReadOnlyCollection<ParticipantId> ids)
+    {
+        return await _context.Participants.Include(p => p.Functions).Where(x => ids.Contains(x.Id)).ToListAsync();
+    }
 }

@@ -3,6 +3,7 @@ using Dara.Server.Modules.Orchestration.Domain.Participants.Functions;
 
 namespace Dara.Server.Modules.Orchestration.Domain.Participants;
 
+// a client with the plugin functions it can use now, projected from identity, profiles and plugins
 public class Participant : Entity, IAggregateRoot
 {
     public ParticipantId Id { get; private set; }
@@ -10,6 +11,10 @@ public class Participant : Entity, IAggregateRoot
     
     public IReadOnlyList<Function> Functions  => _functions.AsReadOnly();
     private List<Function> _functions;
+
+    // kept after a plugin is gone, so an older state that comes late changes nothing
+    public IReadOnlyList<PluginVersion> PluginVersions => _pluginVersions.AsReadOnly();
+    private List<PluginVersion> _pluginVersions;
 
     private Participant()
     {
@@ -20,6 +25,7 @@ public class Participant : Entity, IAggregateRoot
         Id = id;
         Name = name;
         _functions = new();
+        _pluginVersions = new();
     }
 
     public static Participant CreateDefault(ParticipantId id)
@@ -32,15 +38,28 @@ public class Participant : Entity, IAggregateRoot
         Name = name;
     }
 
-    public void AddFunction(FunctionId id, string name, string description, string returnTypeName, IReadOnlyList<FunctionParameter> parameters)
+    // only a newer state of the plugin replaces its functions, an empty list removes them
+    public bool ReplacePluginFunctions(PluginId pluginId, int version, IReadOnlyList<AvailableFunction> functions)
     {
-        _functions.Add(Function.Create(id, name, description, returnTypeName, parameters));
-    }
+        var applied = _pluginVersions.FirstOrDefault(v => v.PluginId == pluginId);
+        if (applied is not null && applied.Version >= version)
+            return false;
 
-    public void RemoveFunction(FunctionId id)
-    {
-        var function = _functions.Single(f => f.Id == id);
-        _functions.Remove(function);
+        var availableIds = functions.Select(f => f.Id).ToHashSet();
+        _functions.RemoveAll(f => f.PluginId == pluginId && !availableIds.Contains(f.Id));
+
+        // kept functions stay the same instances, ef cannot track a removed and an added row with one key
+        var keptIds = _functions.Select(f => f.Id).ToHashSet();
+        _functions.AddRange(functions
+            .Where(f => !keptIds.Contains(f.Id))
+            .Select(f => Function.Create(f.Id, Id, pluginId, f.Description)));
+
+        _pluginVersions = _pluginVersions
+            .Where(v => v.PluginId != pluginId)
+            .Append(new PluginVersion(pluginId, version))
+            .ToList();
+
+        return true;
     }
 
     public ParticipantSnapshot ToSnapshot()
@@ -49,10 +68,5 @@ public class Participant : Entity, IAggregateRoot
             Id.Value,
             Name,
             Functions.Select(e => e.ToSnapshot()).ToList());
-    }
-
-    public IReadOnlyList<FunctionSnapshot> FunctionSnapshots()
-    {
-       return Functions.Select(e => e.ToSnapshot()).ToList();
     }
 }

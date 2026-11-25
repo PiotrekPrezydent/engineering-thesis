@@ -7,14 +7,17 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
     <ItemGroup>
-        <None Include=".env">
+        <None Include=".env" Condition="Exists('.env')">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>
     <ItemGroup>
-      <PackageReference Include="Google.GenAI" Version="1.17.0" />
-      <PackageReference Include="Microsoft.Agents.AI" Version="1.17.0" />
-      <PackageReference Include="Microsoft.Agents.AI.Workflows" Version="1.17.0" />
-      <PackageReference Include="Microsoft.Extensions.AI" Version="10.8.3" />
+      <PackageReference Include="Google.GenAI" Version="2.2.0" />
+      <PackageReference Include="Microsoft.Agents.AI" Version="1.28.0" />
+      <PackageReference Include="Microsoft.Extensions.AI" Version="10.11.0" />
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\Common\Dara.Shared.Common.csproj" />
+      <ProjectReference Include="..\Contracts\Dara.Shared.Contracts.csproj" />
     </ItemGroup>
 </Project>

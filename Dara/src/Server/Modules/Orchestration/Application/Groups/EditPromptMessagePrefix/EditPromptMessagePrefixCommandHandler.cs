@@ -1,5 +1,6 @@
 using Dara.Server.BuildingBlocks.Application.Commands;
 using Dara.Server.Modules.Orchestration.Domain.Groups;
+using Dara.Server.Modules.Orchestration.Domain.Participants;
 
 namespace Dara.Server.Modules.Orchestration.Application.Groups.EditPromptMessagePrefix;
 
@@ -15,6 +16,6 @@ public class EditPromptMessagePrefixCommandHandler : ICommandHandler<EditPromptM
     public async Task HandleAsync(EditPromptMessagePrefixCommand command)
     {
         var group = await _repository.GetByIdAsync(new GroupId(command.GroupId));
-        group.EditPromptMessagePrefix(command.PromptMessagePrefix);
+        group.EditPromptMessagePrefix(new ParticipantId(command.RequesterId), command.PromptMessagePrefix);
     }
 }

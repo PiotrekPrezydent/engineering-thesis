@@ -1,10 +1,10 @@
 using Dara.Server.BuildingBlocks.Domain;
-using Dara.Server.Modules.Plugins.Domain.PluginConfigurations.Events;
 using Dara.Server.Modules.Plugins.Domain.PluginConfigurations.Rules;
 using Dara.Server.Modules.Plugins.Domain.Plugins;
 
 namespace Dara.Server.Modules.Plugins.Domain.PluginConfigurations;
 
+// events of a function change are raised by the configuration root
 public class PluginFunctionConfiguration : Entity
 {
     public PluginFunctionConfigurationId Id { get; private set; }
@@ -38,8 +38,6 @@ public class PluginFunctionConfiguration : Entity
         CheckRule(new OnlyNonActivePluginFunctionCanBeEnabledRule(IsEnabled));
         
         IsEnabled = true;
-        
-        AddDomainEvent(new PluginFunctionEnabledDomainEvent(FunctionId));
     }
 
     internal void Disable()
@@ -47,8 +45,6 @@ public class PluginFunctionConfiguration : Entity
         CheckRule(new OnlyActivePluginFunctionCanBeDisabledRule(IsEnabled));
         
         IsEnabled = false;
-        
-        AddDomainEvent(new PluginFunctionDisabledDomainEvent(FunctionId));
     }
  
 }

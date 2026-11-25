@@ -21,4 +21,9 @@ public class GroupRepository : IGroupRepository
     {
         return await _context.ParticipantGroups.FirstAsync(e=>e.Id == groupId);
     }
+
+    public async Task<Group?> FindByIdAsync(GroupId groupId)
+    {
+        return await _context.ParticipantGroups.FirstOrDefaultAsync(e => e.Id == groupId);
+    }
 }

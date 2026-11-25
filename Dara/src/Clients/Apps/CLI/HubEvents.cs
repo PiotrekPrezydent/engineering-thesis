@@ -46,8 +46,53 @@ public class HubEvents : IAppHubClient
         Console.WriteLine(notification);
     }
 
-    public async Task OnPluginRegistered()
+    public async Task OnPluginsRegistered(PluginsRegisteredNotification notification)
     {
-        Console.WriteLine(nameof(OnPluginRegistered));
+        Console.WriteLine(nameof(OnPluginsRegistered));
+        PrintPlugins(notification.Plugins);
+    }
+
+    public async Task OnAgentRunStarted(AgentRunStartedNotification notification)
+    {
+        Console.WriteLine(notification);
+    }
+
+    public async Task OnExecutionPlanCreated(ExecutionPlanCreatedNotification notification)
+    {
+        Console.WriteLine($"plan of agent run {notification.AgentRunId} in group {notification.GroupId}:");
+        PrintPlan(notification.AgentRunId, notification.Calls);
+    }
+
+    public async Task OnExecutionPlanGenerationFailed(ExecutionPlanGenerationFailedNotification notification)
+    {
+        Console.WriteLine(notification);
+    }
+
+    public async Task OnExecutionPlanApproved(ExecutionPlanApprovedNotification notification)
+    {
+        Console.WriteLine(notification);
+    }
+
+    public async Task OnAgentRunRejected(AgentRunRejectedNotification notification)
+    {
+        Console.WriteLine(notification);
+    }
+
+    public static void PrintPlugins(IReadOnlyList<PluginSnapshot> plugins)
+    {
+        foreach (var plugin in plugins)
+        {
+            Console.WriteLine($"plugin {plugin.PluginId} {plugin.Name} {plugin.Version} enabled: {plugin.IsEnabled}");
+            foreach (var function in plugin.Functions)
+                Console.WriteLine($"  function {function.FunctionId} {function.Description.Name} enabled: {function.IsEnabled}");
+        }
+    }
+
+    public static void PrintPlan(Guid agentRunId, IReadOnlyList<PlannedCallSnapshot> calls)
+    {
+        foreach (var call in calls)
+            Console.WriteLine($"  {call.Index}. {call.ParticipantName}.{call.FunctionName} {call.ArgumentsJson}");
+
+        Console.WriteLine($"approve: ap {agentRunId}, reject: rj {agentRunId}");
     }
 }

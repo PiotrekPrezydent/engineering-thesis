@@ -1,4 +1,5 @@
 using Dara.Server.BuildingBlocks.Infrastructure.DataAccess;
+using Dara.Server.Modules.Orchestration.Domain.AgentRuns;
 using Dara.Server.Modules.Orchestration.Domain.Groups;
 using Dara.Server.Modules.Orchestration.Domain.Participants;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ public class OrchestrationContext : ModuleContextBase
 {
     public DbSet<Participant> Participants { get; set; }
     public DbSet<Group> ParticipantGroups { get; set; }
+    public DbSet<AgentRun> AgentRuns { get; set; }
     
     public OrchestrationContext(DbContextOptions options) : base(options)
     {

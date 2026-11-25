@@ -14,6 +14,10 @@ public class CreateDefaultPluginOwnerCommandHandler : ICommandHandler<CreateDefa
 
     public async Task HandleAsync(CreateDefaultPluginOwnerCommand command)
     {
+        // the owner exists already when the client registered plugins before this event came
+        if (await _ownersRepository.FindByIdAsync(new(command.PluginOwnerId)) is not null)
+            return;
+
         var owner = PluginOwner.CreateDefault(new(command.PluginOwnerId));
         await _ownersRepository.AddAsync(owner);
     }

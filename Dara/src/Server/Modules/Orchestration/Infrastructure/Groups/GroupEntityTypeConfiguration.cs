@@ -39,6 +39,14 @@ public class GroupEntityTypeConfiguration : IEntityTypeConfiguration<Group>
             .HasConversion(participantListConverter)
             .Metadata.SetValueComparer(participantListComparer);
         
+        // settings in columns of the group table, the api key in a column of its own
+        builder.OwnsOne(x => x.AgentSettings, settings =>
+        {
+            settings.Property(s => s.PromptMessagePrefix).HasColumnName(nameof(GroupAgentSettings.PromptMessagePrefix));
+            settings.Property(s => s.ChatClientProviderName).HasColumnName(nameof(GroupAgentSettings.ChatClientProviderName));
+            settings.Property(s => s.ClientModelName).HasColumnName(nameof(GroupAgentSettings.ClientModelName));
+        });
 
+        builder.Navigation(x => x.AgentSettings).IsRequired();
     }
 }

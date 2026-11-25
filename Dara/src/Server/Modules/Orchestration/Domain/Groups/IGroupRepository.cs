@@ -7,4 +7,6 @@ public interface IGroupRepository : IRepository
     public Task AddAsync(Group group);
     
     public Task<Group> GetByIdAsync(GroupId groupId);
+
+    public Task<Group?> FindByIdAsync(GroupId groupId);
 }

@@ -43,11 +43,19 @@
     <Project Path="src/Server/Modules/Orchestration/Infrastructure/Dara.Server.Modules.Orchestration.Infrastructure.csproj" />
     <Project Path="src/Server/Modules/Orchestration/Integration/Dara.Server.Modules.Orchestration.Integration.csproj" />
   </Folder>
+  <Folder Name="/Server/Modules/Orchestration/Tests/">
+    <Project Path="src/Server/Modules/Orchestration/Tests/IntegrationTests/Dara.Server.Modules.Orchestration.IntegrationTests.csproj" />
+    <Project Path="src/Server/Modules/Orchestration/Tests/UnitTests/Dara.Server.Modules.Orchestration.UnitTests.csproj" />
+  </Folder>
   <Folder Name="/Server/Modules/Plugins/">
     <Project Path="src/Server/Modules/Plugins/Application/Dara.Server.Modules.Plugins.Application.csproj" />
     <Project Path="src/Server/Modules/Plugins/Domain/Dara.Server.Modules.Plugins.Domain.csproj" />
     <Project Path="src/Server/Modules/Plugins/Infrastructure/Dara.Server.Modules.Plugins.Infrastructure.csproj" />
     <Project Path="src/Server/Modules/Plugins/Integration/Dara.Server.Modules.Plugins.Integration.csproj" />
+  </Folder>
+  <Folder Name="/Server/Modules/Plugins/Tests/">
+    <Project Path="src/Server/Modules/Plugins/Tests/IntegrationTests/Dara.Server.Modules.Plugins.IntegrationTests.csproj" />
+    <Project Path="src/Server/Modules/Plugins/Tests/UnitTests/Dara.Server.Modules.Plugins.UnitTests.csproj" />
   </Folder>
   <Folder Name="/Server/Modules/Profiles/">
     <Project Path="src\Server\Modules\Profiles\Application\Dara.Server.Modules.Profiles.Application.csproj" />
@@ -56,6 +64,10 @@
     <Project Path="src\Server\Modules\Profiles\Integration\Dara.Server.Modules.Profiles.Integration.csproj" />
   </Folder>
   
+  <Folder Name="/Server/Tests/">
+    <Project Path="src/Server/Tests/SystemTests/Dara.Server.SystemTests.csproj" />
+  </Folder>
+
   <Folder Name="/Shared/">
     <Project Path="src/Shared/Common/Dara.Shared.Common.csproj" />
     <Project Path="src/Shared/Contracts/Dara.Shared.Contracts.csproj" />

@@ -45,9 +45,12 @@ public class ModuleDataAccessVisitor : IVisitor<ModuleDataAccessConfiguration>
     {
         public void Execute<TType>(ITypeKey<DbContext> typeKey) where TType : DbContext
         {
+            // a unique name, because in-memory databases of one name are shared by the process
+            var databaseName = $"{typeof(TType).Name}-{Guid.NewGuid():N}";
+
             services.AddDbContext<TType>(options =>
             {
-                options.UseInMemoryDatabase(typeof(TType).Name);
+                options.UseInMemoryDatabase(databaseName);
             });
             
             services.AddScoped<DbContext>(sp => sp.GetRequiredService<TType>());

@@ -18,9 +18,8 @@ public class FunctionEntityTypeConfiguration : IEntityTypeConfiguration<Function
                 id => id.Value, 
                 value => new FunctionId(value));
         
-        builder.OwnsMany(x => x.Parameters, parametersBuilder =>
-        {
-            parametersBuilder.ToJson();
-        });
+        // the description is recursive, owned json types cannot map it (no suitable constructor)
+        builder.Property(p => p.Parameters).HasJsonConversion();
+        builder.Property(p => p.Returns).HasJsonConversion();
     }
 }

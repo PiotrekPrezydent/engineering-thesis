@@ -1,5 +1,6 @@
 using Dara.Server.BuildingBlocks.Application.Commands;
 using Dara.Server.Modules.Orchestration.Domain.Groups;
+using Dara.Server.Modules.Orchestration.Domain.Participants;
 
 namespace Dara.Server.Modules.Orchestration.Application.Groups.EditApiKey;
 
@@ -15,6 +16,6 @@ public class EditApiKeyCommandHandler : ICommandHandler<EditApiKeyCommand>
     public async Task HandleAsync(EditApiKeyCommand command)
     {
         var group = await _repository.GetByIdAsync(new GroupId(command.GroupId));
-        group.EditApiKey(command.ApiKey);
+        group.EditApiKey(new ParticipantId(command.RequesterId), command.ApiKey);
     }
 }

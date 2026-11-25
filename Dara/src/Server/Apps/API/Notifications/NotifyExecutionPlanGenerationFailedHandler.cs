@@ -1,0 +1,25 @@
+using Dara.Server.Apps.API.Hubs;
+using Dara.Server.Apps.API.Processing;
+using Dara.Server.Modules.Orchestration.Integration;
+using Dara.Shared.Contracts;
+using Dara.Shared.Contracts.Notifications;
+using Microsoft.AspNetCore.SignalR;
+
+namespace Dara.Server.Apps.API.Notifications;
+
+public class NotifyExecutionPlanGenerationFailedHandler : IHubNotificationHandler<ExecutionPlanGenerationFailedIntegrationEvent>
+{
+    private readonly IHubContext<AppHub, IAppHubClient> _context;
+
+    public NotifyExecutionPlanGenerationFailedHandler(IHubContext<AppHub, IAppHubClient> context)
+    {
+        _context = context;
+    }
+
+    public async Task HandleAsync(ExecutionPlanGenerationFailedIntegrationEvent notification, CancellationToken cancellationToken)
+    {
+        var client = _context.Clients.User(notification.AuthorId.ToString());
+
+        await client.OnExecutionPlanGenerationFailed(new ExecutionPlanGenerationFailedNotification(notification.AgentRunId, notification.GroupId, notification.Reason));
+    }
+}

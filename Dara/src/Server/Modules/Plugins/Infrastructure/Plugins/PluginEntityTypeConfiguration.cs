@@ -18,6 +18,14 @@ public class PluginEntityTypeConfiguration : IEntityTypeConfiguration<Plugin>
                 id => id.Value, 
                 value => new PluginId(value));
         
+        builder.Property(p => p.Hash)
+            .HasConversion(
+                hash => hash.Value,
+                value => new PluginHash(value));
+
+        // the natural key of a plugin within its owner
+        builder.HasIndex(p => new { p.OwnerId, p.Hash }).IsUnique();
+
         builder.HasMany(x => x.Functions)
             .WithOne(x => x.Plugin)
             .HasForeignKey(x => x.PluginId)

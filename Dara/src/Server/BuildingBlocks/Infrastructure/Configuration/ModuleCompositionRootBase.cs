@@ -180,6 +180,8 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
         processing.Accept(processingVisitor);
         messaging.Accept(messagingVisitor);
         
+        ConfigureServices(services);
+        
         var moduleDeclaration = references.InfrastructureAssembly.GetFirstImplementationOfType(references.DeclaredModuleInterface.Value);
         services.AddScoped(moduleDeclaration.Interface,moduleDeclaration.Implementation);
         
@@ -214,7 +216,9 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
             OnServiceProviderCreated(scope.ServiceProvider);
         }
         
-        rootServices.AddScoped(moduleDeclaration.Interface , _ => _services.GetRequiredService(moduleDeclaration.Interface));
+        // one module scope per host scope, so host calls do not share a module DbContext
+        rootServices.AddKeyedScoped<IServiceScope>(this, (_, _) => CreateScope());
+        rootServices.AddScoped(moduleDeclaration.Interface, sp => sp.GetRequiredKeyedService<IServiceScope>(this).ServiceProvider.GetRequiredService(moduleDeclaration.Interface));
         
         rootServices.AddSingleton<IHostedService>(_ => _services.GetRequiredService<OutboxBackgroundWorker>());
         rootServices.AddSingleton<IHostedService>(_ => _services.GetRequiredService<InboxBackgroundWorker>());
@@ -230,6 +234,11 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
     }
 
     protected virtual void OnServiceProviderCreated(IServiceProvider serviceProvider)
+    {
+    }
+
+    // services of the module that the standard configuration does not register
+    protected virtual void ConfigureServices(IServiceCollection services)
     {
     }
 

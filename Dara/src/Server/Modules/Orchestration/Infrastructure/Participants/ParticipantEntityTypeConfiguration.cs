@@ -25,6 +25,9 @@ public class ParticipantEntityTypeConfiguration : IEntityTypeConfiguration<Parti
         builder.Navigation(x => x.Functions)
             .UsePropertyAccessMode(PropertyAccessMode.Field);
         
-        
+        builder.Property(x => x.PluginVersions)
+            .HasField("_pluginVersions")
+            .UsePropertyAccessMode(PropertyAccessMode.Field)
+            .HasJsonConversion();
     }
 }

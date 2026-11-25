@@ -8,6 +8,12 @@
     </PropertyGroup>
     
     <ItemGroup>
+        <None Include=".env" Condition="Exists('.env')">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
+    <ItemGroup>
         <PackageReference Include="Microsoft.AspNet.SignalR" Version="2.4.3" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.10" />
     </ItemGroup>
@@ -25,7 +31,9 @@
       <ProjectReference Include="..\..\Modules\Identity\Application\Dara.Server.Modules.Identity.Application.csproj" />
       <ProjectReference Include="..\..\Modules\Identity\Infrastructure\Dara.Server.Modules.Identity.Infrastructure.csproj" />
       <ProjectReference Include="..\..\Modules\Orchestration\Infrastructure\Dara.Server.Modules.Orchestration.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\Modules\Orchestration\Integration\Dara.Server.Modules.Orchestration.Integration.csproj" />
       <ProjectReference Include="..\..\Modules\Plugins\Infrastructure\Dara.Server.Modules.Plugins.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\Modules\Plugins\Integration\Dara.Server.Modules.Plugins.Integration.csproj" />
       <ProjectReference Include="..\..\Modules\Profiles\Infrastructure\Dara.Server.Modules.Profiles.Infrastructure.csproj" />
     </ItemGroup>
     

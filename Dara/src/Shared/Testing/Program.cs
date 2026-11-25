@@ -1,6 +1,6 @@
-﻿using Dara.Shared.Testing.Tests;
+﻿using Dara.Shared.Common.Configuration;
+using Dara.Shared.Testing.Tests;
 using Microsoft.Agents.AI;
-using Microsoft.Agents.AI.Workflows;
 using Microsoft.Extensions.AI;
 
 namespace Dara.Shared.Testing;
@@ -25,11 +25,13 @@ class Program
         [
             new CallFakeToolTest(),
             new CallCorrentUserToolTest(),
-            new CheckFunctionDeclarationTest()
+            new CheckFunctionDeclarationTest(),
+            // no api key needed
+            new CreateDeclarationFromContractTest()
         ];
         
         var apiSelection = apis[1];
-        var testSelection = tests[2];
+        var testSelection = tests[3];
         
         await testSelection.Run(apiSelection);
     }

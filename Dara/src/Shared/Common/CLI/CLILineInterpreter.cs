@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Text.RegularExpressions;
 using Dara.Shared.Common.Extensions;
 
 namespace Dara.Shared.Common.CLI;
@@ -28,7 +29,10 @@ public class CLILineInterpreter
     
     public async Task HandleAsync(string consoleLine)
     {
-        var split = consoleLine.Split(' ');
+        // words in double quotes stay one argument, e.g. a message with spaces
+        var split = Regex.Matches(consoleLine, "\"([^\"]*)\"|(\\S+)")
+            .Select(m => m.Groups[1].Success ? m.Groups[1].Value : m.Groups[2].Value)
+            .ToArray();
 
         string commandName = split[0];
         string[] commandArgs = split.Skip(1).ToArray();

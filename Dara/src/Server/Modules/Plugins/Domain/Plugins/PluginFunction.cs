@@ -1,4 +1,5 @@
 using Dara.Server.BuildingBlocks.Domain;
+using Dara.Server.Modules.Plugins.Domain.Plugins.Descriptions;
 
 namespace Dara.Server.Modules.Plugins.Domain.Plugins;
 
@@ -10,28 +11,33 @@ public class PluginFunction : Entity
     public PluginId PluginId { get; private set; }
     
     public string Name { get; private set; }
-    public string Description { get; private set; }
+    public string? Description { get; private set; }
+    
+    public IReadOnlyList<PropertyDescription> Parameters { get; private set; }
     
     // null represent void function
-    public TypeData? ReturnTypeData { get; private set; }
-    
-    public IReadOnlyList<FunctionParameterData> Parameters { get; private set; }
+    public TypeDescription? Returns { get; private set; }
 
     private PluginFunction() { }
 
-    private PluginFunction(string name, string description, TypeData? returnTypeData, IEnumerable<FunctionParameterData> parameters)
+    private PluginFunction(PluginId pluginId, FunctionDescription description)
     {
         Id = new PluginFunctionId(Guid.NewGuid());
         
-        Name = name;
-        Description = description;
-        ReturnTypeData = returnTypeData;
+        PluginId = pluginId;
+        Name = description.Name;
+        Description = description.Description;
+        Parameters = description.Parameters;
+        Returns = description.Returns;
+    }
         
-        Parameters = parameters.ToList();
+    internal static PluginFunction Create(PluginId pluginId, FunctionDescription description)
+    {
+        return new PluginFunction(pluginId, description);
     }
 
-    public static PluginFunction Create(string name, string description, TypeData? returnTypeData, IEnumerable<FunctionParameterData> parameters)
+    public FunctionDescription GetDescription()
     {
-        return new PluginFunction(name, description, returnTypeData, parameters);
+        return new FunctionDescription(Name, Description, Parameters, Returns);
     }
 }

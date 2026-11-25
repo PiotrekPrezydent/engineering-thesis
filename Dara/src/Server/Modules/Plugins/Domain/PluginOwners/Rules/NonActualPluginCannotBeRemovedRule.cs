@@ -14,9 +14,9 @@ public class NonActualPluginCannotBeRemovedRule : IBuisnessRule
         _currentPlugins = currentPlugins;
     }
 
-    public string Message => nameof(NonActualPluginCannotBeRemovedRule);
+    public string Message => "Only a current plugin of the owner can be removed";
     public bool IsBroken()
     {
-        return _currentPlugins.All(e=>e.Id != _pluginToRemove);
+        return _currentPlugins.All(e => e.Id != _pluginToRemove);
     }
 }

@@ -1,3 +1,4 @@
+using Dara.Server.Modules.Plugins.Domain.PluginOwners;
 using Dara.Server.Modules.Plugins.Domain.Plugins;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,7 +20,12 @@ public class PluginRepository : IPluginRepository
 
     public async Task<Plugin> GetByIdAsync(PluginId id)
     {
-        return await _context.Plugins.FirstAsync(e=>e.Id == id);
+        return await _context.Plugins.Include(e => e.Functions).FirstAsync(e => e.Id == id);
+    }
+
+    public async Task<IReadOnlyList<Plugin>> GetByOwnerIdAsync(PluginOwnerId ownerId)
+    {
+        return await _context.Plugins.Include(e => e.Functions).Where(e => e.OwnerId == ownerId).ToListAsync();
     }
 
     public async Task RemoveAsync(Plugin plugin)
