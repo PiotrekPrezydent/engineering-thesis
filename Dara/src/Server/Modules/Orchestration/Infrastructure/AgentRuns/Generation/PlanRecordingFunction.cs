@@ -44,6 +44,6 @@ public class PlanRecordingFunction : AIFunction
             ? ResultPrefix + index + "}}"
             : ErrorPrefix + result.Error;
 
-        return ValueTask.FromResult(answer);
+        return ValueTask.FromResult<object?>(answer);
     }
 }
