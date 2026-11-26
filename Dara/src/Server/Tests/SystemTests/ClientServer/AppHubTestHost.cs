@@ -1,3 +1,4 @@
+using Dara.Server.BuildingBlocks.Infrastructure.Messaging;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration;
 using Dara.Server.Modules.Groups.Domain.Members;
 using Dara.Server.Modules.Groups.Infrastructure;
@@ -32,10 +33,10 @@ public class AppHubTestHost : IAsyncDisposable
     private readonly WebApplication _app;
     private readonly List<HubTestClient> _clients = new();
 
-    public IdentityCompositionRoot IdentityRoot { get; } = new();
-    public ProfilesCompositionRoot ProfilesRoot { get; } = new();
-    public GroupsCompositionRoot GroupsRoot { get; } = new();
-    public PluginsCompositionRoot PluginsRoot { get; } = new();
+    public IdentityCompositionRoot IdentityRoot { get; } = new() { ProcessingOptions = ModulesHost.ProcessingOptions };
+    public ProfilesCompositionRoot ProfilesRoot { get; } = new() { ProcessingOptions = ModulesHost.ProcessingOptions };
+    public GroupsCompositionRoot GroupsRoot { get; } = new() { ProcessingOptions = ModulesHost.ProcessingOptions };
+    public PluginsCompositionRoot PluginsRoot { get; } = new() { ProcessingOptions = ModulesHost.ProcessingOptions };
     public OrchestrationCompositionRoot OrchestrationRoot { get; }
 
     // no test calls the api of a model provider, every plan comes from this script
@@ -45,7 +46,7 @@ public class AppHubTestHost : IAsyncDisposable
 
     private AppHubTestHost()
     {
-        OrchestrationRoot = new OrchestrationCompositionRoot([Model], new ExecutionPlanGeneratorOptions(TimeoutSeconds: 5));
+        OrchestrationRoot = new OrchestrationCompositionRoot([Model], new ExecutionPlanGeneratorOptions(TimeoutSeconds: 5)) { ProcessingOptions = ModulesHost.ProcessingOptions };
 
         // same order as in the api host, the seed is off so tests see only their own data
         IModuleCompositionRoot[] roots = [IdentityRoot, GroupsRoot, ProfilesRoot, PluginsRoot, OrchestrationRoot];

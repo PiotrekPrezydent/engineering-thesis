@@ -6,15 +6,15 @@ namespace Dara.Server.Modules.Orchestration.Application.Groups.RemoveParticipant
 
 public class MemberLeftGroupIntegrationEventHandler : IIntegrationEventHandler<MemberLeftGroupIntegrationEvent>
 {
-    private readonly IInternalCommandExecutor _commandExecutor;
+    private readonly IInternalCommandScheduler _commandScheduler;
 
-    public MemberLeftGroupIntegrationEventHandler(IInternalCommandExecutor commandExecutor)
+    public MemberLeftGroupIntegrationEventHandler(IInternalCommandScheduler commandScheduler)
     {
-        _commandExecutor = commandExecutor;
+        _commandScheduler = commandScheduler;
     }
 
     public async Task HandleAsync(MemberLeftGroupIntegrationEvent integrationEvent)
     {
-        await _commandExecutor.ExecuteAsync(new RemoveParticipantFromGroupCommand(integrationEvent.GroupId, integrationEvent.MemberId));
+        await _commandScheduler.EnqueueAsync(new RemoveParticipantFromGroupCommand(integrationEvent.GroupId, integrationEvent.MemberId));
     }
 }

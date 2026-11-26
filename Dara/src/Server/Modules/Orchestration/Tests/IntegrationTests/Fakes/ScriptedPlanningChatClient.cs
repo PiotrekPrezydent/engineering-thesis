@@ -41,7 +41,13 @@ public class ScriptedPlanningChatClient : IChatClient
         return new ScriptedRound([], null, exception);
     }
 
-    public Task<ChatResponse> GetResponseAsync(IEnumerable<ChatMessage> messages, ChatOptions? options = null, CancellationToken cancellationToken = default)
+    // the answer comes only after the gate opens, so a test can hold a generation in the middle
+    public static ScriptedRound WaitsFor(Task gate, ScriptedRound then)
+    {
+        return then with { Gate = gate };
+    }
+
+    public async Task<ChatResponse> GetResponseAsync(IEnumerable<ChatMessage> messages, ChatOptions? options = null, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -52,6 +58,9 @@ public class ScriptedPlanningChatClient : IChatClient
             round = _rounds.Count > 0 ? _rounds.Dequeue() : Text("The plan is complete.");
         }
 
+        if (round.Gate is not null)
+            await round.Gate.WaitAsync(cancellationToken);
+
         if (round.Exception is not null)
             throw round.Exception;
 
@@ -59,11 +68,11 @@ public class ScriptedPlanningChatClient : IChatClient
             ? new ChatMessage(ChatRole.Assistant, round.Text)
             : new ChatMessage(ChatRole.Assistant, round.Calls.Select(c => (AIContent)ToCall(c.Tool, c.ArgumentsJson)).ToList());
 
-        return Task.FromResult(new ChatResponse(message)
+        return new ChatResponse(message)
         {
             ModelId = "scripted",
             FinishReason = round.Text is null ? ChatFinishReason.ToolCalls : ChatFinishReason.Stop
-        });
+        };
     }
 
     public async IAsyncEnumerable<ChatResponseUpdate> GetStreamingResponseAsync(IEnumerable<ChatMessage> messages, ChatOptions? options = null, [EnumeratorCancellation] CancellationToken cancellationToken = default)
@@ -92,6 +101,6 @@ public class ScriptedPlanningChatClient : IChatClient
     }
 }
 
-public record ScriptedRound(IReadOnlyList<(string Tool, string ArgumentsJson)> Calls, string? Text, Exception? Exception);
+public record ScriptedRound(IReadOnlyList<(string Tool, string ArgumentsJson)> Calls, string? Text, Exception? Exception, Task? Gate = null);
 
 public record ScriptedRequest(IReadOnlyList<ChatMessage> Messages, IReadOnlyList<AITool> Tools);

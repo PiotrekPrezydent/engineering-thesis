@@ -1,3 +1,4 @@
+using Dara.Server.BuildingBlocks.Infrastructure.Messaging;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -12,5 +13,6 @@ public class OutboxMessageEntityTypeConfiguration : IEntityTypeConfiguration<Out
         
         builder.HasKey(x => x.Id);
         builder.Property(x=>x.Id).ValueGeneratedNever();
+        builder.Property(x => x.LastError).HasMaxLength(RetryableMessage.MaxErrorLength);
     }
 }

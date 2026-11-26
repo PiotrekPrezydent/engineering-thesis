@@ -6,15 +6,15 @@ namespace Dara.Server.Modules.Orchestration.Application.Groups.AddParticipantToG
 
 public class NewMemberJoinedGroupIntegrationEventHandler : IIntegrationEventHandler<MemberJoinedGroupIntegrationEvent>
 {
-    private readonly IInternalCommandExecutor _commandExecutor;
+    private readonly IInternalCommandScheduler _commandScheduler;
 
-    public NewMemberJoinedGroupIntegrationEventHandler(IInternalCommandExecutor commandExecutor)
+    public NewMemberJoinedGroupIntegrationEventHandler(IInternalCommandScheduler commandScheduler)
     {
-        _commandExecutor = commandExecutor;
+        _commandScheduler = commandScheduler;
     }
 
     public async Task HandleAsync(MemberJoinedGroupIntegrationEvent integrationEvent)
     {
-        await _commandExecutor.ExecuteAsync(new AddParticipantToGroupCommand(integrationEvent.GroupId,integrationEvent.MemberId));
+        await _commandScheduler.EnqueueAsync(new AddParticipantToGroupCommand(integrationEvent.GroupId,integrationEvent.MemberId));
     }
 }

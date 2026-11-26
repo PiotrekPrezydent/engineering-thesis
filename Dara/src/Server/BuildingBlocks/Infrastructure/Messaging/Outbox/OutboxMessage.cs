@@ -1,6 +1,6 @@
 namespace Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox;
 
-public class OutboxMessage
+public class OutboxMessage : RetryableMessage
 {
     public Guid Id { get; private set; }
     public DateTime OccurredOn { get; private set; }
@@ -11,9 +11,7 @@ public class OutboxMessage
     // ReSharper disable once EntityFramework.ModelValidation.UnlimitedStringLength
     public string Content { get;  private set; }
     
-    public DateTime? ProcessedDate { get; set; }
-    
-    public OutboxMessage(Guid id, DateTime occurredOn, string type, string content)
+    public OutboxMessage(Guid id, DateTime occurredOn, string type, string content) : base(occurredOn)
     {
         Id = id;
         OccurredOn = occurredOn;

@@ -6,17 +6,17 @@ namespace Dara.Server.Modules.Orchestration.Application.Participants.ReplacePlug
 
 public class PluginFunctionsChangedIntegrationEventHandler : IIntegrationEventHandler<PluginFunctionsChangedIntegrationEvent>
 {
-    private readonly IInternalCommandExecutor _commandExecutor;
+    private readonly IInternalCommandScheduler _commandScheduler;
 
-    public PluginFunctionsChangedIntegrationEventHandler(IInternalCommandExecutor commandExecutor)
+    public PluginFunctionsChangedIntegrationEventHandler(IInternalCommandScheduler commandScheduler)
     {
-        _commandExecutor = commandExecutor;
+        _commandScheduler = commandScheduler;
     }
 
     // the plugin owner is the user, so the participant has the same id
     public async Task HandleAsync(PluginFunctionsChangedIntegrationEvent integrationEvent)
     {
-        await _commandExecutor.ExecuteAsync(new ReplacePluginFunctionsCommand(
+        await _commandScheduler.EnqueueAsync(new ReplacePluginFunctionsCommand(
             integrationEvent.PluginOwnerId,
             integrationEvent.PluginId,
             integrationEvent.Version,

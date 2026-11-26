@@ -3,7 +3,9 @@ using Dara.Server.BuildingBlocks.Infrastructure.Mediation.HandlerResolving;
 
 namespace Dara.Server.BuildingBlocks.Infrastructure.Processing.Commands;
 
-public class CommandExecutor : ICommandExecutor, IInternalCommandExecutor
+// executes a command at once; used by the module facade and by the internal commands worker,
+// event handlers queue commands with IInternalCommandScheduler instead
+public class CommandExecutor : ICommandExecutor
 {
     private readonly IHandlersResolver _handlersResolver;
     

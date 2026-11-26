@@ -1,3 +1,5 @@
+using Dara.Server.BuildingBlocks.Infrastructure.Messaging;
+using Dara.Server.BuildingBlocks.Infrastructure.Configuration;
 using Dara.Server.BuildingBlocks.Application.Commands;
 using Dara.Server.BuildingBlocks.Application.Events;
 using Dara.Server.BuildingBlocks.Application.Queries;
@@ -22,7 +24,13 @@ public class PluginsModuleHost : IAsyncDisposable
     private readonly PublishedStates _published = new();
 
     public InMemoryEventBus EventBus { get; } = new();
-    public PluginsCompositionRoot Root { get; } = new();
+    // retries in milliseconds, so a test with a failing handler does not wait seconds
+    public static readonly MessageProcessingOptions ProcessingOptions = new()
+    {
+        Retry = new RetryPolicy(TimeSpan.FromMilliseconds(10), TimeSpan.FromMilliseconds(200)),
+    };
+
+    public PluginsCompositionRoot Root { get; } = new() { ProcessingOptions = ProcessingOptions };
 
     public IReadOnlyList<PluginFunctionsChangedIntegrationEvent> Published => _published.Snapshot();
 

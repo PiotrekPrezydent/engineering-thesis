@@ -28,7 +28,11 @@ public class InboxWriterIntegrationEventHandler<TIntegrationEvent> : IIntegratio
         var context = scope.ServiceProvider.GetRequiredService<DbContext>();
         var mapper = scope.ServiceProvider.GetRequiredService<IInboxMessagesTypeMapper>();
         var signal = scope.ServiceProvider.GetRequiredService<InboxQueueSignal>();
-        
+
+        // a retried outbox message publishes the same event again; the inbox already has it, so this is a success
+        if (await repository.ExistsAsync(integrationEvent.EventId, CancellationToken.None))
+            return;
+
         var data = JsonSerializer.Serialize(integrationEvent,integrationEvent.GetType());
         var type = mapper.GetTypeNameForMessageWithType(integrationEvent.GetType());
         

@@ -6,15 +6,15 @@ namespace Dara.Server.Modules.Groups.Application.Members.UpdateMemberName;
 
 public class ProfileNameChangedIntegrationEventHandler : IIntegrationEventHandler<ProfileNameChangedIntegrationEvent>
 {
-    private readonly IInternalCommandExecutor _commandExecutor;
+    private readonly IInternalCommandScheduler _commandScheduler;
 
-    public ProfileNameChangedIntegrationEventHandler(IInternalCommandExecutor commandExecutor)
+    public ProfileNameChangedIntegrationEventHandler(IInternalCommandScheduler commandScheduler)
     {
-        _commandExecutor = commandExecutor;
+        _commandScheduler = commandScheduler;
     }
 
     public async Task HandleAsync(ProfileNameChangedIntegrationEvent integrationEvent)
     {
-        await _commandExecutor.ExecuteAsync(new UpdateMemberNameCommand(integrationEvent.ProfileId, integrationEvent.NewName));
+        await _commandScheduler.EnqueueAsync(new UpdateMemberNameCommand(integrationEvent.ProfileId, integrationEvent.NewName));
     }
 }

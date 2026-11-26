@@ -6,15 +6,15 @@ namespace Dara.Server.Modules.Orchestration.Application.AgentRuns.GenerateExecut
 // runs in the outbox loop after the run is saved, so the command that starts the run never waits for the model
 public class PlanGenerationRequestedNotificationHandler : IDomainEventNotificationHandler<PlanGenerationRequestedNotification>
 {
-    private readonly IInternalCommandExecutor _commandExecutor;
+    private readonly IInternalCommandScheduler _commandScheduler;
 
-    public PlanGenerationRequestedNotificationHandler(IInternalCommandExecutor commandExecutor)
+    public PlanGenerationRequestedNotificationHandler(IInternalCommandScheduler commandScheduler)
     {
-        _commandExecutor = commandExecutor;
+        _commandScheduler = commandScheduler;
     }
 
     public async Task HandleAsync(PlanGenerationRequestedNotification notification)
     {
-        await _commandExecutor.ExecuteAsync(new GenerateExecutionPlanCommand(notification.DomainEvent.AgentRunId.Value));
+        await _commandScheduler.EnqueueAsync(new GenerateExecutionPlanCommand(notification.DomainEvent.AgentRunId.Value));
     }
 }

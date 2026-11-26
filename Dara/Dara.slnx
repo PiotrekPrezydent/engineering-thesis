@@ -23,6 +23,9 @@
     <Project Path="src/Server/BuildingBlocks/Infrastructure/Dara.Server.BuildingBlocks.Infrastructure.csproj" />
     <Project Path="src/Server/BuildingBlocks/Integration/Dara.Server.BuildingBlocks.Integration.csproj" />
   </Folder>
+  <Folder Name="/Server/BuildingBlocks/Tests/">
+    <Project Path="src/Server/BuildingBlocks/Tests/UnitTests/Dara.Server.BuildingBlocks.UnitTests.csproj" />
+  </Folder>
   
   <Folder Name="/Server/Modules/" />
   <Folder Name="/Server/Modules/Groups/">

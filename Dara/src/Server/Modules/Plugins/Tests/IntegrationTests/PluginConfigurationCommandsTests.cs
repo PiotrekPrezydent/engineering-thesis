@@ -68,8 +68,11 @@ public class PluginConfigurationCommandsTests
 
         await host.WaitForPublishedAsync(e => e.PluginId == files.PluginId && e.Version == 4, "state after the removal");
 
-        var versions = host.Published.Where(e => e.PluginId == files.PluginId).Select(e => e.Version).Order();
-        Assert.Equal([1, 2, 3, 4], versions);
+        // a late notification publishes the state the plugin has by then (PublishAvailableFunctionsHandler), so a
+        // version can be skipped or repeated, but no subscriber gets a lower version after a higher one
+        var versions = host.Published.Where(e => e.PluginId == files.PluginId).Select(e => e.Version).ToList();
+        Assert.Equal(versions.Order(), versions);
+        Assert.Equal(4, versions[^1]);
     }
 
     [Fact]

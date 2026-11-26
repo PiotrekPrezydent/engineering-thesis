@@ -7,16 +7,16 @@ namespace Dara.Server.Modules.Orchestration.Application.AgentRuns.StartAgentRun;
 // every group message comes here, the group decides by its prefix whether it is a prompt
 public class GroupMessageAddedIntegrationEventHandler : IIntegrationEventHandler<GroupMessageAddedIntegrationEvent>
 {
-    private readonly IInternalCommandExecutor _commandExecutor;
+    private readonly IInternalCommandScheduler _commandScheduler;
 
-    public GroupMessageAddedIntegrationEventHandler(IInternalCommandExecutor commandExecutor)
+    public GroupMessageAddedIntegrationEventHandler(IInternalCommandScheduler commandScheduler)
     {
-        _commandExecutor = commandExecutor;
+        _commandScheduler = commandScheduler;
     }
 
     public async Task HandleAsync(GroupMessageAddedIntegrationEvent integrationEvent)
     {
-        await _commandExecutor.ExecuteAsync(new StartAgentRunCommand(
+        await _commandScheduler.EnqueueAsync(new StartAgentRunCommand(
             integrationEvent.MessageId,
             integrationEvent.GroupId,
             integrationEvent.AuthorId,

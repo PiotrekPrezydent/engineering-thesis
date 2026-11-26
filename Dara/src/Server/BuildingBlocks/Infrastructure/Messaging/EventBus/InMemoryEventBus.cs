@@ -21,13 +21,31 @@ public class InMemoryEventBus : IEventBus
     public async Task PublishAsync<TEvent>(TEvent @event) where TEvent : IIntegrationEvent
     {
         var eventType = typeof(TEvent);
-        if (_eventHandlers.TryGetValue(eventType, out var eventHandlers))
+        if (!_eventHandlers.TryGetValue(eventType, out var eventHandlers))
+            return;
+
+        // a failing subscriber does not cut off the next ones; the outbox retries the message and the inboxes of the
+        // subscribers that got it already drop the repeat
+        List<Exception>? errors = null;
+        foreach (var handler in eventHandlers)
         {
-            foreach (var handler  in eventHandlers)
+            if (handler is not IIntegrationEventHandler<TEvent> eventHandler)
+                continue;
+
+            try
             {
-                if (handler is IIntegrationEventHandler<TEvent> eventHandler)
-                    await eventHandler.HandleAsync(@event);
+                await eventHandler.HandleAsync(@event);
+            }
+            catch (Exception ex)
+            {
+                (errors ??= []).Add(ex);
             }
         }
+
+        if (errors is { Count: 1 })
+            System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(errors[0]).Throw();
+
+        if (errors != null)
+            throw new AggregateException($"{errors.Count} subscribers of {eventType.Name} failed.", errors);
     }
 }

@@ -6,16 +6,16 @@ namespace Dara.Server.Modules.Plugins.Application.PluginOwners.CreatePluginOwner
 
 public class NewUserCreatedIntegrationEventHandler : IIntegrationEventHandler<NewUserCreatedIntegrationEvent>
 {
-    private readonly IInternalCommandExecutor _commandExecutor;
+    private readonly IInternalCommandScheduler _commandScheduler;
 
-    public NewUserCreatedIntegrationEventHandler(IInternalCommandExecutor commandExecutor)
+    public NewUserCreatedIntegrationEventHandler(IInternalCommandScheduler commandScheduler)
     {
-        _commandExecutor = commandExecutor;
+        _commandScheduler = commandScheduler;
     }
 
 
     public async Task HandleAsync(NewUserCreatedIntegrationEvent integrationEvent)
     {
-        await _commandExecutor.ExecuteAsync(new CreateDefaultPluginOwnerCommand(integrationEvent.CreatedUserId));
+        await _commandScheduler.EnqueueAsync(new CreateDefaultPluginOwnerCommand(integrationEvent.CreatedUserId));
     }
 }

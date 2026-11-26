@@ -6,16 +6,16 @@ namespace Dara.Server.Modules.Orchestration.Application.Groups.CreateGroup;
 
 public class NewGroupCreatedIntegrationEventHandler : IIntegrationEventHandler<NewGroupCreatedIntegrationEvent>
 {
-    private readonly IInternalCommandExecutor _commandExecutor;
+    private readonly IInternalCommandScheduler _commandScheduler;
 
-    public NewGroupCreatedIntegrationEventHandler(IInternalCommandExecutor commandExecutor)
+    public NewGroupCreatedIntegrationEventHandler(IInternalCommandScheduler commandScheduler)
     {
-        _commandExecutor = commandExecutor;
+        _commandScheduler = commandScheduler;
     }
 
     public async Task HandleAsync(NewGroupCreatedIntegrationEvent integrationEvent)
     {
-        await _commandExecutor.ExecuteAsync(
+        await _commandScheduler.EnqueueAsync(
             new CreateGroupCommand(integrationEvent.GroupId, integrationEvent.GroupOwnerId));
     }
 }

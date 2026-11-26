@@ -23,6 +23,7 @@ using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox.Persistence;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox.Processing;
 using Dara.Server.BuildingBlocks.Infrastructure.Processing.Commands;
 using Dara.Server.BuildingBlocks.Infrastructure.Processing.DomainEvents;
+using Dara.Server.BuildingBlocks.Infrastructure.Processing.InternalCommands;
 using Dara.Server.BuildingBlocks.Integration;
 using Dara.Shared.Logging;
 using Microsoft.EntityFrameworkCore;
@@ -38,6 +39,12 @@ namespace Dara.Server.BuildingBlocks.Infrastructure.Configuration;
 public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
 {
     private IServiceProvider _services = null!;
+
+    // how the outbox, inbox and internal commands workers of the module process and retry messages
+    public MessageProcessingOptions ProcessingOptions { get; init; } = new();
+
+    // the clock of retries and of the queue order; tests may give a fake one
+    public TimeProvider TimeProvider { get; init; } = TimeProvider.System;
     
     public IServiceScope CreateScope()
     { 
@@ -172,7 +179,7 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
         
         ModuleMediationVisitor mediationVisitor = new(references,services);
         ModuleDataAccessVisitor dataAccessVisitor = new(references,services);
-        ModuleProcessingVisitor processingVisitor = new(services);
+        ModuleProcessingVisitor processingVisitor = new(references,services);
         ModuleMessagingVisitor messagingVisitor = new(references,services);
         
         dataAccess.Accept(dataAccessVisitor);
@@ -207,6 +214,8 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
         services.AddSingleton<IInboxMessagesTypeMapper>(new InboxMessagesTypeMapper(inboxMap));
         
         services.AddSingleton(eventBus);
+        services.AddSingleton(ProcessingOptions);
+        services.AddSingleton(TimeProvider);
         services.AddSingleton(references.CompositionRoot);
         
         SetServiceProvider(services.BuildServiceProvider());
@@ -222,6 +231,7 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
         
         rootServices.AddSingleton<IHostedService>(_ => _services.GetRequiredService<OutboxBackgroundWorker>());
         rootServices.AddSingleton<IHostedService>(_ => _services.GetRequiredService<InboxBackgroundWorker>());
+        rootServices.AddSingleton<IHostedService>(_ => _services.GetRequiredService<InternalCommandsBackgroundWorker>());
     }
 
     class InboxWriterIntegrationEventRegistrator(IModuleCompositionRoot compositionRoot, IEventBus eventBus) : ITypeKeyAction<IIntegrationEvent>
@@ -280,6 +290,8 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
     {
         builder
             .WithCommandExecutor(ITypeKey<CommandExecutor>.Instance)
+            .WithInternalCommandScheduler(ITypeKey<InternalCommandScheduler>.Instance)
+            .WithInternalCommandProcessor(ITypeKey<InternalCommandProcessor>.Instance)
             .WithDomainEventDispatcher(ITypeKey<DomainEventsDispatcher>.Instance);
     }
 

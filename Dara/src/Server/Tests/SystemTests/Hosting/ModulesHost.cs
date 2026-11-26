@@ -1,3 +1,4 @@
+using Dara.Server.BuildingBlocks.Infrastructure.Messaging;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration;
 using Dara.Server.BuildingBlocks.Infrastructure.DataAccess;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.EventBus;
@@ -23,15 +24,21 @@ public class ModulesHost : IAsyncDisposable
     public static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(10);
     private static readonly TimeSpan PollInterval = TimeSpan.FromMilliseconds(25);
 
+    // retries in milliseconds, so a test with a failing handler does not wait seconds
+    public static readonly MessageProcessingOptions ProcessingOptions = new()
+    {
+        Retry = new RetryPolicy(TimeSpan.FromMilliseconds(10), TimeSpan.FromMilliseconds(200)),
+    };
+
     private readonly ServiceProvider _services;
     private readonly IReadOnlyList<IHostedService> _workers;
 
     public InMemoryEventBus EventBus { get; } = new();
 
-    public IdentityCompositionRoot IdentityRoot { get; } = new();
-    public ProfilesCompositionRoot ProfilesRoot { get; } = new();
-    public GroupsCompositionRoot GroupsRoot { get; } = new();
-    public PluginsCompositionRoot PluginsRoot { get; } = new();
+    public IdentityCompositionRoot IdentityRoot { get; } = new() { ProcessingOptions = ProcessingOptions };
+    public ProfilesCompositionRoot ProfilesRoot { get; } = new() { ProcessingOptions = ProcessingOptions };
+    public GroupsCompositionRoot GroupsRoot { get; } = new() { ProcessingOptions = ProcessingOptions };
+    public PluginsCompositionRoot PluginsRoot { get; } = new() { ProcessingOptions = ProcessingOptions };
     public OrchestrationCompositionRoot OrchestrationRoot { get; }
 
     public IIdentityModule Identity { get; }
@@ -44,8 +51,8 @@ public class ModulesHost : IAsyncDisposable
     private ModulesHost(IChatClientProvider? chatClientProvider)
     {
         OrchestrationRoot = chatClientProvider is null
-            ? new OrchestrationCompositionRoot()
-            : new OrchestrationCompositionRoot([chatClientProvider], new ExecutionPlanGeneratorOptions(TimeoutSeconds: 5));
+            ? new OrchestrationCompositionRoot() { ProcessingOptions = ProcessingOptions }
+            : new OrchestrationCompositionRoot([chatClientProvider], new ExecutionPlanGeneratorOptions(TimeoutSeconds: 5)) { ProcessingOptions = ProcessingOptions };
 
         var services = new ServiceCollection();
 

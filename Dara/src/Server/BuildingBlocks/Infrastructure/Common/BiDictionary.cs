@@ -19,4 +19,8 @@ public class BiDictionary<TFirst, TSecond> where TFirst : notnull where TSecond 
     public TSecond GetByFirst(TFirst first) => _forward[first];
     
     public TFirst GetBySecond(TSecond second) => _reverse[second];
+
+    public bool TryGetByFirst(TFirst first, out TSecond second) => _forward.TryGetValue(first, out second!);
+
+    public bool TryGetBySecond(TSecond second, out TFirst first) => _reverse.TryGetValue(second, out first!);
 }

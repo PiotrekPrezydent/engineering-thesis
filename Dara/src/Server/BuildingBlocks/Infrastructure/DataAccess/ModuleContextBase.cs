@@ -1,6 +1,7 @@
 using Dara.Server.BuildingBlocks.Domain;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Outbox;
+using Dara.Server.BuildingBlocks.Infrastructure.Processing.InternalCommands;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 
@@ -10,6 +11,7 @@ public class ModuleContextBase : DbContext, IReadModel
 {
     public DbSet<InboxMessage> InboxMessages { get; set; }
     public DbSet<OutboxMessage> OutboxMessages { get; set; }
+    public DbSet<InternalCommand> InternalCommands { get; set; }
 
     public ModuleContextBase(DbContextOptions options) : base(options)
     {
@@ -37,6 +39,7 @@ public class ModuleContextBase : DbContext, IReadModel
     {
         modelBuilder.ApplyConfiguration(new InboxMessageEntityTypeConfiguration());
         modelBuilder.ApplyConfiguration(new OutboxMessageEntityTypeConfiguration());
+        modelBuilder.ApplyConfiguration(new InternalCommandEntityTypeConfiguration());
 
         base.OnModelCreating(modelBuilder);
     }

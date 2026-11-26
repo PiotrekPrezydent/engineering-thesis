@@ -1,3 +1,5 @@
+using Dara.Server.BuildingBlocks.Infrastructure.Messaging;
+using Dara.Server.BuildingBlocks.Infrastructure.Configuration;
 using Dara.Server.BuildingBlocks.Application.Commands;
 using Dara.Server.BuildingBlocks.Application.Events;
 using Dara.Server.BuildingBlocks.Application.Queries;
@@ -24,6 +26,12 @@ public class OrchestrationModuleHost : IAsyncDisposable
     private readonly IReadOnlyList<IHostedService> _workers;
     private readonly PublishedEvents _published = new();
 
+    // retries in milliseconds, so a test with a failing handler does not wait seconds
+    public static readonly MessageProcessingOptions ProcessingOptions = new()
+    {
+        Retry = new RetryPolicy(TimeSpan.FromMilliseconds(10), TimeSpan.FromMilliseconds(200)),
+    };
+
     public InMemoryEventBus EventBus { get; } = new();
     public OrchestrationCompositionRoot Root { get; }
     public ScriptedChatClientProvider Model { get; }
@@ -33,7 +41,7 @@ public class OrchestrationModuleHost : IAsyncDisposable
     private OrchestrationModuleHost(ScriptedChatClientProvider model)
     {
         Model = model;
-        Root = new OrchestrationCompositionRoot([model], new ExecutionPlanGeneratorOptions(TimeoutSeconds: 5));
+        Root = new OrchestrationCompositionRoot([model], new ExecutionPlanGeneratorOptions(TimeoutSeconds: 5)) { ProcessingOptions = ProcessingOptions };
 
         var services = new ServiceCollection();
         Root.Initialize(services, EventBus);
