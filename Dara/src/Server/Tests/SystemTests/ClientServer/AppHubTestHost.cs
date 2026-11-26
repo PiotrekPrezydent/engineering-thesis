@@ -1,9 +1,14 @@
+using System.Net.Http.Json;
+using System.Security.Cryptography;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration;
 using Dara.Server.Modules.Groups.Domain.Members;
 using Dara.Server.Modules.Groups.Infrastructure;
+using Dara.Server.Apps.API.Authentication;
 using Dara.Server.Modules.Identity.Application;
-using Dara.Server.Modules.Identity.Application.GetUser;
+using Dara.Server.Modules.Identity.Application.RegisterDeviceSession;
+using Dara.Server.Modules.Identity.Application.RegisterUser;
+using Dara.Shared.Contracts.Auth;
 using Dara.Server.Modules.Identity.Infrastructure;
 using Dara.Server.Modules.Orchestration.Application;
 using Dara.Server.Modules.Orchestration.Application.Participants.GetParticipantFunctions;
@@ -44,35 +49,56 @@ public class AppHubTestHost : IAsyncDisposable
 
     public string HubUrl { get; private set; } = "";
 
-    private AppHubTestHost()
+    // the http api of the host, with the base address of the host; it keeps no cookies: the panel cookie is Secure,
+    // so over the http of the tests it is sent by hand (SendAsPanelAsync)
+    public HttpClient Http { get; } = new(new SocketsHttpHandler { UseCookies = false });
+
+    // the key of this host only, random per run, never in the repository
+    public string SigningKey { get; } = Convert.ToBase64String(RandomNumberGenerator.GetBytes(48));
+
+    private AppHubTestHost(TimeSpan? accessTokenLifetime, Action<WebApplication>? mapExtra, int? deviceLoginPermitsPerMinute)
     {
         OrchestrationRoot = new OrchestrationCompositionRoot([Model], new ExecutionPlanGeneratorOptions(TimeoutSeconds: 5)) { ProcessingOptions = ModulesHost.ProcessingOptions };
 
         // same order as in the api host, the seed is off so tests see only their own data
         IModuleCompositionRoot[] roots = [IdentityRoot, GroupsRoot, ProfilesRoot, PluginsRoot, OrchestrationRoot];
-        _app = ApiProgram.CreateApplication(
-            ["--urls", "http://127.0.0.1:0", "--Seed:Enabled", "false", "--Logging:LogLevel:Default", "Warning"],
-            roots);
+        List<string> args =
+        [
+            "--urls", "http://127.0.0.1:0", "--Seed:Enabled", "false", "--Logging:LogLevel:Default", "Warning",
+            "--Jwt:SigningKey", SigningKey
+        ];
+        if (accessTokenLifetime is { } lifetime)
+            args.AddRange(["--Jwt:AccessTokenLifetime", lifetime.ToString("c")]);
+        if (deviceLoginPermitsPerMinute is { } permits)
+            args.AddRange(["--Auth:DeviceLoginPermitsPerMinute", permits.ToString()]);
+
+        _app = ApiProgram.CreateApplication(args.ToArray(), roots, mapExtra);
     }
 
-    public static async Task<AppHubTestHost> StartAsync(CancellationToken cancellationToken)
+    public static async Task<AppHubTestHost> StartAsync(CancellationToken cancellationToken, TimeSpan? accessTokenLifetime = null,
+        Action<WebApplication>? mapExtra = null, int? deviceLoginPermitsPerMinute = null)
     {
-        var host = new AppHubTestHost();
+        var host = new AppHubTestHost(accessTokenLifetime, mapExtra, deviceLoginPermitsPerMinute);
         await host._app.StartAsync(cancellationToken);
 
         // kestrel puts the port it got for port 0 into the addresses
-        host.HubUrl = $"{host._app.Urls.First()}/{Connections.HubName}";
+        var baseUrl = host._app.Urls.First();
+        host.HubUrl = $"{baseUrl}/{Connections.HubName}";
+        host.Http.BaseAddress = new Uri(baseUrl);
         return host;
     }
 
-    // connects a device and waits until every module knows its user, like a client that waits for the seed
-    public async Task<HubTestClient> ConnectAsync(string identifier, CancellationToken cancellationToken)
+    // registers an account with its device like the seed, signs the device in with a code from the panel and
+    // connects it; ready when every module knows the user, like a client that waits for the seed
+    public async Task<HubTestClient> ConnectAsync(string login, CancellationToken cancellationToken)
     {
-        var client = new HubTestClient(HubUrl, identifier);
+        var userId = await RegisterAsync(login);
+        var tokens = await SignInDeviceAsync(login, userId);
+
+        var client = new HubTestClient(HubUrl, Http, login, tokens);
         _clients.Add(client);
         await client.StartAsync(cancellationToken);
 
-        client.UserId = await GetUserIdAsync(identifier);
         await WaitForUserAsync(client.UserId);
 
         return client;
@@ -125,12 +151,85 @@ public class AppHubTestHost : IAsyncDisposable
         return await query(scope.ServiceProvider.GetRequiredService<TModule>());
     }
 
-    private async Task<Guid> GetUserIdAsync(string identifier)
+    // there is no registration endpoint: an account and one device with the id of the account, through the module
+    // like the seed; the e-mail and the password of every test account follow from the login
+    public async Task<Guid> RegisterAsync(string login)
     {
-        var userId = await QueryAsync<IIdentityModule, Guid?>(module =>
-            module.ExecuteQueryAsync<GetUserQuery, Guid?>(new GetUserQuery(identifier)));
+        var userId = await QueryAsync<IIdentityModule, Guid>(module => module.ExecuteCommandAsync<RegisterUserCommand, Guid>(
+            new RegisterUserCommand(login, $"{login}@test.local", ModulesHost.TestPassword)));
+        await RegisterDeviceAsync(userId, userId);
+        return userId;
+    }
 
-        return userId ?? throw new InvalidOperationException($"the connection of {identifier} created no user");
+    // a further device of the account, as the devices module will create it (TASK-ENG-029)
+    public Task RegisterDeviceAsync(Guid userId, Guid deviceId)
+    {
+        return QueryAsync<IIdentityModule, bool>(async module =>
+        {
+            await module.ExecuteCommandAsync(new RegisterDeviceSessionCommand(deviceId, userId));
+            return true;
+        });
+    }
+
+    public Task<HttpResponseMessage> LoginAsync(LoginRequest request)
+    {
+        return Http.PostAsJsonAsync(AuthRoutes.Login, request);
+    }
+
+    // the account panel: the value of its session cookie ("dara.account=..."), never connected to the hub
+    public async Task<string> SignInAccountAsync(string login)
+    {
+        var response = await LoginAsync(new LoginRequest(login, ModulesHost.TestPassword));
+        await EnsureAsync(response, $"account sign-in of {login}");
+        return SessionCookie(response) ?? throw new InvalidOperationException($"account sign-in of {login} set no cookie");
+    }
+
+    // the cookie of the answer as the browser sends it back, without its attributes
+    public static string? SessionCookie(HttpResponseMessage response)
+    {
+        return response.Headers.TryGetValues("Set-Cookie", out var cookies)
+            ? cookies.Select(c => c.Split(';')[0]).FirstOrDefault(c => c.StartsWith(AccountCookie.CookieName + "=") && c.Length > AccountCookie.CookieName.Length + 1)
+            : null;
+    }
+
+    // a request of the panel with its cookie
+    public async Task<HttpResponseMessage> SendAsPanelAsync(HttpMethod method, string path, string? cookie)
+    {
+        using var request = new HttpRequestMessage(method, path);
+        if (cookie != null)
+            request.Headers.Add("Cookie", cookie);
+
+        return await Http.SendAsync(request);
+    }
+
+    public Task<HttpResponseMessage> RequestLoginCodeAsync(string? cookie, Guid deviceId)
+    {
+        return SendAsPanelAsync(HttpMethod.Post, AuthRoutes.DeviceLoginCode(deviceId), cookie);
+    }
+
+    public Task<HttpResponseMessage> DeviceLoginAsync(string code)
+    {
+        return Http.PostAsJsonAsync(AuthRoutes.DeviceLogin, new DeviceLoginRequest(code));
+    }
+
+    // the whole sign-in of a device: the panel signs in, issues a code for the device and the device signs in with it
+    public async Task<AuthTokensResponse> SignInDeviceAsync(string login, Guid deviceId)
+    {
+        var cookie = await SignInAccountAsync(login);
+
+        var codeResponse = await RequestLoginCodeAsync(cookie, deviceId);
+        await EnsureAsync(codeResponse, $"login code of {login}");
+        var code = (await codeResponse.Content.ReadFromJsonAsync<DeviceLoginCodeResponse>())!;
+
+        var response = await DeviceLoginAsync(code.Code);
+        await EnsureAsync(response, $"device sign-in of {login}");
+        return (await response.Content.ReadFromJsonAsync<AuthTokensResponse>())!;
+    }
+
+    private static async Task EnsureAsync(HttpResponseMessage response, string what)
+    {
+        if (!response.IsSuccessStatusCode)
+            throw new InvalidOperationException($"{what} failed: {(int)response.StatusCode} {await response.Content.ReadAsStringAsync()}");
     }
 
     private async Task WaitForUserAsync(Guid userId)
@@ -157,5 +256,6 @@ public class AppHubTestHost : IAsyncDisposable
 
         await _app.StopAsync();
         await _app.DisposeAsync();
+        Http.Dispose();
     }
 }

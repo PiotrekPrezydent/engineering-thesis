@@ -1,26 +1,42 @@
+using System.Net.Http.Json;
 using Dara.Shared.Contracts;
+using Dara.Shared.Contracts.Auth;
 using Microsoft.AspNetCore.SignalR.Client;
 using TypedSignalR.Client;
 
 namespace Dara.Server.SystemTests.ClientServer;
 
-// one device built like DaraConnection of the cli: the identifier header, typed hub proxy and typed receiver
+// one signed-in device built like DaraConnection of the cli: a device token from AccessTokenProvider,
+// typed hub proxy and typed receiver; it keeps its tokens, so a new connection is the same device
 public class HubTestClient : IAsyncDisposable
 {
+    // like the cli: a token that expires sooner is refreshed before a connection
+    private static readonly TimeSpan RefreshMargin = TimeSpan.FromSeconds(1);
+
     private readonly string _hubUrl;
+    private readonly HttpClient _http;
+    // one refresh at a time, two refreshes with one token would end the session
+    private readonly SemaphoreSlim _refreshLock = new(1, 1);
     private HubConnection _connection;
 
     public string Identifier { get; }
     public Guid UserId { get; set; }
+    public Guid DeviceId { get; }
+    public AuthTokensResponse Tokens { get; private set; }
     public IAppHub Hub { get; private set; } = null!;
+    public HubConnection Connection => _connection;
 
     // kept across connections, so a test sees everything the device got
     public RecordingHubClient Events { get; } = new();
 
-    public HubTestClient(string hubUrl, string identifier)
+    public HubTestClient(string hubUrl, HttpClient http, string identifier, AuthTokensResponse tokens)
     {
         _hubUrl = hubUrl;
+        _http = http;
         Identifier = identifier;
+        DeviceId = tokens.DeviceId;
+        Tokens = tokens;
+        UserId = tokens.UserId;
         _connection = BuildConnection();
     }
 
@@ -37,12 +53,35 @@ public class HubTestClient : IAsyncDisposable
         await _connection.StartAsync(cancellationToken);
     }
 
+    public async Task<string?> GetAccessTokenAsync()
+    {
+        await _refreshLock.WaitAsync();
+        try
+        {
+            if (Tokens.AccessTokenExpiresAt - DateTime.UtcNow < RefreshMargin)
+                await RefreshCoreAsync();
+
+            return Tokens.AccessToken;
+        }
+        finally
+        {
+            _refreshLock.Release();
+        }
+    }
+
+    private async Task RefreshCoreAsync()
+    {
+        var response = await _http.PostAsJsonAsync(AuthRoutes.Refresh, new RefreshRequest(Tokens.RefreshToken));
+        response.EnsureSuccessStatusCode();
+        Tokens = (await response.Content.ReadFromJsonAsync<AuthTokensResponse>())!;
+    }
+
     private HubConnection BuildConnection()
     {
         var connection = new HubConnectionBuilder()
             .WithUrl(_hubUrl, options =>
             {
-                options.Headers[Connections.IdentifierHeaderName] = Identifier;
+                options.AccessTokenProvider = GetAccessTokenAsync;
             })
             .Build();
 

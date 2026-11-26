@@ -26,10 +26,14 @@ using Dara.Server.Modules.Profiles.Application.ChangeProfileName;
 using Dara.Shared.Contracts;
 using Dara.Shared.Contracts.Plugins;
 using Dara.Shared.Contracts.StateSnapshots;
+using Dara.Server.Apps.API.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Dara.Server.Apps.API.Hubs;
 
+// a device token only (claims sub and device); an account token gets 403 at the negotiation
+[Authorize(Policy = AuthPolicies.Device)]
 public partial class AppHub : Hub<IAppHubClient>, IAppHub
 {
     private readonly IIdentityModule _identityModule;
@@ -49,14 +53,14 @@ public partial class AppHub : Hub<IAppHubClient>, IAppHub
 
     public override async Task OnConnectedAsync()
     {
-        Console.WriteLine($"{Context.ConnectionId} connected - GUID: {Context.GuidIdentifier()}");
+        Console.WriteLine($"{Context.ConnectionId} connected - USER: {Context.GuidIdentifier()} DEVICE: {Context.DeviceId()}");
         await base.OnConnectedAsync();
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
 
-        Console.WriteLine($"{Context.ConnectionId} DISCONNECTED - GUID: {Context.GuidIdentifier()}");
+        Console.WriteLine($"{Context.ConnectionId} DISCONNECTED - USER: {Context.GuidIdentifier()} DEVICE: {Context.DeviceId()}");
         await base.OnDisconnectedAsync(exception);
     }
 

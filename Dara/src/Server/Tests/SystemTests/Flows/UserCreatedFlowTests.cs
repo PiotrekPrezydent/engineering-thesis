@@ -1,5 +1,4 @@
 using Dara.Server.Modules.Groups.Domain.Members;
-using Dara.Server.Modules.Identity.Application.CreateUser;
 using Dara.Server.Modules.Identity.Application.GetUser;
 using Dara.Server.Modules.Orchestration.Domain.Participants;
 using Dara.Server.Modules.Plugins.Domain.PluginOwners;
@@ -17,7 +16,7 @@ public class UserCreatedFlowTests
     {
         await using var host = await ModulesHost.StartAsync(TestContext.Current.CancellationToken);
 
-        var userId = await host.Identity.ExecuteCommandAsync<CreateUserCommand, Guid>(new CreateUserCommand("flow-user"));
+        var userId = await host.CreateUserAsync("flow-user");
 
         await ModulesHost.WaitUntilAsync(() => ProfileExistsAsync(host, userId), "profile of the new user");
         await ModulesHost.WaitUntilAsync(() => MemberExistsAsync(host, userId, "DEFAULT-NAME"), "groups member of the new user");
@@ -31,7 +30,7 @@ public class UserCreatedFlowTests
     {
         await using var host = await ModulesHost.StartAsync(TestContext.Current.CancellationToken);
 
-        var userId = await host.Identity.ExecuteCommandAsync<CreateUserCommand, Guid>(new CreateUserCommand("renamed-user"));
+        var userId = await host.CreateUserAsync("renamed-user");
         await ModulesHost.WaitUntilAsync(() => ProfileExistsAsync(host, userId), "profile of the new user");
 
         await host.Profiles.ExecuteCommandAsync(new ChangeProfileNameCommand(userId, "Bob-Phone"));
@@ -45,7 +44,7 @@ public class UserCreatedFlowTests
     {
         await using var host = await ModulesHost.StartAsync(TestContext.Current.CancellationToken);
 
-        var userId = await host.Identity.ExecuteCommandAsync<CreateUserCommand, Guid>(new CreateUserCommand("participant-user"));
+        var userId = await host.CreateUserAsync("participant-user");
 
         await ModulesHost.WaitUntilAsync(() => ModulesHost.ReadAsync(host.PluginsRoot,
             model => model.Query<PluginOwner>().AnyAsync(e => e.Id.Match(userId))), "plugin owner of the new user");
@@ -62,10 +61,10 @@ public class UserCreatedFlowTests
         await using var first = await ModulesHost.StartAsync(TestContext.Current.CancellationToken);
         await using var second = await ModulesHost.StartAsync(TestContext.Current.CancellationToken);
 
-        var userId = await first.Identity.ExecuteCommandAsync<CreateUserCommand, Guid>(new CreateUserCommand("first-host-user"));
+        var userId = await first.CreateUserAsync("first-host-user");
         await ModulesHost.WaitUntilAsync(() => ProfileExistsAsync(first, userId), "profile in the first host");
 
-        var secondUsers = await second.Identity.ExecuteQueryAsync<GetAllUsersQuery, List<(Guid userId, string userIdentifier)>>(new GetAllUsersQuery());
+        var secondUsers = await second.Identity.ExecuteQueryAsync<GetAllUsersQuery, List<(Guid userId, string login)>>(new GetAllUsersQuery());
         Assert.DoesNotContain(secondUsers, user => user.userId == userId);
         Assert.False(await ProfileExistsAsync(second, userId));
     }

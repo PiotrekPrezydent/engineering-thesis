@@ -5,6 +5,7 @@ using Dara.Server.BuildingBlocks.Infrastructure.Messaging.EventBus;
 using Dara.Server.Modules.Groups.Application;
 using Dara.Server.Modules.Groups.Infrastructure;
 using Dara.Server.Modules.Identity.Application;
+using Dara.Server.Modules.Identity.Application.RegisterUser;
 using Dara.Server.Modules.Identity.Infrastructure;
 using Dara.Server.Modules.Orchestration.Application;
 using Dara.Server.Modules.Orchestration.Infrastructure;
@@ -79,6 +80,14 @@ public class ModulesHost : IAsyncDisposable
 
         return host;
     }
+
+    // an account like one registered over /auth/register; the other modules get it from NewUserCreatedIntegrationEvent
+    public Task<Guid> CreateUserAsync(string login)
+    {
+        return Identity.ExecuteCommandAsync<RegisterUserCommand, Guid>(new RegisterUserCommand(login, $"{login}@test.local", TestPassword));
+    }
+
+    public const string TestPassword = "test-password-1";
 
     // reads module state that the module api has no query for
     public static async Task<TResult> ReadAsync<TResult>(IModuleCompositionRoot module, Func<IReadModel, Task<TResult>> read)

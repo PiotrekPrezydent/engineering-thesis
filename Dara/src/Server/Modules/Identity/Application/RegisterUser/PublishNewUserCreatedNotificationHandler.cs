@@ -2,7 +2,7 @@ using Dara.Server.BuildingBlocks.Application.Events;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.EventBus;
 using Dara.Server.Modules.Identity.Integration;
 
-namespace Dara.Server.Modules.Identity.Application.CreateUser;
+namespace Dara.Server.Modules.Identity.Application.RegisterUser;
 
 public class PublishNewUserCreatedNotificationHandler : IDomainEventNotificationHandler<NewUserCreatedNotification>
 {

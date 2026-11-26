@@ -38,7 +38,7 @@ public class LogModulesDataService
     {
         StringBuilder sb = new();
         Dictionary<Guid, (string Identifier, string ProfileName)> userDetails = new();
-        var users = await _identityModule.ExecuteQueryAsync<GetAllUsersQuery, List<(Guid userId, string userIdentifier)>>(new());
+        var users = await _identityModule.ExecuteQueryAsync<GetAllUsersQuery, List<(Guid userId, string login)>>(new());
         
         sb.AppendLine("\nUSERS-PROFILES :::: \n");
         foreach (var user in users)
@@ -46,10 +46,10 @@ public class LogModulesDataService
             var profile = await _profilesModule.ExecuteQueryAsync<GetProfileQuery,ProfileDto>(new GetProfileQuery(user.userId));
             var plugins = await _pluginsModule.ExecuteQueryAsync<GetOwnerPluginsQuery,List<OwnerPluginDto>>(new GetOwnerPluginsQuery(user.userId));
             var functions = await _orchestrationModule.ExecuteQueryAsync<GetParticipantFunctionsQuery,List<ParticipantFunctionDto>>(new GetParticipantFunctionsQuery(user.userId));
-            userDetails.Add(user.userId, ("IDENTIFIER: " + user.userIdentifier, "PROFILE-NAME: " + profile.Name));
+            userDetails.Add(user.userId, ("LOGIN: " + user.login, "PROFILE-NAME: " + profile.Name));
             
             sb.AppendLine($"ID : {user.userId}");
-            sb.AppendLine($"IDENTIFIER : {user.userIdentifier}");
+            sb.AppendLine($"LOGIN : {user.login}");
             sb.AppendLine($"PROFILE-NAME : {profile.Name}");
             sb.AppendLine($"PLUGINS : {plugins.Count}");
             foreach (var plugin in plugins)

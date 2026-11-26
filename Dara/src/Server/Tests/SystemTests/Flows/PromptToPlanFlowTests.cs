@@ -2,7 +2,6 @@ using Dara.Server.BuildingBlocks.Application.Events;
 using Dara.Server.Modules.Groups.Application.Groups.CreateNewGroup;
 using Dara.Server.Modules.Groups.Application.Groups.JoinToGroup;
 using Dara.Server.Modules.Groups.Application.Messages.SendGroupMessage;
-using Dara.Server.Modules.Identity.Application.CreateUser;
 using Dara.Server.Modules.Orchestration.Application.Groups.EditApiKey;
 using Dara.Server.Modules.Orchestration.Application.Groups.EditChatClientProviderName;
 using Dara.Server.Modules.Orchestration.Application.Groups.EditClientModelName;
@@ -82,7 +81,7 @@ public class PromptToPlanFlowTests
 
     private static async Task<Guid> CreateDeviceAsync(ModulesHost host, string identifier, string name, PluginManifest plugin, string functionName)
     {
-        var userId = await host.Identity.ExecuteCommandAsync<CreateUserCommand, Guid>(new CreateUserCommand(identifier));
+        var userId = await host.CreateUserAsync(identifier);
 
         await ModulesHost.WaitUntilAsync(() => ModulesHost.ReadAsync(host.OrchestrationRoot,
             model => model.Query<Participant>().AnyAsync(p => p.Id.Match(userId))), "participant of the new user");

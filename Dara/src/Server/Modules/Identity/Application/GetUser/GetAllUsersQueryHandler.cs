@@ -4,7 +4,7 @@ using Dara.Server.Modules.Identity.Domain;
 
 namespace Dara.Server.Modules.Identity.Application.GetUser;
 
-public class GetAllUsersQueryHandler : IQueryHandler<GetAllUsersQuery,List<(Guid userId, string userIdentifier)>>
+public class GetAllUsersQueryHandler : IQueryHandler<GetAllUsersQuery,List<(Guid userId, string login)>>
 {
     private readonly IReadModel _readModel;
 
@@ -13,13 +13,13 @@ public class GetAllUsersQueryHandler : IQueryHandler<GetAllUsersQuery,List<(Guid
         _readModel = readModel;
     }
 
-    public async Task<List<(Guid userId, string userIdentifier)>> HandleAsync(GetAllUsersQuery query)
+    public Task<List<(Guid userId, string login)>> HandleAsync(GetAllUsersQuery query)
     {
         var users = _readModel.Query<User>().ToList().Select(e => (
             e.Id.Value,
-            e.Identifier
+            e.Login
         )).ToList();
-        
-        return users;
+
+        return Task.FromResult(users);
     }
 }

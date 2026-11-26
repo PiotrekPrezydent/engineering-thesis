@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- PasswordHasher<T> (Microsoft.Extensions.Identity.Core) comes with the shared ASP.NET Core framework -->
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\..\BuildingBlocks\Infrastructure\Dara.Server.BuildingBlocks.Infrastructure.csproj" />
     <ProjectReference Include="..\Application\Dara.Server.Modules.Identity.Application.csproj" />
   </ItemGroup>

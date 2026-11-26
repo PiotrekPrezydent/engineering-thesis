@@ -26,6 +26,10 @@ public class SeedData
     public Dictionary<string, Guid> GroupIds { get; } = new();
 }
 
-public record SeedUser(string Identifier, string ProfileName);
+// the identifier is the login of the account
+public record SeedUser(string Identifier, string ProfileName)
+{
+    public string Email => $"{Identifier}@dara.local";
+}
 
 public record SeedGroup(string Name, string JoinCode, string Owner, IReadOnlyList<string> Members);

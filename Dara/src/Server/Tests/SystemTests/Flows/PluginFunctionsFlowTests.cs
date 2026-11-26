@@ -2,7 +2,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.Inbox;
-using Dara.Server.Modules.Identity.Application.CreateUser;
 using Dara.Server.Modules.Identity.Integration;
 using Dara.Server.Modules.Orchestration.Application.Participants.GetParticipantFunctions;
 using Dara.Server.Modules.Orchestration.Domain.Participants;
@@ -130,7 +129,7 @@ public class PluginFunctionsFlowTests
 
     private static async Task<Guid> CreateUserAsync(ModulesHost host, string identifier)
     {
-        var userId = await host.Identity.ExecuteCommandAsync<CreateUserCommand, Guid>(new CreateUserCommand(identifier));
+        var userId = await host.CreateUserAsync(identifier);
 
         await ModulesHost.WaitUntilAsync(() => ModulesHost.ReadAsync(host.PluginsRoot,
             model => model.Query<PluginOwner>().AnyAsync(o => o.Id.Match(userId))), "plugin owner of the new user");

@@ -13,8 +13,12 @@ public class SeedEnvironment
     public string AgentModel { get; }
     public string AgentApiKey { get; }
 
+    // the password of every seeded account, only in .env; empty with the seed on stops the start
+    public string UserPassword { get; }
+
     public SeedEnvironment(IConfiguration configuration)
     {
+        UserPassword = configuration.GetValue("Seed:UserPassword", "")!;
         Enabled = configuration.GetValue("Seed:Enabled", true);
         WaitTimeout = configuration.GetValue("Seed:WaitTimeout", TimeSpan.FromSeconds(10));
         AgentProvider = configuration.GetValue("Seed:AgentProvider", "google")!;

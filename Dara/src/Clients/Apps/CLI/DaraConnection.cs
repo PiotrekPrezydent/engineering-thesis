@@ -1,4 +1,3 @@
-using System.Text;
 using Dara.Shared.Common.CLI;
 using Dara.Shared.Contracts;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -9,70 +8,83 @@ namespace Dara.Clients.Apps.CLI;
 
 public class DaraConnection
 {
-    private readonly string _serverUrl;
-    public HubConnection Connection { get; private set; }
-    
+    public const string ServerUrl = "http://127.0.0.1:5273";
 
-    public DaraConnection()
+    private readonly string _hubUrl = $"{ServerUrl}/{Connections.HubName}";
+    private readonly AuthSession _auth;
+    private bool _stopRequested;
+
+    public HubConnection? Connection { get; private set; }
+
+    public DaraConnection(AuthSession auth)
     {
-        _serverUrl = ProvideUrl();
+        _auth = auth;
     }
-    
-    public HubConnection SetConnection(string identifier)
+
+    // every (re)connect asks the session for a device token, so an expired one is refreshed first
+    public HubConnection SetConnection()
     {
         var builder = new HubConnectionBuilder();
-        builder.WithUrl(_serverUrl, options =>
+        builder.WithUrl(_hubUrl, options =>
         {
-            options.Headers[Connections.IdentifierHeaderName] = identifier;
+            options.AccessTokenProvider = _auth.GetAccessTokenAsync;
         });
         builder.WithAutomaticReconnect();
-        Connection = builder.Build();
-        Connection.Register<IAppHubClient>(new HubEvents());
-        HubCommands.Proxy = Connection.CreateHubProxy<IAppHub>();
-        return Connection;
-    }
+        var connection = builder.Build();
+        connection.Register<IAppHubClient>(new HubEvents());
+        HubCommands.Proxy = connection.CreateHubProxy<IAppHub>();
 
-    string ProvideUrl()
-    {
-        return $"http://127.0.0.1:5273/{Connections.HubName}";
-    }
+        // the server closes the connection when the token expires; when the automatic reconnect does not run,
+        // the connection starts again with a refreshed token
+        connection.Closed += async _ =>
+        {
+            if (_stopRequested || !_auth.IsSignedIn)
+                return;
 
-    string GenerateIdentifier()
-    {
-        var secretKey = $"{AppDomain.CurrentDomain.BaseDirectory}-{DateTime.UtcNow.Ticks}";
-        var key = Encoding.ASCII.GetBytes(secretKey);
-        return Convert.ToBase64String(key);
+            CLIClient.Logger.LogInformation("Connection closed by the server, connecting again...");
+            await Task.Delay(TimeSpan.FromSeconds(1));
+            try
+            {
+                await connection.StartAsync();
+            }
+            catch (Exception e)
+            {
+                CLIClient.Logger.LogWarning("Could not connect again: {Message}", e.Message);
+            }
+        };
+
+        Connection = connection;
+        return connection;
     }
 
     [CLICommand("connect","con")]
     async Task Connect()
     {
-        CLIClient.Logger.LogInformation("Connecting to {url}...", _serverUrl);
-        
-        await SetConnection(GenerateIdentifier()).StartAsync();
-        
-        Console.WriteLine($"Connected to {_serverUrl}");
+        if (!_auth.IsSignedIn)
+        {
+            Console.WriteLine("Sign in first: login <code> (the code comes from the account panel)");
+            return;
+        }
+
+        CLIClient.Logger.LogInformation("Connecting to {url}...", _hubUrl);
+
+        _stopRequested = false;
+        await SetConnection().StartAsync();
+
+        Console.WriteLine($"Connected to {_hubUrl}");
     }
-    
-    [CLICommand("con-u")]
-    async Task Connect(string identifier)
-    {
-        CLIClient.Logger.LogInformation("Connecting to {url}...", _serverUrl);
-        
-        await SetConnection(identifier).StartAsync();
-        
-        Console.WriteLine($"Connected to {_serverUrl}");
-    }
-    
-    
 
     [CLICommand("disconnect", "dis")]
     async Task Disconnect()
     {
-        Console.WriteLine($"Disconnecting from {_serverUrl}...");
-    
+        if (Connection == null)
+            return;
+
+        Console.WriteLine($"Disconnecting from {_hubUrl}...");
+
+        _stopRequested = true;
         await Connection.StopAsync();
-    
-        Console.WriteLine($"Disconnected from {_serverUrl}");
+
+        Console.WriteLine($"Disconnected from {_hubUrl}");
     }
 }

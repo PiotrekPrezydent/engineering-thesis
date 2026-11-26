@@ -5,16 +5,22 @@ namespace Dara.Server.Modules.Identity.Infrastructure.Users;
 
 public class UserRepository : IUserRepository
 {
-    private IdentityContext _context;
+    private readonly IdentityContext _context;
 
     public UserRepository(IdentityContext context)
     {
         _context = context;
     }
-    
+
     public async Task<User> GetByIdAsync(UserId id)
     {
         return await _context.Users.FirstAsync(e => e.Id == id);
+    }
+
+    public async Task<User?> FindByLoginAsync(string login)
+    {
+        var normalized = User.NormalizeLogin(login);
+        return await _context.Users.FirstOrDefaultAsync(e => e.Login == normalized);
     }
 
     public async Task AddAsync(User user)

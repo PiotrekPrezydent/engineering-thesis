@@ -1,7 +1,9 @@
 using System.Collections.Immutable;
 using System.Reflection;
 using System.Threading.Channels;
+using System.Threading.RateLimiting;
 using Dara.Server.Apps.API.Authentication;
+using Dara.Server.Apps.API.Endpoints;
 using Dara.Server.Apps.API.Hubs;
 using Dara.Server.Apps.API.Processing;
 using Dara.Server.Apps.API.Services;
@@ -18,7 +20,10 @@ using Dara.Server.Modules.Plugins.Infrastructure;
 using Dara.Server.Modules.Profiles.Infrastructure;
 using Dara.Shared.Common.Configuration;
 using Dara.Shared.Contracts;
+using Dara.Shared.Contracts.Auth;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Dara.Server.Apps.API;
 
@@ -42,23 +47,25 @@ public class Program
         app.Run();
     }
 
-    // modules build their containers before the host, so tests pass their own roots here (e.g. a scripted model provider)
-    public static WebApplication CreateApplication(string[] args, IReadOnlyList<IModuleCompositionRoot> modulesRoots)
+    // modules build their containers before the host, so tests pass their own roots here (e.g. a scripted model provider);
+    // mapExtra maps endpoints of a test host (e.g. probes of the authorization policies)
+    public static WebApplication CreateApplication(string[] args, IReadOnlyList<IModuleCompositionRoot> modulesRoots, Action<WebApplication>? mapExtra = null)
     {
         var builder = WebApplication.CreateBuilder(args);
-        
-        builder.Services.AddMemoryCache();
-        
-        builder.Services.AddSignalR(options => 
-        { 
+
+        builder.Services.AddSignalR(options =>
+        {
             options.AddFilter<AppHubFilter>();
         });
-        
-        builder.Services.AddAuthentication(options =>
-        {
-            options.AddScheme<ClientIdentifierAuthHandler>(nameof(ClientIdentifierAuthHandler),null);
-        });
-        
+        builder.Services.AddSingleton<IUserIdProvider, SubjectUserIdProvider>();
+
+        AddAuthentication(builder);
+        AddDeviceLoginRateLimit(builder);
+        // minimal api checks the token only on endpoints that bind a form (the panel, TASK-ENG-036);
+        // json endpoints of the panel are covered by the SameSite=Strict cookie
+        builder.Services.AddAntiforgery();
+        builder.Services.AddProblemDetails();
+
         // one bus per host, so several hosts in one process (tests) do not share events
         var eventBus = new InMemoryEventBus();
         
@@ -83,6 +90,8 @@ public class Program
         
         app.UseAuthentication();
         app.UseAuthorization();
+        app.UseAntiforgery();
+        app.UseRateLimiter();
         // await app.StartAsync();
         // await Task.Delay(TimeSpan.FromSeconds(5));
         // foreach (var modulesRoot in modulesRoots)
@@ -93,8 +102,82 @@ public class Program
         // }
         // await app.StopAsync();
         
-        app.MapHub<AppHub>(Connections.HubName);
+        app.MapAuthEndpoints();
+
+        // only a device token connects; the server closes the connection when the token expires,
+        // the client refreshes it over http and connects again
+        app.MapHub<AppHub>(Connections.HubName, options => options.CloseOnAuthenticationExpiration = true)
+            .RequireAuthorization(AuthPolicies.Device);
+
+        mapExtra?.Invoke(app);
         return app;
+    }
+
+    // two schemes: the device token (jwt, the default) for devices and the hub, the cookie for the account panel
+    static void AddAuthentication(WebApplicationBuilder builder)
+    {
+        var jwt = JwtOptions.FromConfiguration(builder.Configuration);
+        builder.Services.AddSingleton(jwt);
+        builder.Services.AddSingleton(TimeProvider.System);
+        builder.Services.AddSingleton<AccessTokenIssuer>();
+
+        builder.Services
+            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                // claims keep their jwt names (sub, scope, device, sid)
+                options.MapInboundClaims = false;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidIssuer = jwt.Issuer,
+                    ValidateAudience = true,
+                    ValidAudience = jwt.Audience,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = jwt.CreateSigningKey(),
+                    ValidAlgorithms = [SecurityAlgorithms.HmacSha256],
+                    ValidateLifetime = true,
+                    // one server issues and checks, without it an expired token would work 5 more minutes
+                    ClockSkew = TimeSpan.Zero,
+                    NameClaimType = AuthClaims.Subject
+                };
+                options.Events = new JwtBearerEvents
+                {
+                    // a browser cannot set headers on a websocket, so the hub also takes the token from the query
+                    OnMessageReceived = context =>
+                    {
+                        var token = context.Request.Query["access_token"];
+                        if (!string.IsNullOrEmpty(token) && context.HttpContext.Request.Path.StartsWithSegments("/" + Connections.HubName))
+                            context.Token = token;
+
+                        return Task.CompletedTask;
+                    }
+                };
+            })
+            .AddCookie(AccountCookie.Scheme, AccountCookie.Configure);
+
+        builder.Services.AddAuthorization(AuthPolicies.Configure);
+    }
+
+    // attempts of device-login per client address in a fixed window of one minute (Auth:DeviceLoginPermitsPerMinute)
+    static void AddDeviceLoginRateLimit(WebApplicationBuilder builder)
+    {
+        var permits = builder.Configuration.GetValue("Auth:DeviceLoginPermitsPerMinute", 10);
+        if (permits <= 0)
+            throw new InvalidOperationException("Auth__DeviceLoginPermitsPerMinute must be positive");
+
+        builder.Services.AddRateLimiter(options =>
+        {
+            options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+            options.AddPolicy(AuthEndpoints.DeviceLoginRateLimit, context => RateLimitPartition.GetFixedWindowLimiter(
+                context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = permits,
+                    Window = TimeSpan.FromMinutes(1),
+                    QueueLimit = 0
+                }));
+        });
     }
 
     static void AddNotificationHandlersInAssembly(IServiceCollection services, Assembly assembly, IEventBus eventBus)

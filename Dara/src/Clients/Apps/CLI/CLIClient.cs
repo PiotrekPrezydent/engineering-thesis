@@ -17,12 +17,14 @@ public class CLIClient
         CLILineInterpreter ci = new();
 
         // BasicCommands bc = new();
-        DaraConnection con = new();
+        AuthSession auth = new(DaraConnection.ServerUrl);
+        DaraConnection con = new(auth);
         HubCommands hc = new();
         // ConnectionCommands cc = new(con.Connection);
         // ClientCommands acc = new(con.Connection);
         //
         // ci.BindObjectCommands(bc);
+        ci.BindObjectCommands(auth);
         ci.BindObjectCommands(con);
         ci.BindObjectCommands(hc);
         // ci.BindObjectCommands(cc);
