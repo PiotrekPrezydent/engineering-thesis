@@ -28,7 +28,16 @@
   </Folder>
   
   <Folder Name="/Server/Modules/" />
-  <Folder Name="/Server/Modules/Groups/">
+  <Folder Name="/Server/Modules/Authorization/">
+    <Project Path="src/Server/Modules/Authorization/Application/Dara.Server.Modules.Authorization.Application.csproj" />
+    <Project Path="src/Server/Modules/Authorization/Domain/Dara.Server.Modules.Authorization.Domain.csproj" />
+    <Project Path="src/Server/Modules/Authorization/Infrastructure/Dara.Server.Modules.Authorization.Infrastructure.csproj" />
+    <Project Path="src/Server/Modules/Authorization/Integration/Dara.Server.Modules.Authorization.Integration.csproj" />
+  </Folder>
+  <Folder Name="/Server/Modules/Authorization/Tests/">
+    <Project Path="src/Server/Modules/Authorization/Tests/IntegrationTests/Dara.Server.Modules.Authorization.IntegrationTests.csproj" />
+    <Project Path="src/Server/Modules/Authorization/Tests/UnitTests/Dara.Server.Modules.Authorization.UnitTests.csproj" />
+  </Folder>  <Folder Name="/Server/Modules/Groups/">
     <Project Path="src/Server/Modules/Groups/Application/Dara.Server.Modules.Groups.Application.csproj" />
     <Project Path="src/Server/Modules/Groups/Domain/Dara.Server.Modules.Groups.Domain.csproj" />
     <Project Path="src/Server/Modules/Groups/Infrastructure/Dara.Server.Modules.Groups.Infrastructure.csproj" />
@@ -63,12 +72,6 @@
   <Folder Name="/Server/Modules/Plugins/Tests/">
     <Project Path="src/Server/Modules/Plugins/Tests/IntegrationTests/Dara.Server.Modules.Plugins.IntegrationTests.csproj" />
     <Project Path="src/Server/Modules/Plugins/Tests/UnitTests/Dara.Server.Modules.Plugins.UnitTests.csproj" />
-  </Folder>
-  <Folder Name="/Server/Modules/Profiles/">
-    <Project Path="src\Server\Modules\Profiles\Application\Dara.Server.Modules.Profiles.Application.csproj" />
-    <Project Path="src\Server\Modules\Profiles\Domain\Dara.Server.Modules.Profiles.Domain.csproj" />
-    <Project Path="src\Server\Modules\Profiles\Infrastructure\Dara.Server.Modules.Profiles.Infrastructure.csproj" />
-    <Project Path="src\Server\Modules\Profiles\Integration\Dara.Server.Modules.Profiles.Integration.csproj" />
   </Folder>
   
   <Folder Name="/Server/Tests/">

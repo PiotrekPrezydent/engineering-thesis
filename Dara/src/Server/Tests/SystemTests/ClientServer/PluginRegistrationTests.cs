@@ -95,13 +95,13 @@ public class PluginRegistrationTests
         await laptop.Hub.DisablePluginFunction(files.PluginId, deleteFile.FunctionId);
         await laptop.Events.WaitForAsync<PluginsRegisteredNotification>(
             n => n.Plugins.Single().Functions.Any(f => f.FunctionId == deleteFile.FunctionId && !f.IsEnabled), "delete file disabled");
-        await ModulesHost.WaitUntilAsync(async () => (await host.GetParticipantFunctionNamesAsync(laptop.UserId)).SequenceEqual(["SaveFile"]),
+        await ModulesHost.WaitUntilAsync(async () => (await host.GetParticipantFunctionNamesAsync(laptop.ClientId)).SequenceEqual(["SaveFile"]),
             "only save file left in orchestration");
 
         await laptop.Hub.EnablePluginFunction(files.PluginId, deleteFile.FunctionId);
         await laptop.Events.WaitForAsync<PluginsRegisteredNotification>(
             n => n.Plugins.Single().Functions.All(f => f.IsEnabled), "delete file enabled again");
-        await ModulesHost.WaitUntilAsync(async () => (await host.GetParticipantFunctionNamesAsync(laptop.UserId)).SequenceEqual(["DeleteFile", "SaveFile"]),
+        await ModulesHost.WaitUntilAsync(async () => (await host.GetParticipantFunctionNamesAsync(laptop.ClientId)).SequenceEqual(["DeleteFile", "SaveFile"]),
             "delete file back in orchestration");
     }
 

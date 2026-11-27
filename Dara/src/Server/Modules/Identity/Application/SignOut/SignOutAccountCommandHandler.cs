@@ -1,5 +1,5 @@
 using Dara.Server.BuildingBlocks.Application.Commands;
-using Dara.Server.Modules.Identity.Domain.Sessions;
+using Dara.Server.Modules.Identity.Domain.AccountSessions;
 
 namespace Dara.Server.Modules.Identity.Application.SignOut;
 

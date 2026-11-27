@@ -1,0 +1,48 @@
+# manual checks of sign-in (Rider, Visual Studio or the VS Code REST Client); the seed makes the accounts bob and
+# room-101 with the password Seed__UserPassword of .env, and their clients Bob-Phone, Bob-Laptop, Bob-Smartwatch
+# (bob), Room-101-Computer-01 and Room-101-Computer-02 (room-101); the clientId of a client is in the answer of
+# GET /account/clients; the cookie of the panel is Secure, so use the https profile of the api
+@host = https://localhost:7105
+@password = change-me-1
+@clientId = paste-the-client-id
+@code = paste-a-code
+@refreshToken = paste-a-refresh-token
+@accessToken = paste-an-access-token
+
+### sign in the account panel: the answer sets the cookie dara.account (no token in the body)
+POST {{host}}/auth/login
+Content-Type: application/json
+
+{ "login": "bob", "password": "{{password}}" }
+
+### the panel creates a registration code for a new client (10 minutes, used once)
+POST {{host}}/account/clients/registration-code
+
+### the app of the new client registers itself with the code: client tokens and the client id; an empty name gets
+### "Phone 1", "PC 2"...
+POST {{host}}/auth/register-client
+Content-Type: application/json
+
+{ "code": "{{code}}", "type": "Phone", "name": "Bob-Phone-2" }
+
+### the panel issues a login code for an existing client (a copy of the app on another computer)
+POST {{host}}/account/clients/{{clientId}}/login-code
+
+### the existing client signs in with the login code; the tokens of its earlier copy end
+POST {{host}}/auth/client-login
+Content-Type: application/json
+
+{ "code": "{{code}}" }
+
+### refresh the client tokens: the old refresh token is used up
+POST {{host}}/auth/refresh
+Content-Type: application/json
+
+{ "refreshToken": "{{refreshToken}}" }
+
+### sign out the client
+POST {{host}}/auth/logout
+Authorization: Bearer {{accessToken}}
+
+### sign out the panel: the session ends and the cookie is removed
+POST {{host}}/auth/logout

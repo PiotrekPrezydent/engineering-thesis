@@ -1,9 +1,9 @@
 using Dara.Server.BuildingBlocks.Application.Commands;
-using Dara.Server.Modules.Identity.Domain.Sessions;
+using Dara.Server.Modules.Identity.Domain.AccountSessions;
 
 namespace Dara.Server.Modules.Identity.Application.SignIn;
 
-// every sign-in of the panel is a new session; it publishes nothing, the panel is not a device
+// every sign-in of the panel is a new session; it publishes nothing, the panel is not a client
 public class SignInAccountCommandHandler : ICommandHandler<SignInAccountCommand, AccountSignInResult>
 {
     private readonly CredentialsVerifier _credentialsVerifier;

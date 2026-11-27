@@ -6,7 +6,12 @@ namespace Dara.Clients.Apps.CLI;
 
 public class HubEvents : IAppHubClient
 {
-    public async Task OnProfileNameChanged(ProfileNameChangedNotification notification)
+    public async Task OnClientRenamed(ClientRenamedNotification notification)
+    {
+        Console.WriteLine(notification);
+    }
+
+    public async Task OnClientRevoked(ClientRevokedNotification notification)
     {
         Console.WriteLine(notification);
     }

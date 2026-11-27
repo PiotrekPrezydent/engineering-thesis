@@ -1,5 +1,5 @@
-using Dara.Server.Modules.Identity.Domain;
-using Dara.Server.Modules.Identity.Domain.Sessions;
+using Dara.Server.Modules.Identity.Domain.Users;
+using Dara.Server.Modules.Identity.Domain.AccountSessions;
 
 namespace Dara.Server.Modules.Identity.UnitTests;
 

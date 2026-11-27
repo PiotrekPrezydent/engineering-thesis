@@ -24,7 +24,6 @@
         <ProjectReference Include="..\..\Apps\API\Dara.Server.Apps.API.csproj" />
         <ProjectReference Include="..\..\BuildingBlocks\Infrastructure\Dara.Server.BuildingBlocks.Infrastructure.csproj" />
         <ProjectReference Include="..\..\Modules\Identity\Infrastructure\Dara.Server.Modules.Identity.Infrastructure.csproj" />
-        <ProjectReference Include="..\..\Modules\Profiles\Infrastructure\Dara.Server.Modules.Profiles.Infrastructure.csproj" />
         <ProjectReference Include="..\..\Modules\Groups\Infrastructure\Dara.Server.Modules.Groups.Infrastructure.csproj" />
         <ProjectReference Include="..\..\Modules\Plugins\Infrastructure\Dara.Server.Modules.Plugins.Infrastructure.csproj" />
         <ProjectReference Include="..\..\Modules\Orchestration\Infrastructure\Dara.Server.Modules.Orchestration.Infrastructure.csproj" />

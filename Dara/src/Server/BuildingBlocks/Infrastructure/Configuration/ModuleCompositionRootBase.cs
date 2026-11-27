@@ -1,3 +1,4 @@
+using Dara.Server.BuildingBlocks.Application.Authorization;
 using Dara.Server.BuildingBlocks.Application.Commands;
 using Dara.Server.BuildingBlocks.Application.Events;
 using Dara.Server.BuildingBlocks.Application.Queries;
@@ -39,13 +40,18 @@ namespace Dara.Server.BuildingBlocks.Infrastructure.Configuration;
 public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
 {
     private IServiceProvider _services = null!;
+    private ModuleAuthorizationCatalog? _authorizationCatalog;
 
     // how the outbox, inbox and internal commands workers of the module process and retry messages
     public MessageProcessingOptions ProcessingOptions { get; init; } = new();
 
     // the clock of retries and of the queue order; tests may give a fake one
     public TimeProvider TimeProvider { get; init; } = TimeProvider.System;
-    
+
+    // the permissions and roles of the module, checked by Initialize
+    public ModuleAuthorizationCatalog AuthorizationCatalog =>
+        _authorizationCatalog ?? throw new InvalidOperationException($"{GetType().FullName} is not initialized.");
+
     public IServiceScope CreateScope()
     { 
         if(_services == null)
@@ -122,7 +128,7 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
            [.9495] OUTBOX AVERAGE TICKS : 1521910 --- 0.15219102
            [.9496] INBOX AVERAGE TICKS : -2147483648 --- -2147483648
            
-           [01:40:35] [INF] [Dara.Server.BuildingBlocks.Infrastructure.Configuration.ModuleCompositionRootBase] [Profiles]
+           [01:40:35] [INF] [Dara.Server.BuildingBlocks.Infrastructure.Configuration.ModuleCompositionRootBase] [Devices]
            [.9650] OUTBOX AVERAGE TICKS : 119395 --- 0.01193952
            [.9650] INBOX AVERAGE TICKS : 113990 --- 0.011399040000000001
            
@@ -135,7 +141,7 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
             groups     [.0556] INBOX LOOP : 10 / Processor call: 9              10
                     [.1063] OUTBOX LOOP : 22 / [.1037] Processor call: 11       12
                     
-            profiles [.1144] INBOX LOOP : 5 / [.1140] Processor call: 4         5
+            devices [.1144] INBOX LOOP : 5 / [.1140] Processor call: 4         5
                     .0476] OUTBOX LOOP : 10 / [.0463] Processor call: 4         5
                     
             plugins: [.1141] INBOX LOOP : 5 / [.1138] Processor call: 4             5
@@ -176,7 +182,10 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
         var mediation = mediationBuilder.Build();
         var processing = processingBuilder.Build();
         var messaging = messagingBuilder.Build();
-        
+
+        // the module does not start when a permission is in no role; checked before anything is registered
+        _authorizationCatalog = ModuleAuthorizationCatalog.FromAssembly(this.GetModuleName(), references.ApplicationAssembly);
+
         ModuleMediationVisitor mediationVisitor = new(references,services);
         ModuleDataAccessVisitor dataAccessVisitor = new(references,services);
         ModuleProcessingVisitor processingVisitor = new(references,services);
@@ -305,6 +314,3 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
             .WithOutboxProcessor(ITypeKey<OutboxMessageProcessor>.Instance);
     }
 }
-
-
-

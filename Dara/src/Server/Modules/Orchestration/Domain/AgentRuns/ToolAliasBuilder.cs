@@ -21,7 +21,7 @@ public static class ToolAliasBuilder
 
         foreach (var participant in participants)
         {
-            // one number for all functions of the participant, so the model sees which tools are on one device
+            // one number for all functions of the participant, so the model sees which tools are on one client
             var name = ParticipantPart(participant.Name);
             var number = 1;
             while (!prefixes.Add(name + NumberText(number)))

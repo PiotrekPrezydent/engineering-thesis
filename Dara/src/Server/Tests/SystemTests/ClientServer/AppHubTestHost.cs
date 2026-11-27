@@ -1,14 +1,15 @@
 using System.Net.Http.Json;
 using System.Security.Cryptography;
-using Dara.Server.BuildingBlocks.Infrastructure.Messaging;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration;
 using Dara.Server.Modules.Groups.Domain.Members;
 using Dara.Server.Modules.Groups.Infrastructure;
-using Dara.Server.Apps.API.Authentication;
+using Dara.Server.Apps.API.Common.Authentication;
 using Dara.Server.Modules.Identity.Application;
-using Dara.Server.Modules.Identity.Application.RegisterDeviceSession;
+using Dara.Server.Modules.Identity.Application.Clients;
+using Dara.Server.Modules.Identity.Application.GetClients;
 using Dara.Server.Modules.Identity.Application.RegisterUser;
 using Dara.Shared.Contracts.Auth;
+using Dara.Shared.Contracts.Clients;
 using Dara.Server.Modules.Identity.Infrastructure;
 using Dara.Server.Modules.Orchestration.Application;
 using Dara.Server.Modules.Orchestration.Application.Participants.GetParticipantFunctions;
@@ -18,9 +19,6 @@ using Dara.Server.Modules.Orchestration.Infrastructure.AgentRuns.Generation;
 using Dara.Server.Modules.Orchestration.IntegrationTests.Fakes;
 using Dara.Server.Modules.Plugins.Domain.PluginOwners;
 using Dara.Server.Modules.Plugins.Infrastructure;
-using Dara.Server.Modules.Profiles.Application;
-using Dara.Server.Modules.Profiles.Application.GetProfile;
-using Dara.Server.Modules.Profiles.Infrastructure;
 using Dara.Server.SystemTests.Hosting;
 using Dara.Shared.Contracts;
 using Dara.Shared.Contracts.Notifications;
@@ -39,7 +37,6 @@ public class AppHubTestHost : IAsyncDisposable
     private readonly List<HubTestClient> _clients = new();
 
     public IdentityCompositionRoot IdentityRoot { get; } = new() { ProcessingOptions = ModulesHost.ProcessingOptions };
-    public ProfilesCompositionRoot ProfilesRoot { get; } = new() { ProcessingOptions = ModulesHost.ProcessingOptions };
     public GroupsCompositionRoot GroupsRoot { get; } = new() { ProcessingOptions = ModulesHost.ProcessingOptions };
     public PluginsCompositionRoot PluginsRoot { get; } = new() { ProcessingOptions = ModulesHost.ProcessingOptions };
     public OrchestrationCompositionRoot OrchestrationRoot { get; }
@@ -56,12 +53,12 @@ public class AppHubTestHost : IAsyncDisposable
     // the key of this host only, random per run, never in the repository
     public string SigningKey { get; } = Convert.ToBase64String(RandomNumberGenerator.GetBytes(48));
 
-    private AppHubTestHost(TimeSpan? accessTokenLifetime, Action<WebApplication>? mapExtra, int? deviceLoginPermitsPerMinute)
+    private AppHubTestHost(TimeSpan? accessTokenLifetime, Action<WebApplication>? mapExtra, int? clientCodePermitsPerMinute)
     {
         OrchestrationRoot = new OrchestrationCompositionRoot([Model], new ExecutionPlanGeneratorOptions(TimeoutSeconds: 5)) { ProcessingOptions = ModulesHost.ProcessingOptions };
 
         // same order as in the api host, the seed is off so tests see only their own data
-        IModuleCompositionRoot[] roots = [IdentityRoot, GroupsRoot, ProfilesRoot, PluginsRoot, OrchestrationRoot];
+        IModuleCompositionRoot[] roots = [IdentityRoot, GroupsRoot, PluginsRoot, OrchestrationRoot];
         List<string> args =
         [
             "--urls", "http://127.0.0.1:0", "--Seed:Enabled", "false", "--Logging:LogLevel:Default", "Warning",
@@ -69,16 +66,16 @@ public class AppHubTestHost : IAsyncDisposable
         ];
         if (accessTokenLifetime is { } lifetime)
             args.AddRange(["--Jwt:AccessTokenLifetime", lifetime.ToString("c")]);
-        if (deviceLoginPermitsPerMinute is { } permits)
-            args.AddRange(["--Auth:DeviceLoginPermitsPerMinute", permits.ToString()]);
+        if (clientCodePermitsPerMinute is { } permits)
+            args.AddRange(["--Auth:ClientCodePermitsPerMinute", permits.ToString()]);
 
         _app = ApiProgram.CreateApplication(args.ToArray(), roots, mapExtra);
     }
 
     public static async Task<AppHubTestHost> StartAsync(CancellationToken cancellationToken, TimeSpan? accessTokenLifetime = null,
-        Action<WebApplication>? mapExtra = null, int? deviceLoginPermitsPerMinute = null)
+        Action<WebApplication>? mapExtra = null, int? clientCodePermitsPerMinute = null)
     {
-        var host = new AppHubTestHost(accessTokenLifetime, mapExtra, deviceLoginPermitsPerMinute);
+        var host = new AppHubTestHost(accessTokenLifetime, mapExtra, clientCodePermitsPerMinute);
         await host._app.StartAsync(cancellationToken);
 
         // kestrel puts the port it got for port 0 into the addresses
@@ -88,18 +85,18 @@ public class AppHubTestHost : IAsyncDisposable
         return host;
     }
 
-    // registers an account with its device like the seed, signs the device in with a code from the panel and
-    // connects it; ready when every module knows the user, like a client that waits for the seed
+    // registers an account and one client of it like the app does (a registration code of the panel) and connects
+    // the client; ready when every module knows the client, like a client that waits for the seed
     public async Task<HubTestClient> ConnectAsync(string login, CancellationToken cancellationToken)
     {
-        var userId = await RegisterAsync(login);
-        var tokens = await SignInDeviceAsync(login, userId);
+        await RegisterAsync(login);
+        var tokens = await RegisterClientAsync(login);
 
         var client = new HubTestClient(HubUrl, Http, login, tokens);
         _clients.Add(client);
         await client.StartAsync(cancellationToken);
 
-        await WaitForUserAsync(client.UserId);
+        await WaitForClientAsync(client.ClientId);
 
         return client;
     }
@@ -116,31 +113,31 @@ public class AppHubTestHost : IAsyncDisposable
             await member.Events.WaitForAsync<GroupSnapshot>(g => g.GroupId == group.GroupId, $"{member.Identifier} joined {groupName}");
         }
 
-        foreach (var device in members.Prepend(owner))
-            await ModulesHost.WaitUntilAsync(async () => await device.Hub.GetGroupAgentSettings(group.GroupId) is not null,
-                $"{device.Identifier} in the orchestration group {groupName}");
+        foreach (var client in members.Prepend(owner))
+            await ModulesHost.WaitUntilAsync(async () => await client.Hub.GetGroupAgentSettings(group.GroupId) is not null,
+                $"{client.Identifier} in the orchestration group {groupName}");
 
         return group;
     }
 
     // the alias of a tool comes from the participant name, so a plan needs the name and the functions in orchestration
-    public async Task WaitForParticipantAsync(Guid userId, string name, params string[] functionNames)
+    public async Task WaitForParticipantAsync(Guid clientId, string name, params string[] functionNames)
     {
         await ModulesHost.WaitUntilAsync(() => ModulesHost.ReadAsync(OrchestrationRoot,
-            model => model.Query<Participant>().AnyAsync(p => p.Id.Match(userId) && p.Name == name)), $"participant {name}");
+            model => model.Query<Participant>().AnyAsync(p => p.Id.Match(clientId) && p.Name == name)), $"participant {name}");
 
         await ModulesHost.WaitUntilAsync(async () =>
         {
-            var functions = await GetParticipantFunctionNamesAsync(userId);
+            var functions = await GetParticipantFunctionNamesAsync(clientId);
             return functionNames.All(functions.Contains);
         }, $"functions of {name}");
     }
 
     // names of the functions orchestration can plan with, sorted
-    public async Task<IReadOnlyList<string>> GetParticipantFunctionNamesAsync(Guid userId)
+    public async Task<IReadOnlyList<string>> GetParticipantFunctionNamesAsync(Guid clientId)
     {
         var functions = await QueryAsync<IOrchestrationModule, List<ParticipantFunctionDto>>(module =>
-            module.ExecuteQueryAsync<GetParticipantFunctionsQuery, List<ParticipantFunctionDto>>(new GetParticipantFunctionsQuery(userId)));
+            module.ExecuteQueryAsync<GetParticipantFunctionsQuery, List<ParticipantFunctionDto>>(new GetParticipantFunctionsQuery(clientId)));
 
         return functions.Select(f => f.Name).Order().ToList();
     }
@@ -151,24 +148,12 @@ public class AppHubTestHost : IAsyncDisposable
         return await query(scope.ServiceProvider.GetRequiredService<TModule>());
     }
 
-    // there is no registration endpoint: an account and one device with the id of the account, through the module
-    // like the seed; the e-mail and the password of every test account follow from the login
-    public async Task<Guid> RegisterAsync(string login)
+    // there is no registration endpoint for accounts: an account without clients, through the module like the seed;
+    // the e-mail and the password of every test account follow from the login
+    public Task<Guid> RegisterAsync(string login)
     {
-        var userId = await QueryAsync<IIdentityModule, Guid>(module => module.ExecuteCommandAsync<RegisterUserCommand, Guid>(
+        return QueryAsync<IIdentityModule, Guid>(module => module.ExecuteCommandAsync<RegisterUserCommand, Guid>(
             new RegisterUserCommand(login, $"{login}@test.local", ModulesHost.TestPassword)));
-        await RegisterDeviceAsync(userId, userId);
-        return userId;
-    }
-
-    // a further device of the account, as the devices module will create it (TASK-ENG-029)
-    public Task RegisterDeviceAsync(Guid userId, Guid deviceId)
-    {
-        return QueryAsync<IIdentityModule, bool>(async module =>
-        {
-            await module.ExecuteCommandAsync(new RegisterDeviceSessionCommand(deviceId, userId));
-            return true;
-        });
     }
 
     public Task<HttpResponseMessage> LoginAsync(LoginRequest request)
@@ -193,36 +178,70 @@ public class AppHubTestHost : IAsyncDisposable
     }
 
     // a request of the panel with its cookie
-    public async Task<HttpResponseMessage> SendAsPanelAsync(HttpMethod method, string path, string? cookie)
+    public async Task<HttpResponseMessage> SendAsPanelAsync(HttpMethod method, string path, string? cookie, object? body = null)
     {
         using var request = new HttpRequestMessage(method, path);
+        if (body != null)
+            request.Content = JsonContent.Create(body);
         if (cookie != null)
             request.Headers.Add("Cookie", cookie);
 
         return await Http.SendAsync(request);
     }
 
-    public Task<HttpResponseMessage> RequestLoginCodeAsync(string? cookie, Guid deviceId)
+    public Task<HttpResponseMessage> RequestRegistrationCodeAsync(string? cookie)
     {
-        return SendAsPanelAsync(HttpMethod.Post, AuthRoutes.DeviceLoginCode(deviceId), cookie);
+        return SendAsPanelAsync(HttpMethod.Post, AuthRoutes.RegistrationCode, cookie);
     }
 
-    public Task<HttpResponseMessage> DeviceLoginAsync(string code)
+    public Task<HttpResponseMessage> RequestLoginCodeAsync(string? cookie, Guid clientId)
     {
-        return Http.PostAsJsonAsync(AuthRoutes.DeviceLogin, new DeviceLoginRequest(code));
+        return SendAsPanelAsync(HttpMethod.Post, AuthRoutes.ClientLoginCode(clientId), cookie);
     }
 
-    // the whole sign-in of a device: the panel signs in, issues a code for the device and the device signs in with it
-    public async Task<AuthTokensResponse> SignInDeviceAsync(string login, Guid deviceId)
+    // the account panel of the client renames it (the name is read-only in the app of the client)
+    public async Task RenameClientAsync(HubTestClient client, string name)
+    {
+        var cookie = await SignInAccountAsync(client.Identifier);
+        await EnsureAsync(await SendAsPanelAsync(HttpMethod.Put, ClientRoutes.Name(client.ClientId), cookie, new RenameClientRequest(name)),
+            $"rename of {client.Identifier}");
+    }
+
+    public Task<HttpResponseMessage> RegisterClientWithCodeAsync(string code, string? type = "Pc", string? name = null)
+    {
+        return Http.PostAsJsonAsync(AuthRoutes.RegisterClient, new RegisterClientRequest(code, type, name));
+    }
+
+    public Task<HttpResponseMessage> ClientLoginAsync(string code)
+    {
+        return Http.PostAsJsonAsync(AuthRoutes.ClientLogin, new ClientLoginRequest(code));
+    }
+
+    // a new client of the account: the panel signs in and creates a registration code, the app registers with it
+    public async Task<AuthTokensResponse> RegisterClientAsync(string login, string? type = "Pc", string? name = null)
     {
         var cookie = await SignInAccountAsync(login);
 
-        var codeResponse = await RequestLoginCodeAsync(cookie, deviceId);
-        await EnsureAsync(codeResponse, $"login code of {login}");
-        var code = (await codeResponse.Content.ReadFromJsonAsync<DeviceLoginCodeResponse>())!;
+        var codeResponse = await RequestRegistrationCodeAsync(cookie);
+        await EnsureAsync(codeResponse, $"registration code of {login}");
+        var code = (await codeResponse.Content.ReadFromJsonAsync<ClientCodeResponse>())!;
 
-        var response = await DeviceLoginAsync(code.Code);
-        await EnsureAsync(response, $"device sign-in of {login}");
+        var response = await RegisterClientWithCodeAsync(code.Code, type, name);
+        await EnsureAsync(response, $"client registration of {login}");
+        return (await response.Content.ReadFromJsonAsync<AuthTokensResponse>())!;
+    }
+
+    // an existing client signs in again: the panel issues a login code for it and the client signs in with it
+    public async Task<AuthTokensResponse> SignInClientAsync(string login, Guid clientId)
+    {
+        var cookie = await SignInAccountAsync(login);
+
+        var codeResponse = await RequestLoginCodeAsync(cookie, clientId);
+        await EnsureAsync(codeResponse, $"login code of {login}");
+        var code = (await codeResponse.Content.ReadFromJsonAsync<ClientCodeResponse>())!;
+
+        var response = await ClientLoginAsync(code.Code);
+        await EnsureAsync(response, $"client sign-in of {login}");
         return (await response.Content.ReadFromJsonAsync<AuthTokensResponse>())!;
     }
 
@@ -232,21 +251,18 @@ public class AppHubTestHost : IAsyncDisposable
             throw new InvalidOperationException($"{what} failed: {(int)response.StatusCode} {await response.Content.ReadAsStringAsync()}");
     }
 
-    private async Task WaitForUserAsync(Guid userId)
+    private async Task WaitForClientAsync(Guid clientId)
     {
-        await ModulesHost.WaitUntilAsync(async () =>
-        {
-            var profiles = await QueryAsync<IProfilesModule, List<ProfileDto>>(module =>
-                module.ExecuteQueryAsync<GetProfilesQuery, List<ProfileDto>>(new GetProfilesQuery([userId])));
-            return profiles.Count == 1;
-        }, "profile of the user");
+        var clients = await QueryAsync<IIdentityModule, List<ClientDto>>(module =>
+            module.ExecuteQueryAsync<GetClientsQuery, List<ClientDto>>(new GetClientsQuery([clientId])));
+        Assert.Single(clients);
 
         await ModulesHost.WaitUntilAsync(() => ModulesHost.ReadAsync(GroupsRoot,
-            model => model.Query<Member>().AnyAsync(m => m.Id.Match(userId))), "groups member of the user");
+            model => model.Query<Member>().AnyAsync(m => m.Id.Match(clientId))), "groups member of the client");
         await ModulesHost.WaitUntilAsync(() => ModulesHost.ReadAsync(PluginsRoot,
-            model => model.Query<PluginOwner>().AnyAsync(o => o.Id.Match(userId))), "plugin owner of the user");
+            model => model.Query<PluginOwner>().AnyAsync(o => o.Id.Match(clientId))), "plugin owner of the client");
         await ModulesHost.WaitUntilAsync(() => ModulesHost.ReadAsync(OrchestrationRoot,
-            model => model.Query<Participant>().AnyAsync(p => p.Id.Match(userId))), "participant of the user");
+            model => model.Query<Participant>().AnyAsync(p => p.Id.Match(clientId))), "participant of the client");
     }
 
     public async ValueTask DisposeAsync()

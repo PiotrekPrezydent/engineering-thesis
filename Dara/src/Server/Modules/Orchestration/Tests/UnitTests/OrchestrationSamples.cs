@@ -7,7 +7,7 @@ using Dara.Server.Modules.Orchestration.Domain.Participants.Functions.Descriptio
 
 namespace Dara.Server.Modules.Orchestration.UnitTests;
 
-// two devices with a few functions and a group around them; each test breaks one thing
+// two clients with a few functions and a group around them; each test breaks one thing
 internal static class OrchestrationSamples
 {
     public static TypeDescription Text => new(TypeKind.String);
@@ -51,15 +51,15 @@ internal static class OrchestrationSamples
 
     public static FunctionDescription SendFiles => Function("SendFiles", new PropertyDescription("paths", ListOf(Text), true));
 
-    public static ParticipantSnapshot Device(string name, params FunctionDescription[] functions)
-        => DeviceWithPlugins(name, functions.Select(f => (Plugin: Guid.NewGuid(), Function: f)).ToArray());
+    public static ParticipantSnapshot Client(string name, params FunctionDescription[] functions)
+        => ClientWithPlugins(name, functions.Select(f => (Plugin: Guid.NewGuid(), Function: f)).ToArray());
 
-    public static ParticipantSnapshot DeviceWithPlugins(string name, params (Guid Plugin, FunctionDescription Function)[] functions)
+    public static ParticipantSnapshot ClientWithPlugins(string name, params (Guid Plugin, FunctionDescription Function)[] functions)
         => new(Guid.NewGuid(), name, functions.Select(f => new FunctionSnapshot(Guid.NewGuid(), f.Plugin, f.Function)).ToList());
 
-    public static ParticipantSnapshot Phone => Device("Bob's phone", SaveFile, ReadFile, GetBatteryLevel, Ping);
+    public static ParticipantSnapshot Phone => Client("Bob's phone", SaveFile, ReadFile, GetBatteryLevel, Ping);
 
-    public static ParticipantSnapshot Laptop => Device("Alice laptop", Notify, SetVolume, ListFiles, SendFiles);
+    public static ParticipantSnapshot Laptop => Client("Alice laptop", Notify, SetVolume, ListFiles, SendFiles);
 
     public static Group GroupOf(params ParticipantSnapshot[] participants)
     {
@@ -70,7 +70,7 @@ internal static class OrchestrationSamples
         return group;
     }
 
-    // a run of the phone owner with both devices in the group
+    // a run of the phone owner with both clients in the group
     public static AgentRun StartRun(out ParticipantSnapshot phone, out ParticipantSnapshot laptop)
     {
         phone = Phone;

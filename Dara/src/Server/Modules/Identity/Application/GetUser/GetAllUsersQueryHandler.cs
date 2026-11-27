@@ -1,6 +1,6 @@
 using Dara.Server.BuildingBlocks.Application.Queries;
 using Dara.Server.BuildingBlocks.Infrastructure.DataAccess;
-using Dara.Server.Modules.Identity.Domain;
+using Dara.Server.Modules.Identity.Domain.Users;
 
 namespace Dara.Server.Modules.Identity.Application.GetUser;
 

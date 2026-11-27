@@ -1,0 +1,30 @@
+using Dara.Server.Apps.API.Common.Hubs;
+using Dara.Server.Apps.API.Common.Notifications;
+using Dara.Server.Modules.Groups.Application;
+using Dara.Server.Modules.Groups.Application.Groups.GetGroupDetails;
+using Dara.Server.Modules.Groups.Integration;
+using Dara.Shared.Contracts;
+using Dara.Shared.Contracts.Notifications;
+using Microsoft.AspNetCore.SignalR;
+
+namespace Dara.Server.Apps.API.Modules.Groups.Notifications;
+
+public class NotifyGroupCreatedHandler : IHubNotificationHandler<NewGroupCreatedIntegrationEvent>
+{ 
+    private readonly IGroupsModule _groupModule;
+    private readonly IHubContext<AppHub, IAppHubClient> _context;
+    
+    public NotifyGroupCreatedHandler(IGroupsModule groupModule, IHubContext<AppHub, IAppHubClient> context)
+    {
+        _groupModule = groupModule;
+        _context = context;
+    }
+
+    public async Task HandleAsync(NewGroupCreatedIntegrationEvent notification, CancellationToken cancellationToken)
+    {
+        var client = _context.Clients.User(notification.GroupOwnerId.ToString());
+        var details = await _groupModule.ExecuteQueryAsync<GetGroupDetailsQuery,GroupDetailsDto>(new GetGroupDetailsQuery(notification.GroupId));
+        
+        await client.OnGroupCreated(new GroupCreatedNotification(details.GroupId, details.GroupName, details.JoinCode));
+    }
+}

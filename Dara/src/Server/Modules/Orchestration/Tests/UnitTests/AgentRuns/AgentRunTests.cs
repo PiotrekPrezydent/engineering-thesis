@@ -15,7 +15,7 @@ public class AgentRunTests
     {
         var phone = Phone;
         var laptop = Laptop;
-        var stranger = Device("Stranger", Ping);
+        var stranger = Client("Stranger", Ping);
         var group = GroupOf(phone, laptop);
         var messageId = Guid.NewGuid();
 

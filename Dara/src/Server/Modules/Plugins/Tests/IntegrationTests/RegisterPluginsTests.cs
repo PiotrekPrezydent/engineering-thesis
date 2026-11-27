@@ -125,7 +125,8 @@ public class RegisterPluginsTests
         await host.ExecuteAsync(new RegisterPluginsCommand(ownerId, [Files()]));
         Assert.Equal(1, await CountOwnersAsync(host, ownerId));
 
-        var userCreated = new NewUserCreatedIntegrationEvent(Guid.NewGuid(), DateTime.UtcNow, ownerId);
+        var userCreated = new UserClientRegisteredIntegrationEvent(Guid.NewGuid(), DateTime.UtcNow, ownerId, Guid.NewGuid(),
+            "PC 1", "Pc");
         await host.EventBus.PublishAsync(userCreated);
 
         // a failing handler leaves the message unprocessed

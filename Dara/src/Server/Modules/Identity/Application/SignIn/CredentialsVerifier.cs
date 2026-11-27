@@ -1,5 +1,5 @@
-using Dara.Server.Modules.Identity.Domain;
-using Dara.Server.Modules.Identity.Domain.Rules;
+using Dara.Server.Modules.Identity.Domain.Users;
+using Dara.Server.Modules.Identity.Domain.Users.Rules;
 
 namespace Dara.Server.Modules.Identity.Application.SignIn;
 

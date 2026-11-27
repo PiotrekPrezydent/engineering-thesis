@@ -5,7 +5,7 @@ using Dara.Shared.Contracts.StateSnapshots;
 
 namespace Dara.Server.SystemTests.ClientServer;
 
-// keeps every notification the server sends to one device, signalr calls it on its own threads
+// keeps every notification the server sends to one client, signalr calls it on its own threads
 public class RecordingHubClient : IAppHubClient
 {
     private readonly Lock _lock = new();
@@ -29,7 +29,12 @@ public class RecordingHubClient : IAppHubClient
         return found!;
     }
 
-    public Task OnProfileNameChanged(ProfileNameChangedNotification notification)
+    public Task OnClientRenamed(ClientRenamedNotification notification)
+    {
+        return Record(notification);
+    }
+
+    public Task OnClientRevoked(ClientRevokedNotification notification)
     {
         return Record(notification);
     }

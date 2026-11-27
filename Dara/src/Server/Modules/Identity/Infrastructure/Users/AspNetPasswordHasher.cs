@@ -1,4 +1,4 @@
-using Dara.Server.Modules.Identity.Domain;
+using Dara.Server.Modules.Identity.Domain.Users;
 using Microsoft.AspNetCore.Identity;
 
 namespace Dara.Server.Modules.Identity.Infrastructure.Users;

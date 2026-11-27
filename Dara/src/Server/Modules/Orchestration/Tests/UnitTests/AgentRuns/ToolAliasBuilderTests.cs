@@ -21,7 +21,7 @@ public class ToolAliasBuilderTests
     [InlineData("!!!", "P")]
     public void ParticipantNameIsCleanedForTheProviders(string participantName, string participantPart)
     {
-        var map = ToolAliasBuilder.Build([Device(participantName, Ping)]);
+        var map = ToolAliasBuilder.Build([Client(participantName, Ping)]);
 
         var alias = Assert.Single(map).Alias;
         Assert.Equal($"{participantPart}_Ping", alias);
@@ -31,7 +31,7 @@ public class ToolAliasBuilderTests
     [Fact]
     public void ValidFunctionNameDoesNotChange()
     {
-        var map = ToolAliasBuilder.Build([Device("Bob", Function("_get_battery_level2"), Function("saveFile"))]);
+        var map = ToolAliasBuilder.Build([Client("Bob", Function("_get_battery_level2"), Function("saveFile"))]);
 
         Assert.Equal(new[] { "Bob__get_battery_level2", "Bob_saveFile" }, map.Select(a => a.Alias));
     }
@@ -39,11 +39,11 @@ public class ToolAliasBuilderTests
     [Fact]
     public void ParticipantNamesSameIgnoringCaseGetANumberAfterTheParticipant()
     {
-        var first = Device("Bob", SaveFile);
-        var second = Device("bob", SaveFile, Ping);
-        var third = Device("BOB", Ping);
-        var withoutFunctions = Device("Bob");
-        var fifth = Device("Bob", Ping);
+        var first = Client("Bob", SaveFile);
+        var second = Client("bob", SaveFile, Ping);
+        var third = Client("BOB", Ping);
+        var withoutFunctions = Client("Bob");
+        var fifth = Client("Bob", Ping);
 
         var map = ToolAliasBuilder.Build([first, second, third, withoutFunctions, fifth]);
 
@@ -56,9 +56,9 @@ public class ToolAliasBuilderTests
     [Fact]
     public void SameFunctionNameFromTwoPluginsOfOneParticipantGetsANumberAfterTheFunction()
     {
-        var device = DeviceWithPlugins("Bob", (Guid.NewGuid(), SaveFile), (Guid.NewGuid(), SaveFile));
+        var client = ClientWithPlugins("Bob", (Guid.NewGuid(), SaveFile), (Guid.NewGuid(), SaveFile));
 
-        var map = ToolAliasBuilder.Build([device]);
+        var map = ToolAliasBuilder.Build([client]);
 
         Assert.Equal(new[] { "Bob_SaveFile", "Bob_SaveFile2" }, map.Select(a => a.Alias).Order());
         Assert.Equal(2, map.Select(a => a.FunctionId).Distinct().Count());
@@ -70,7 +70,7 @@ public class ToolAliasBuilderTests
         var longName = new string('a', 70);
         var longFunction = "F" + new string('x', 63);
 
-        var map = ToolAliasBuilder.Build([Device(longName, SaveFile, Function(longFunction)), Device(longName, SaveFile)]);
+        var map = ToolAliasBuilder.Build([Client(longName, SaveFile, Function(longFunction)), Client(longName, SaveFile)]);
 
         var aliases = map.Select(a => a.Alias).ToList();
         Assert.All(aliases, alias => Assert.Matches(ProviderLimits, alias));
@@ -85,7 +85,7 @@ public class ToolAliasBuilderTests
     {
         var prefix = "F" + new string('x', 62);
 
-        var map = ToolAliasBuilder.Build([Device("Bob", Function(prefix + "a"), Function(prefix + "b"))]);
+        var map = ToolAliasBuilder.Build([Client("Bob", Function(prefix + "a"), Function(prefix + "b"))]);
 
         var aliases = map.Select(a => a.Alias).ToList();
         Assert.Equal(2, aliases.Distinct(StringComparer.OrdinalIgnoreCase).Count());

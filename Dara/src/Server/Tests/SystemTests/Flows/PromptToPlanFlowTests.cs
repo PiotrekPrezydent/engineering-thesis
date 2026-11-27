@@ -11,8 +11,6 @@ using Dara.Server.Modules.Orchestration.Domain.Participants;
 using Dara.Server.Modules.Orchestration.Integration;
 using Dara.Server.Modules.Orchestration.IntegrationTests.Fakes;
 using Dara.Server.Modules.Plugins.Application.Plugins.RegisterPlugins;
-using Dara.Server.Modules.Profiles.Application.ChangeProfileName;
-using Dara.Server.Modules.Profiles.Application.GetProfile;
 using Dara.Server.SystemTests.Hosting;
 using Dara.Shared.Contracts.Functions;
 using Dara.Shared.Contracts.Plugins;
@@ -39,7 +37,7 @@ public class PromptToPlanFlowTests
     ]);
 
     [Fact]
-    public async Task PromptInTheGroupBecomesAPlanForTheDevicesOfTheGroup()
+    public async Task PromptInTheGroupBecomesAPlanForTheClientsOfTheGroup()
     {
         var model = new ScriptedChatClientProvider(
             Calls(("BobLaptop_TakePhoto", "{}")),
@@ -50,8 +48,8 @@ public class PromptToPlanFlowTests
         host.EventBus.Subscribe<AgentRunStartedIntegrationEvent>(plans);
         host.EventBus.Subscribe<ExecutionPlanCreatedIntegrationEvent>(plans);
 
-        var phoneId = await CreateDeviceAsync(host, "bob-phone", "Bob-Phone", Files, "SaveFile");
-        var laptopId = await CreateDeviceAsync(host, "bob-laptop", "Bob-Laptop", Camera, "TakePhoto");
+        var phoneId = await CreateClientAsync(host, "bob-phone", "Bob-Phone", Files, "SaveFile");
+        var laptopId = await CreateClientAsync(host, "bob-laptop", "Bob-Laptop", Camera, "TakePhoto");
 
         var groupId = await host.Groups.ExecuteCommandAsync<CreateNewGroupCommand, Guid>(new CreateNewGroupCommand(phoneId, "bob-devices", "bob-jc"));
         await host.Groups.ExecuteCommandAsync(new JoinToGroupCommand(groupId, laptopId, "bob-jc"));
@@ -79,34 +77,21 @@ public class PromptToPlanFlowTests
             model.Client.Requests[0].Messages.Last().Text);
     }
 
-    private static async Task<Guid> CreateDeviceAsync(ModulesHost host, string identifier, string name, PluginManifest plugin, string functionName)
+    // an account with one client of this name; the id of the client is the member and the participant
+    private static async Task<Guid> CreateClientAsync(ModulesHost host, string identifier, string name, PluginManifest plugin, string functionName)
     {
-        var userId = await host.CreateUserAsync(identifier);
+        var clientId = (await host.CreateClientAsync(identifier, name)).ClientId;
 
         await ModulesHost.WaitUntilAsync(() => ModulesHost.ReadAsync(host.OrchestrationRoot,
-            model => model.Query<Participant>().AnyAsync(p => p.Id.Match(userId))), "participant of the new user");
-        await ModulesHost.WaitUntilAsync(async () =>
-        {
-            try
-            {
-                return await host.Profiles.ExecuteQueryAsync<GetProfileQuery, ProfileDto>(new GetProfileQuery(userId)) is not null;
-            }
-            catch (InvalidOperationException)
-            {
-                return false;
-            }
-        }, "profile of the new user");
+            model => model.Query<Participant>().AnyAsync(p => p.Id.Match(clientId) && p.Name == name)), "participant of the new client");
 
-        await host.Profiles.ExecuteCommandAsync(new ChangeProfileNameCommand(userId, name));
-        await host.Plugins.ExecuteCommandAsync(new RegisterPluginsCommand(userId, [plugin]));
+        await host.Plugins.ExecuteCommandAsync(new RegisterPluginsCommand(clientId, [plugin]));
 
-        await ModulesHost.WaitUntilAsync(() => ModulesHost.ReadAsync(host.OrchestrationRoot,
-            model => model.Query<Participant>().AnyAsync(p => p.Id.Match(userId) && p.Name == name)), "name of the participant");
         await ModulesHost.WaitUntilAsync(async () =>
-            (await host.Orchestration.ExecuteQueryAsync<GetParticipantFunctionsQuery, List<ParticipantFunctionDto>>(new GetParticipantFunctionsQuery(userId)))
+            (await host.Orchestration.ExecuteQueryAsync<GetParticipantFunctionsQuery, List<ParticipantFunctionDto>>(new GetParticipantFunctionsQuery(clientId)))
             .Any(f => f.Name == functionName), "functions of the participant");
 
-        return userId;
+        return clientId;
     }
 
     private static Task<GroupAgentSettingsDto?> GetSettingsAsync(ModulesHost host, Guid groupId, Guid requesterId)

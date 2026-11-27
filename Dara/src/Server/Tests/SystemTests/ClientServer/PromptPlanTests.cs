@@ -29,7 +29,7 @@ public class PromptPlanTests
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var host = await AppHubTestHost.StartAsync(cancellationToken);
-        var (phone, laptop, groupId) = await CreateDevicesAsync(host, cancellationToken);
+        var (phone, laptop, groupId) = await CreateClientsAsync(host, cancellationToken);
         host.Model.Script(
             Calls(("BobLaptop_TakePhoto", "{}")),
             Calls(("BobPhone_SaveFile", """{"path":"/photos/new.jpg","content":"{{result:1}}"}""")),
@@ -41,7 +41,7 @@ public class PromptPlanTests
         var plan = await phone.Events.WaitForAsync<ExecutionPlanCreatedNotification>(n => n.AgentRunId == started.AgentRunId, "plan at the author");
         var promptMessage = await phone.Events.WaitForAsync<GroupMessageReceivedNotification>(m => m.Message == Prompt, "prompt in the group");
         Assert.Equal(promptMessage.MessageId, started.MessageId);
-        Assert.Equal([laptop.UserId, phone.UserId], plan.Calls.Select(c => c.ParticipantId));
+        Assert.Equal([laptop.ClientId, phone.ClientId], plan.Calls.Select(c => c.ParticipantId));
         Assert.Equal(["TakePhoto", "SaveFile"], plan.Calls.Select(c => c.FunctionName));
         Assert.Equal("""{"path":"/photos/new.jpg","content":"{{result:1}}"}""", plan.Calls[1].ArgumentsJson);
         Assert.Equal([(ApiKey, "gemini-test")], host.Model.CreatedClients);
@@ -67,7 +67,7 @@ public class PromptPlanTests
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var host = await AppHubTestHost.StartAsync(cancellationToken);
-        var (phone, _, groupId) = await CreateDevicesAsync(host, cancellationToken);
+        var (phone, _, groupId) = await CreateClientsAsync(host, cancellationToken);
         host.Model.Script(Calls(("BobLaptop_TakePhoto", "{}")), Text("Photo taken."));
 
         await phone.Hub.SendGroupMessage(groupId, "/prompt take a photo on my laptop");
@@ -86,7 +86,7 @@ public class PromptPlanTests
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var host = await AppHubTestHost.StartAsync(cancellationToken);
-        var (phone, laptop, groupId) = await CreateDevicesAsync(host, cancellationToken);
+        var (phone, laptop, groupId) = await CreateClientsAsync(host, cancellationToken);
         host.Model.Script(Text("I cannot do that."));
 
         await laptop.Hub.SendGroupMessage(groupId, "/prompt make me a coffee");
@@ -98,17 +98,17 @@ public class PromptPlanTests
     }
 
     // bob has a phone with files (the group owner) and a laptop with a camera, the owner sets the scripted provider
-    private static async Task<(HubTestClient Phone, HubTestClient Laptop, Guid GroupId)> CreateDevicesAsync(AppHubTestHost host, CancellationToken cancellationToken)
+    private static async Task<(HubTestClient Phone, HubTestClient Laptop, Guid GroupId)> CreateClientsAsync(AppHubTestHost host, CancellationToken cancellationToken)
     {
         var phone = await host.ConnectAsync("bob-phone", cancellationToken);
         var laptop = await host.ConnectAsync("bob-laptop", cancellationToken);
 
-        await phone.Hub.ChangeName("Bob-Phone");
-        await laptop.Hub.ChangeName("Bob-Laptop");
+        await host.RenameClientAsync(phone, "Bob-Phone");
+        await host.RenameClientAsync(laptop, "Bob-Laptop");
         await phone.Hub.RegisterPlugins([Files]);
         await laptop.Hub.RegisterPlugins([Camera]);
-        await host.WaitForParticipantAsync(phone.UserId, "Bob-Phone", "SaveFile");
-        await host.WaitForParticipantAsync(laptop.UserId, "Bob-Laptop", "TakePhoto");
+        await host.WaitForParticipantAsync(phone.ClientId, "Bob-Phone", "SaveFile");
+        await host.WaitForParticipantAsync(laptop.ClientId, "Bob-Laptop", "TakePhoto");
 
         var group = await host.CreateGroupAsync(phone, "bob-devices", laptop);
         await phone.Hub.EditGroupChatClientProviderName(group.GroupId, "google");
@@ -118,17 +118,17 @@ public class PromptPlanTests
         return (phone, laptop, group.GroupId);
     }
 
-    // a message of the device after the plan arrives after every earlier notification for that device
-    private static async Task AssertNoAgentRunNotificationsAsync(HubTestClient device, Guid groupId)
+    // a message of the client after the plan arrives after every earlier notification for that client
+    private static async Task AssertNoAgentRunNotificationsAsync(HubTestClient client, Guid groupId)
     {
         var marker = $"marker-{Guid.NewGuid():N}";
-        await device.Hub.SendGroupMessage(groupId, marker);
-        await device.Events.WaitForAsync<GroupMessageReceivedNotification>(m => m.Message == marker, $"marker at {device.Identifier}");
+        await client.Hub.SendGroupMessage(groupId, marker);
+        await client.Events.WaitForAsync<GroupMessageReceivedNotification>(m => m.Message == marker, $"marker at {client.Identifier}");
 
-        Assert.Empty(device.Events.Received<AgentRunStartedNotification>());
-        Assert.Empty(device.Events.Received<ExecutionPlanCreatedNotification>());
-        Assert.Empty(device.Events.Received<ExecutionPlanGenerationFailedNotification>());
-        Assert.Empty(device.Events.Received<ExecutionPlanApprovedNotification>());
-        Assert.Empty(device.Events.Received<AgentRunRejectedNotification>());
+        Assert.Empty(client.Events.Received<AgentRunStartedNotification>());
+        Assert.Empty(client.Events.Received<ExecutionPlanCreatedNotification>());
+        Assert.Empty(client.Events.Received<ExecutionPlanGenerationFailedNotification>());
+        Assert.Empty(client.Events.Received<ExecutionPlanApprovedNotification>());
+        Assert.Empty(client.Events.Received<AgentRunRejectedNotification>());
     }
 }

@@ -3,8 +3,9 @@ using Dara.Server.BuildingBlocks.Application.Queries;
 using Dara.Server.BuildingBlocks.Infrastructure.DataAccess;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.EventBus;
 using Dara.Server.Modules.Identity.Application;
-using Dara.Server.Modules.Identity.Application.IssueDeviceLoginCode;
-using Dara.Server.Modules.Identity.Application.RegisterDeviceSession;
+using Dara.Server.Modules.Identity.Application.CreateClientRegistrationCode;
+using Dara.Server.Modules.Identity.Application.IssueClientLoginCode;
+using Dara.Server.Modules.Identity.Application.RegisterClient;
 using Dara.Server.Modules.Identity.Application.RegisterUser;
 using Dara.Server.Modules.Identity.Application.SignIn;
 using Dara.Server.Modules.Identity.Infrastructure;
@@ -64,6 +65,12 @@ public class IdentityModuleHost : IAsyncDisposable
         return await scope.ServiceProvider.GetRequiredService<IIdentityModule>().ExecuteQueryAsync<TQuery, TResult>(query);
     }
 
+    public async Task<Guid?> AuthenticateAsync(Guid accountSessionId)
+    {
+        await using var scope = _services.CreateAsyncScope();
+        return await scope.ServiceProvider.GetRequiredService<IIdentityModule>().AuthenticateAccountSessionAsync(accountSessionId);
+    }
+
     // reads module state that the module api has no query for
     public async Task<TResult> ReadAsync<TResult>(Func<IReadModel, TResult> read)
     {
@@ -71,33 +78,45 @@ public class IdentityModuleHost : IAsyncDisposable
         return read(scope.ServiceProvider.GetRequiredService<IReadModel>());
     }
 
-    // an account with one device of the same id, like the seed
-    public async Task<Guid> RegisterAsync(string login)
+    public Task<Guid> RegisterAsync(string login)
     {
-        var userId = await ExecuteAsync<RegisterUserCommand, Guid>(new RegisterUserCommand(login, $"{login}@test.local", Password));
-        await RegisterDeviceAsync(userId, userId);
-        return userId;
+        return ExecuteAsync<RegisterUserCommand, Guid>(new RegisterUserCommand(login, $"{login}@test.local", Password));
     }
 
-    public Task RegisterDeviceAsync(Guid userId, Guid deviceId)
+    public Task<ClientCodeResult> CreateRegistrationCodeAsync(Guid userId)
     {
-        return ExecuteAsync(new RegisterDeviceSessionCommand(deviceId, userId));
+        return ExecuteAsync<CreateClientRegistrationCodeCommand, ClientCodeResult>(new CreateClientRegistrationCodeCommand(userId));
     }
 
-    public Task<DeviceLoginCodeResult> IssueCodeAsync(Guid userId, Guid deviceId)
+    public Task<ClientTokensResult> RegisterClientWithCodeAsync(string code, string? type = "Pc", string? name = null)
     {
-        return ExecuteAsync<IssueDeviceLoginCodeCommand, DeviceLoginCodeResult>(new IssueDeviceLoginCodeCommand(userId, deviceId));
+        return ExecuteAsync<RegisterClientCommand, ClientTokensResult>(new RegisterClientCommand(code, type, name));
     }
 
-    public Task<DeviceTokensResult> SignInWithCodeAsync(string code)
+    // the panel creates a registration code and the app of the client registers itself with it
+    public async Task<ClientTokensResult> RegisterClientAsync(Guid userId, string? type = "Pc", string? name = null)
     {
-        return ExecuteAsync<SignInDeviceCommand, DeviceTokensResult>(new SignInDeviceCommand(code));
+        var code = await CreateRegistrationCodeAsync(userId);
+        Assert.True(code.Succeeded, $"registration code: {code.Error}");
+        var tokens = await RegisterClientWithCodeAsync(code.Code!, type, name);
+        Assert.True(tokens.Succeeded, $"registration: {tokens.Error}");
+        return tokens;
     }
 
-    // the panel issues a code and the device signs in with it
-    public async Task<DeviceTokensResult> SignInDeviceAsync(Guid userId, Guid deviceId)
+    public Task<ClientCodeResult> IssueLoginCodeAsync(Guid userId, Guid clientId)
     {
-        var code = await IssueCodeAsync(userId, deviceId);
+        return ExecuteAsync<IssueClientLoginCodeCommand, ClientCodeResult>(new IssueClientLoginCodeCommand(userId, clientId));
+    }
+
+    public Task<ClientTokensResult> SignInWithCodeAsync(string code)
+    {
+        return ExecuteAsync<SignInClientCommand, ClientTokensResult>(new SignInClientCommand(code));
+    }
+
+    // the panel issues a login code and an existing client signs in with it
+    public async Task<ClientTokensResult> SignInClientAsync(Guid userId, Guid clientId)
+    {
+        var code = await IssueLoginCodeAsync(userId, clientId);
         Assert.True(code.Succeeded, $"login code: {code.Error}");
         return await SignInWithCodeAsync(code.Code!);
     }

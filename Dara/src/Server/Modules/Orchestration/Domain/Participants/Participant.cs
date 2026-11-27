@@ -3,12 +3,17 @@ using Dara.Server.Modules.Orchestration.Domain.Participants.Functions;
 
 namespace Dara.Server.Modules.Orchestration.Domain.Participants;
 
-// a client with the plugin functions it can use now, projected from identity, profiles and plugins
+// a client with the plugin functions it can use now, projected from identity and plugins
 public class Participant : Entity, IAggregateRoot
 {
     public ParticipantId Id { get; private set; }
     public string Name { get; private set; }
-    
+
+    public bool IsRevoked { get; private set; }
+
+    // the context of the client, replaced as a whole
+    public IReadOnlyDictionary<string, string> Context { get; private set; } = new Dictionary<string, string>();
+
     public IReadOnlyList<Function> Functions  => _functions.AsReadOnly();
     private List<Function> _functions;
 
@@ -28,11 +33,28 @@ public class Participant : Entity, IAggregateRoot
         _pluginVersions = new();
     }
 
+    public static Participant Create(ParticipantId id, string name)
+    {
+        return new Participant(id, name);
+    }
+
+    // a placeholder for plugin functions that came before the client; the event of the client fills it in
     public static Participant CreateDefault(ParticipantId id)
     {
         return new Participant(id, "DEFAULT-NAME");
     }
-    
+
+    public void MarkRevoked()
+    {
+        IsRevoked = true;
+    }
+
+    public void ChangeContext(IReadOnlyDictionary<string, string> context)
+    {
+        Context = new Dictionary<string, string>(context);
+    }
+
+
     public void UpdateName(string name)
     {
         Name = name;

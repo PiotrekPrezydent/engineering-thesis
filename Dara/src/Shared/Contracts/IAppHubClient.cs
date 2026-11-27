@@ -5,7 +5,9 @@ namespace Dara.Shared.Contracts;
 
 public interface IAppHubClient
 {
-    public Task OnProfileNameChanged(ProfileNameChangedNotification notification);
+    public Task OnClientRenamed(ClientRenamedNotification notification);
+
+    public Task OnClientRevoked(ClientRevokedNotification notification);
     
     public Task OnGroupCreated(GroupCreatedNotification notification);
 

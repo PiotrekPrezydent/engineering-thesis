@@ -1,0 +1,31 @@
+# manual checks of clients until the account panel exists (TASK-ENG-036); sign in the panel first (Auth.http, the
+# cookie dara.account), the https profile of the api; ids come from the answers; a client registers itself with a
+# registration code (Auth.http), so there is no create here
+@host = https://localhost:7105
+@clientId = paste-a-client-id
+@accessToken = paste-an-access-token
+
+### every client of the account
+GET {{host}}/account/clients
+
+### one client of the account
+GET {{host}}/account/clients/{{clientId}}
+
+### the client reads itself: name (read-only there), type, context
+GET {{host}}/clients/current
+Authorization: Bearer {{accessToken}}
+
+### rename
+PUT {{host}}/account/clients/{{clientId}}/name
+Content-Type: application/json
+
+{ "name": "Bob-Phone-2" }
+
+### the context of the client, added to prompts of its groups (never secrets)
+PUT {{host}}/account/clients/{{clientId}}/context
+Content-Type: application/json
+
+{ "entries": { "Photos folder": "C:\\Users\\bob\\Pictures" } }
+
+### revoke the client for good: no login code, refresh and access token refused, its hub connections closed
+POST {{host}}/account/clients/{{clientId}}/revoke

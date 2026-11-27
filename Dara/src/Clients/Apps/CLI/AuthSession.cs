@@ -5,9 +5,9 @@ using Dara.Shared.Contracts.Auth;
 
 namespace Dara.Clients.Apps.CLI;
 
-// sign-in of the cli as a device (minimal, the full client is TASK-ENG-034): the account panel issues a one-time
-// code for the device, the cli signs in with it and keeps the tokens and the device id only in memory
-// (a session that outlives the program is TASK-ENG-034)
+// sign-in of the cli as a client (minimal, the full client is TASK-ENG-034): a new cli registers itself with a
+// registration code of the account panel, an existing one signs in with a login code; it keeps the tokens and the
+// client id only in memory (a session that outlives the program is TASK-ENG-034)
 public class AuthSession
 {
     // a token that expires sooner is refreshed before it is given to the connection
@@ -45,19 +45,32 @@ public class AuthSession
         }
     }
 
-    // the code comes from the account panel, for a device created there
+    // the registration code of the account panel makes this cli a new client of the account, type Pc with the
+    // default name ("PC 2"); the panel renames it
+    [CLICommand("register")]
+    async Task Register(string code)
+    {
+        var request = new RegisterClientRequest(code, "Pc", null);
+        await SignInAsync("Registration", await _http.PostAsJsonAsync(AuthRoutes.RegisterClient, request));
+    }
+
+    // the login code of the account panel, for a client registered before (a copy of the cli on another computer)
     [CLICommand("login")]
     async Task Login(string code)
     {
-        var response = await _http.PostAsJsonAsync(AuthRoutes.DeviceLogin, new DeviceLoginRequest(code));
+        await SignInAsync("Sign-in", await _http.PostAsJsonAsync(AuthRoutes.ClientLogin, new ClientLoginRequest(code)));
+    }
+
+    private async Task SignInAsync(string what, HttpResponseMessage response)
+    {
         if (!response.IsSuccessStatusCode)
         {
-            await PrintRefusalAsync("Sign-in", response);
+            await PrintRefusalAsync(what, response);
             return;
         }
 
         _tokens = await response.Content.ReadFromJsonAsync<AuthTokensResponse>();
-        Console.WriteLine($"Signed in, user id {_tokens!.UserId}, device id {_tokens.DeviceId}");
+        Console.WriteLine($"Signed in, user id {_tokens!.UserId}, client id {_tokens.ClientId}");
     }
 
     [CLICommand("logout")]

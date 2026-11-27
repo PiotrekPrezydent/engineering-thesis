@@ -34,7 +34,7 @@
       <ProjectReference Include="..\..\Modules\Orchestration\Integration\Dara.Server.Modules.Orchestration.Integration.csproj" />
       <ProjectReference Include="..\..\Modules\Plugins\Infrastructure\Dara.Server.Modules.Plugins.Infrastructure.csproj" />
       <ProjectReference Include="..\..\Modules\Plugins\Integration\Dara.Server.Modules.Plugins.Integration.csproj" />
-      <ProjectReference Include="..\..\Modules\Profiles\Infrastructure\Dara.Server.Modules.Profiles.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\Modules\Identity\Integration\Dara.Server.Modules.Identity.Integration.csproj" />
     </ItemGroup>
     
 </Project>

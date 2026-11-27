@@ -1,4 +1,4 @@
-using Dara.Server.Modules.Identity.Domain;
+using Dara.Server.Modules.Identity.Domain.Users;
 
 namespace Dara.Server.Modules.Identity.Infrastructure.Users;
 

@@ -6,8 +6,8 @@ using TypedSignalR.Client;
 
 namespace Dara.Server.SystemTests.ClientServer;
 
-// one signed-in device built like DaraConnection of the cli: a device token from AccessTokenProvider,
-// typed hub proxy and typed receiver; it keeps its tokens, so a new connection is the same device
+// one signed-in client built like DaraConnection of the cli: a client token from AccessTokenProvider,
+// typed hub proxy and typed receiver; it keeps its tokens, so a new connection is the same client
 public class HubTestClient : IAsyncDisposable
 {
     // like the cli: a token that expires sooner is refreshed before a connection
@@ -21,12 +21,12 @@ public class HubTestClient : IAsyncDisposable
 
     public string Identifier { get; }
     public Guid UserId { get; set; }
-    public Guid DeviceId { get; }
+    public Guid ClientId { get; }
     public AuthTokensResponse Tokens { get; private set; }
     public IAppHub Hub { get; private set; } = null!;
     public HubConnection Connection => _connection;
 
-    // kept across connections, so a test sees everything the device got
+    // kept across connections, so a test sees everything the client got
     public RecordingHubClient Events { get; } = new();
 
     public HubTestClient(string hubUrl, HttpClient http, string identifier, AuthTokensResponse tokens)
@@ -34,7 +34,7 @@ public class HubTestClient : IAsyncDisposable
         _hubUrl = hubUrl;
         _http = http;
         Identifier = identifier;
-        DeviceId = tokens.DeviceId;
+        ClientId = tokens.ClientId;
         Tokens = tokens;
         UserId = tokens.UserId;
         _connection = BuildConnection();
@@ -45,7 +45,7 @@ public class HubTestClient : IAsyncDisposable
         await _connection.StartAsync(cancellationToken);
     }
 
-    // a new connection of the same device, like the cli after a restart
+    // a new connection of the same client, like the cli after a restart
     public async Task ReconnectAsync(CancellationToken cancellationToken)
     {
         await _connection.DisposeAsync();

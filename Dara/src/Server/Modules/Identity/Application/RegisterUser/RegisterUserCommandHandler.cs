@@ -1,10 +1,10 @@
 using Dara.Server.BuildingBlocks.Application.Commands;
-using Dara.Server.Modules.Identity.Domain;
+using Dara.Server.Modules.Identity.Domain.Users;
 
 namespace Dara.Server.Modules.Identity.Application.RegisterUser;
 
-// accounts come only from the seed and from tests for now (no registration endpoint); its devices come from
-// the account panel (RegisterDeviceSessionCommand)
+// accounts come only from the seed and from tests for now (no registration endpoint); its clients register
+// themselves with a code of the panel (RegisterClientCommand)
 public class RegisterUserCommandHandler : ICommandHandler<RegisterUserCommand, Guid>
 {
     private readonly IUserRepository _userRepository;

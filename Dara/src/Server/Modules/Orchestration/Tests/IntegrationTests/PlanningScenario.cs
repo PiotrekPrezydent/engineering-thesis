@@ -80,7 +80,7 @@ public class PlanningScenario
 
     private async Task AddParticipantAsync(OrchestrationModuleHost host, Guid participantId, string name, Guid pluginId, IReadOnlyList<AvailableFunctionSnapshot> functions)
     {
-        await host.ExecuteAsync(new CreateDefaultParticipantCommand(participantId));
+        await host.ExecuteAsync(new CreateParticipantCommand(participantId, name));
         await host.ExecuteAsync(new UpdateParticipantNameCommand(participantId, name));
         await host.ExecuteAsync(new ReplacePluginFunctionsCommand(participantId, pluginId, 1, functions));
     }

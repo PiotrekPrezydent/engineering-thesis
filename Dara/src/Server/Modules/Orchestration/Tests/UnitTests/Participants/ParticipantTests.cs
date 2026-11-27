@@ -15,7 +15,7 @@ public class ParticipantTests
     [Fact]
     public void PluginFunctionsComeWithTheirPluginAndFullDescription()
     {
-        var participant = Participant.CreateDefault(new ParticipantId(Guid.NewGuid()));
+        var participant = Participant.Create(new ParticipantId(Guid.NewGuid()), "Phone");
         var saveFile = Available(SaveFile);
 
         var applied = participant.ReplacePluginFunctions(Files, 1, [saveFile, Available(ReadFile)]);
@@ -36,7 +36,7 @@ public class ParticipantTests
     [Fact]
     public void NewerVersionReplacesTheFunctionsOfItsPluginOnly()
     {
-        var participant = Participant.CreateDefault(new ParticipantId(Guid.NewGuid()));
+        var participant = Participant.Create(new ParticipantId(Guid.NewGuid()), "Phone");
         var saveFile = Available(SaveFile);
         var readFile = Available(ReadFile);
         participant.ReplacePluginFunctions(Files, 1, [saveFile, readFile]);
@@ -56,7 +56,7 @@ public class ParticipantTests
     [Fact]
     public void OlderOrTheSameVersionIsIgnored()
     {
-        var participant = Participant.CreateDefault(new ParticipantId(Guid.NewGuid()));
+        var participant = Participant.Create(new ParticipantId(Guid.NewGuid()), "Phone");
         participant.ReplacePluginFunctions(Files, 3, [Available(SaveFile)]);
 
         var older = participant.ReplacePluginFunctions(Files, 2, [Available(ReadFile)]);
@@ -71,7 +71,7 @@ public class ParticipantTests
     [Fact]
     public void EmptyListRemovesThePluginAndALateOlderStateDoesNotBringItBack()
     {
-        var participant = Participant.CreateDefault(new ParticipantId(Guid.NewGuid()));
+        var participant = Participant.Create(new ParticipantId(Guid.NewGuid()), "Phone");
         participant.ReplacePluginFunctions(Files, 1, [Available(SaveFile)]);
 
         participant.ReplacePluginFunctions(Files, 2, []);
@@ -83,9 +83,9 @@ public class ParticipantTests
     }
 
     [Fact]
-    public void NameComesFromTheProfileLater()
+    public void NameComesFromTheClientLater()
     {
-        var participant = Participant.CreateDefault(new ParticipantId(Guid.NewGuid()));
+        var participant = Participant.Create(new ParticipantId(Guid.NewGuid()), "Phone");
 
         participant.UpdateName("Bob's phone");
 

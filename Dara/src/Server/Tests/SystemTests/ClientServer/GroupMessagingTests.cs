@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.SignalR;
 namespace Dara.Server.SystemTests.ClientServer;
 
 // groups, messages and names over the hub; signalr keeps the order of messages to one connection,
-// so a later notification of a device proves that an earlier one did not come
+// so a later notification of a client proves that an earlier one did not come
 public class GroupMessagingTests
 {
     [Fact]
@@ -18,7 +18,7 @@ public class GroupMessagingTests
         var outsider = await host.ConnectAsync("outsider-tablet", cancellationToken);
 
         var group = await host.CreateGroupAsync(owner, "family", member);
-        await owner.Events.WaitForAsync<GroupMemberJoinedGroupNotification>(n => n.GroupId == group.GroupId && n.GroupMember.MemberId == member.UserId,
+        await owner.Events.WaitForAsync<GroupMemberJoinedGroupNotification>(n => n.GroupId == group.GroupId && n.GroupMember.MemberId == member.ClientId,
             "owner told about the new member");
 
         await member.Hub.SendGroupMessage(group.GroupId, "dinner at seven");
@@ -26,12 +26,12 @@ public class GroupMessagingTests
         var atOwner = await owner.Events.WaitForAsync<GroupMessageReceivedNotification>(m => m.Message == "dinner at seven", "message at the owner");
         var atMember = await member.Events.WaitForAsync<GroupMessageReceivedNotification>(m => m.Message == "dinner at seven", "message at its author");
         Assert.Equal(group.GroupId, atOwner.GroupId);
-        Assert.Equal(member.UserId, atOwner.MessageAuthorId);
+        Assert.Equal(member.ClientId, atOwner.MessageAuthorId);
         Assert.NotEqual(Guid.Empty, atOwner.MessageId);
         Assert.Equal(atOwner.MessageId, atMember.MessageId);
 
-        await outsider.Hub.ChangeName("Outsider");
-        await outsider.Events.WaitForAsync<ProfileNameChangedNotification>(n => n.ProfileName == "Outsider", "outsider renamed");
+        await host.RenameClientAsync(outsider, "Outsider");
+        await outsider.Events.WaitForAsync<ClientRenamedNotification>(n => n.Name == "Outsider", "outsider renamed");
         Assert.Empty(outsider.Events.Received<GroupMessageReceivedNotification>());
     }
 
@@ -43,10 +43,10 @@ public class GroupMessagingTests
         var phone = await host.ConnectAsync("reconnecting-phone", cancellationToken);
 
         await phone.ReconnectAsync(cancellationToken);
-        await phone.Hub.ChangeName("Bob-Phone");
+        await host.RenameClientAsync(phone, "Bob-Phone");
 
-        var renamed = await phone.Events.WaitForAsync<ProfileNameChangedNotification>(n => n.ProfileName == "Bob-Phone", "name changed");
-        Assert.Equal(phone.UserId, renamed.ProfileId);
+        var renamed = await phone.Events.WaitForAsync<ClientRenamedNotification>(n => n.Name == "Bob-Phone", "name changed");
+        Assert.Equal(phone.ClientId, renamed.ClientId);
         Assert.Empty(phone.Events.Received<GroupLeft>());
     }
 

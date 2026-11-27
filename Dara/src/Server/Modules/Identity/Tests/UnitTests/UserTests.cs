@@ -1,7 +1,7 @@
 using Dara.Server.BuildingBlocks.Domain.Exceptions;
-using Dara.Server.Modules.Identity.Domain;
-using Dara.Server.Modules.Identity.Domain.Events;
-using Dara.Server.Modules.Identity.Domain.Rules;
+using Dara.Server.Modules.Identity.Domain.Users;
+using Dara.Server.Modules.Identity.Domain.Users.Events;
+using Dara.Server.Modules.Identity.Domain.Users.Rules;
 
 namespace Dara.Server.Modules.Identity.UnitTests;
 

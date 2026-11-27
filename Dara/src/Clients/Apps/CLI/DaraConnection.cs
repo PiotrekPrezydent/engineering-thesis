@@ -21,7 +21,7 @@ public class DaraConnection
         _auth = auth;
     }
 
-    // every (re)connect asks the session for a device token, so an expired one is refreshed first
+    // every (re)connect asks the session for a client token, so an expired one is refreshed first
     public HubConnection SetConnection()
     {
         var builder = new HubConnectionBuilder();

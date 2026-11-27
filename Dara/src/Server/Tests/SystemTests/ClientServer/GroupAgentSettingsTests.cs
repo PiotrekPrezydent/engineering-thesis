@@ -26,7 +26,7 @@ public class GroupAgentSettingsTests
         var atMember = await member.Hub.GetGroupAgentSettings(group.GroupId);
         Assert.Equal(("/dara", "google", "gemini-test", ApiKey),
             (atOwner!.PromptMessagePrefix, atOwner.ChatClientProviderName, atOwner.ClientModelName, atOwner.ApiKey));
-        Assert.Equal(owner.UserId, atMember!.OwnerId);
+        Assert.Equal(owner.ClientId, atMember!.OwnerId);
         Assert.Equal(("/dara", "google", "gemini-test"), (atMember.PromptMessagePrefix, atMember.ChatClientProviderName, atMember.ClientModelName));
         Assert.Null(atMember.ApiKey);
         Assert.Null(await outsider.Hub.GetGroupAgentSettings(group.GroupId));

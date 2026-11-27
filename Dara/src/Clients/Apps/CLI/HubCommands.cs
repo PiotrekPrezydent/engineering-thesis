@@ -19,12 +19,6 @@ public class HubCommands : IAppHub
     {
     }
 
-    [CLICommand("cn")]
-    public async Task ChangeName(string name)
-    {
-        await CallAsync(() => Proxy.ChangeName(name));
-    }
-
     [CLICommand("cg")]
     public async Task CreateGroup(string groupName)
     {

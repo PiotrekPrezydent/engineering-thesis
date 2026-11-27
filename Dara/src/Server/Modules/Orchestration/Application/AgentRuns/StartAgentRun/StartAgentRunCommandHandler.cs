@@ -31,7 +31,7 @@ public class StartAgentRunCommandHandler : ICommandHandler<StartAgentRunCommand>
         var participants = await _participantRepository.GetByIdsAsync(group.Participants);
 
         var agentRun = group.StartAgentRun(
-            participants.Select(p => p.ToSnapshot()).ToList(),
+            participants.Where(p => !p.IsRevoked).Select(p => p.ToSnapshot()).ToList(),
             new ParticipantId(command.AuthorId),
             command.MessageId,
             prompt);

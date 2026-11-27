@@ -5,15 +5,18 @@ using Dara.Server.BuildingBlocks.Infrastructure.Messaging.EventBus;
 using Dara.Server.Modules.Groups.Application;
 using Dara.Server.Modules.Groups.Infrastructure;
 using Dara.Server.Modules.Identity.Application;
+using Dara.Server.Modules.Identity.Application.CreateClientRegistrationCode;
+using Dara.Server.Modules.Identity.Application.IssueClientLoginCode;
+using Dara.Server.Modules.Identity.Application.RegisterClient;
 using Dara.Server.Modules.Identity.Application.RegisterUser;
+using Dara.Server.Modules.Identity.Application.RenameClient;
+using Dara.Server.Modules.Identity.Application.SignIn;
 using Dara.Server.Modules.Identity.Infrastructure;
 using Dara.Server.Modules.Orchestration.Application;
 using Dara.Server.Modules.Orchestration.Infrastructure;
 using Dara.Server.Modules.Orchestration.Infrastructure.AgentRuns.Generation;
 using Dara.Server.Modules.Plugins.Application;
 using Dara.Server.Modules.Plugins.Infrastructure;
-using Dara.Server.Modules.Profiles.Application;
-using Dara.Server.Modules.Profiles.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -37,13 +40,11 @@ public class ModulesHost : IAsyncDisposable
     public InMemoryEventBus EventBus { get; } = new();
 
     public IdentityCompositionRoot IdentityRoot { get; } = new() { ProcessingOptions = ProcessingOptions };
-    public ProfilesCompositionRoot ProfilesRoot { get; } = new() { ProcessingOptions = ProcessingOptions };
     public GroupsCompositionRoot GroupsRoot { get; } = new() { ProcessingOptions = ProcessingOptions };
     public PluginsCompositionRoot PluginsRoot { get; } = new() { ProcessingOptions = ProcessingOptions };
     public OrchestrationCompositionRoot OrchestrationRoot { get; }
 
     public IIdentityModule Identity { get; }
-    public IProfilesModule Profiles { get; }
     public IGroupsModule Groups { get; }
     public IPluginsModule Plugins { get; }
     public IOrchestrationModule Orchestration { get; }
@@ -58,7 +59,7 @@ public class ModulesHost : IAsyncDisposable
         var services = new ServiceCollection();
 
         // same order as in the api host
-        IModuleCompositionRoot[] roots = [IdentityRoot, GroupsRoot, ProfilesRoot, PluginsRoot, OrchestrationRoot];
+        IModuleCompositionRoot[] roots = [IdentityRoot, GroupsRoot, PluginsRoot, OrchestrationRoot];
         foreach (var root in roots)
             root.Initialize(services, EventBus);
 
@@ -66,7 +67,6 @@ public class ModulesHost : IAsyncDisposable
         _workers = _services.GetServices<IHostedService>().ToList();
 
         Identity = _services.GetRequiredService<IIdentityModule>();
-        Profiles = _services.GetRequiredService<IProfilesModule>();
         Groups = _services.GetRequiredService<IGroupsModule>();
         Plugins = _services.GetRequiredService<IPluginsModule>();
         Orchestration = _services.GetRequiredService<IOrchestrationModule>();
@@ -81,10 +81,59 @@ public class ModulesHost : IAsyncDisposable
         return host;
     }
 
-    // an account like one registered over /auth/register; the other modules get it from NewUserCreatedIntegrationEvent
+    // an account without clients
     public Task<Guid> CreateUserAsync(string login)
     {
-        return Identity.ExecuteCommandAsync<RegisterUserCommand, Guid>(new RegisterUserCommand(login, $"{login}@test.local", TestPassword));
+        return ExecuteAsync<RegisterUserCommand, Guid>(new RegisterUserCommand(login, $"{login}@test.local", TestPassword));
+    }
+
+    // an account with one client, registered like an app does it; the other modules get the client from
+    // UserClientRegisteredIntegrationEvent; UserId and ClientId of the result say who it is
+    public async Task<ClientTokensResult> CreateClientAsync(string login, string? name = null, string type = "Pc")
+    {
+        var userId = await CreateUserAsync(login);
+        return await RegisterClientAsync(userId, name, type);
+    }
+
+    // the panel creates a registration code and the app of the client registers itself with it
+    public async Task<ClientTokensResult> RegisterClientAsync(Guid userId, string? name = null, string type = "Pc")
+    {
+        var code = await ExecuteAsync<CreateClientRegistrationCodeCommand, ClientCodeResult>(new CreateClientRegistrationCodeCommand(userId));
+        var tokens = await ExecuteAsync<RegisterClientCommand, ClientTokensResult>(new RegisterClientCommand(code.Code!, type, name));
+        Assert.True(tokens.Succeeded, $"registration of a client: {tokens.Error}");
+        return tokens;
+    }
+
+    // the account panel renames a client of its account
+    public Task RenameClientAsync(Guid userId, Guid clientId, string name)
+    {
+        return ExecuteAsync(new RenameClientCommand(userId, clientId, name));
+    }
+
+    public Task<ClientCodeResult> IssueLoginCodeAsync(Guid userId, Guid clientId)
+    {
+        return ExecuteAsync<IssueClientLoginCodeCommand, ClientCodeResult>(new IssueClientLoginCodeCommand(userId, clientId));
+    }
+
+    // an existing client signs in like the client does: a login code of the panel, then client-login
+    public async Task<ClientTokensResult> LoginClientAsync(Guid userId, Guid clientId)
+    {
+        var code = await IssueLoginCodeAsync(userId, clientId);
+        Assert.True(code.Succeeded, $"login code: {code.Error}");
+        return await ExecuteAsync<SignInClientCommand, ClientTokensResult>(new SignInClientCommand(code.Code!));
+    }
+
+    // one scope per call like one http request, so a command sees what internal commands saved after an earlier one
+    public async Task ExecuteAsync<TCommand>(TCommand command) where TCommand : BuildingBlocks.Application.Commands.ICommand
+    {
+        await using var scope = _services.CreateAsyncScope();
+        await scope.ServiceProvider.GetRequiredService<IIdentityModule>().ExecuteCommandAsync(command);
+    }
+
+    public async Task<TResult> ExecuteAsync<TCommand, TResult>(TCommand command) where TCommand : BuildingBlocks.Application.Commands.ICommand<TResult>
+    {
+        await using var scope = _services.CreateAsyncScope();
+        return await scope.ServiceProvider.GetRequiredService<IIdentityModule>().ExecuteCommandAsync<TCommand, TResult>(command);
     }
 
     public const string TestPassword = "test-password-1";

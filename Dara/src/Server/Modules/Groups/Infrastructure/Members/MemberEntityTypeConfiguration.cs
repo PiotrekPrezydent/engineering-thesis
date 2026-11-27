@@ -14,5 +14,8 @@ public class MemberEntityTypeConfiguration : IEntityTypeConfiguration<Member>
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Id).HasConversion(id => id.Value, value => new MemberId(value));
+
+        builder.Property(x => x.UserId);
+        builder.Property(x => x.IsRevoked);
     }
 }
