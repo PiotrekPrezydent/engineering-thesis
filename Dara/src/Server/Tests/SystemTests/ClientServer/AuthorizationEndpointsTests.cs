@@ -6,6 +6,7 @@ using Dara.Server.Apps.API.Common.Authorization;
 using Dara.Server.Modules.Authorization.Application;
 using Dara.Server.Modules.Authorization.Application.RoleAssignments.GetMyAssignments;
 using Dara.Server.Modules.Identity.Application;
+using Dara.Server.Modules.Identity.Application.GetClients;
 using Dara.Server.SystemTests.Hosting;
 using Dara.Shared.Contracts.Auth;
 using Dara.Shared.Contracts.Authorization;
@@ -19,8 +20,8 @@ using Microsoft.AspNetCore.SignalR.Client;
 namespace Dara.Server.SystemTests.ClientServer;
 
 // the mechanism of TASK-ENG-040 on probes of the test host (endpoints and hub methods marked with permissions of
-// Identity, for any session) and the endpoints of Authorization; the sender is the client of a token or the user of
-// the panel cookie, each with only its own roles
+// Identity, for any session) and the endpoints of Authorization; the sender is the client of a token or the panel
+// client of the account of the panel cookie (TASK-ENG-041), each with only its own roles; the account holds none
 public class AuthorizationEndpointsTests
 {
     private const string ClientProbe = "/test/clients/{clientId}/change-context";
@@ -49,14 +50,19 @@ public class AuthorizationEndpointsTests
         var ofClient = await GetAsync<List<RoleAssignmentSnapshot>>(host, AuthorizationRoutes.MyAssignments, alice.AccessToken);
         Assert.Contains(ofClient, a => a is { RoleCode: "Identity.ClientOwner", ScopeCode: "Identity.Client" } && a.ScopeId == alice.ClientId);
         Assert.Contains(ofClient, a => a is { RoleCode: "Plugins.Viewer", ScopeCode: "Plugins.Plugin" } && a.ScopeId == Guid.Empty);
-        // a client does not get the roles of its user
+        // a client does not get the roles of the panel of its account
         Assert.DoesNotContain(ofClient, a => a.RoleCode == "Identity.Owner");
         Assert.All(ofClient, a => Assert.Equal(alice.ClientId, a.SubjectId));
 
+        var panelId = await PanelClientIdAsync(host, alice.UserId);
+        Assert.NotEqual(alice.UserId, panelId);
         var ofUser = await ReadAsync<List<RoleAssignmentSnapshot>>(await host.SendAsPanelAsync(HttpMethod.Get, AuthorizationRoutes.MyAssignments, panel));
+        Assert.All(ofUser, a => Assert.Equal(panelId, a.SubjectId));
         Assert.Contains(ofUser, a => a is { RoleCode: "Identity.Owner", ScopeCode: "Identity.User" } && a.ScopeId == alice.UserId);
         Assert.Contains(ofUser, a => a.RoleCode == "Identity.ClientOwner" && a.ScopeId == alice.ClientId);
         Assert.Contains(ofUser, a => a.RoleCode == "Plugins.Viewer" && a.ScopeId == Guid.Empty);
+        // the account is a resource, not a subject
+        Assert.Empty(await AssignmentsAsync(host, alice.UserId));
 
         var roles = await GetAsync<List<RoleSnapshot>>(host, AuthorizationRoutes.Roles, alice.AccessToken);
         var pluginsOwner = Assert.Single(roles, r => r.Code == "Plugins.Owner");
@@ -164,26 +170,34 @@ public class AuthorizationEndpointsTests
         await using var host = await AppHubTestHost.StartAsync(cancellationToken, mapExtra: MapProbes);
         var alice = await NewClientAsync(host, "authz-revoked");
         var cookie = await host.SignInAccountAsync("authz-revoked");
+        var panelId = await PanelClientIdAsync(host, alice.UserId);
 
         var revoked = await host.SendAsPanelAsync(HttpMethod.Post, ClientRoutes.Revoke(alice.ClientId), cookie);
         Assert.True(revoked.IsSuccessStatusCode, $"revoke: {(int)revoked.StatusCode}");
 
         await ModulesHost.WaitUntilAsync(async () => (await AssignmentsAsync(host, alice.ClientId)).Count == 0
-                && (await AssignmentsAsync(host, alice.UserId)).All(a => a.ScopeId != alice.ClientId),
+                && (await AssignmentsAsync(host, panelId)).All(a => a.ScopeId != alice.ClientId),
             "the assignments of and on the revoked client are gone");
-        Assert.Contains(await AssignmentsAsync(host, alice.UserId), a => a.RoleCode == "Identity.Owner");
+        Assert.Contains(await AssignmentsAsync(host, panelId), a => a.RoleCode == "Identity.Owner");
     }
 
     // an account with one client whose assignments from Identity and Plugins have arrived in Authorization: the client
-    // holds itself and sees the plugins, the user holds its account and the client and sees the plugins
+    // holds itself and sees the plugins, the panel client holds the account and the client and sees the plugins
     private static async Task<AuthTokensResponse> NewClientAsync(AppHubTestHost host, string login)
     {
         await host.RegisterAsync(login);
         var tokens = await host.RegisterClientAsync(login);
         await ModulesHost.WaitUntilAsync(async () => (await AssignmentsAsync(host, tokens.ClientId)).Count >= 2
-                && (await AssignmentsAsync(host, tokens.UserId)).Count >= 3,
+                && (await AssignmentsAsync(host, await PanelClientIdAsync(host, tokens.UserId))).Count >= 3,
             $"the assignments of {login}");
         return tokens;
+    }
+
+    private static async Task<Guid> PanelClientIdAsync(AppHubTestHost host, Guid userId)
+    {
+        var panelId = await host.QueryAsync<IIdentityModule, Guid?>(module =>
+            module.ExecuteQueryAsync<GetPanelClientIdQuery, Guid?>(new GetPanelClientIdQuery(userId)));
+        return panelId!.Value;
     }
 
     private static Task<List<RoleAssignmentDto>> AssignmentsAsync(AppHubTestHost host, Guid subjectId)

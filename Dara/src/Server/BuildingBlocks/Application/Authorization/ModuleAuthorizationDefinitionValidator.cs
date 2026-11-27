@@ -67,7 +67,7 @@ public static class ModuleAuthorizationDefinitionValidator
         if (uncovered.Count > 0)
             errors.Add($"permissions that no role allows: {string.Join(", ", uncovered)}");
 
-        foreach (var role in definition.GetNewUserRoles().Concat(definition.GetNewClientRoles()).Where(r => !rolesByCode.ContainsKey(r.Role.Code)))
+        foreach (var role in definition.GetNewPanelRoles().Concat(definition.GetNewClientRoles()).Where(r => !rolesByCode.ContainsKey(r.Role.Code)))
             errors.Add($"new subjects get role {role.Role.Code} the module does not declare");
 
         if (errors.Count > 0)

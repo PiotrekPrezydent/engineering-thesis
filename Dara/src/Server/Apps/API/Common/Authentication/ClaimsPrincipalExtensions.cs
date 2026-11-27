@@ -17,16 +17,16 @@ public static class ClaimsPrincipalExtensions
         return RequiredGuid(principal, AuthClaims.Client);
     }
 
-    public static Guid AccountSessionId(this ClaimsPrincipal principal)
+    public static Guid PanelSignInId(this ClaimsPrincipal principal)
     {
         return RequiredGuid(principal, AuthClaims.Session);
     }
 
-    // the subject Authorization checks: the client of a client token, the user of the panel cookie; each has only its
-    // own roles (a client does not get the roles of its user)
+    // the subject Authorization checks: the client of a client token, the panel client of the account of the panel
+    // cookie; each has only its own roles (a client does not get the roles of the panel), the account itself has none
     public static Guid SenderId(this ClaimsPrincipal principal)
     {
-        return principal.IsClient() ? principal.ClientId() : principal.UserId();
+        return principal.ClientId();
     }
 
     public static bool IsClient(this ClaimsPrincipal principal)

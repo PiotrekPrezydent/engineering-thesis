@@ -1,6 +1,5 @@
 using Dara.Server.BuildingBlocks.Domain.Exceptions;
 using Dara.Server.Modules.Identity.Domain.Users;
-using Dara.Server.Modules.Identity.Domain.Users.Events;
 using Dara.Server.Modules.Identity.Domain.Users.Rules;
 
 namespace Dara.Server.Modules.Identity.UnitTests;
@@ -23,7 +22,8 @@ public class UserTests
         Assert.Equal("ALICE@TEST.LOCAL", user.NormalizedEmail);
         Assert.Equal("hash:" + Password, user.PasswordHash);
         Assert.Equal(Now, user.RegisteredAt);
-        Assert.IsType<NewUserCreatedDomainEvent>(Assert.Single(user.DomainEvents));
+        // the new account is published by its panel client, created with it by the application
+        Assert.Empty(user.DomainEvents);
     }
 
     [Theory]

@@ -1,16 +1,16 @@
 using Dara.Server.BuildingBlocks.Application.Commands;
-using Dara.Server.Modules.Identity.Domain.ClientSessions;
-using Dara.Server.Modules.Identity.Domain.Users.Clients;
+using Dara.Server.Modules.Identity.Domain.UserSessions;
+using Dara.Server.Modules.Identity.Domain.Clients;
 
 namespace Dara.Server.Modules.Identity.Application.SignOut;
 
 // a session of another account or an unknown one is left as it is; a repeated sign-out changes nothing
 public class SignOutClientCommandHandler : ICommandHandler<SignOutClientCommand>
 {
-    private readonly IClientSessionRepository _sessions;
+    private readonly IUserSessionRepository _sessions;
     private readonly TimeProvider _timeProvider;
 
-    public SignOutClientCommandHandler(IClientSessionRepository sessions, TimeProvider timeProvider)
+    public SignOutClientCommandHandler(IUserSessionRepository sessions, TimeProvider timeProvider)
     {
         _sessions = sessions;
         _timeProvider = timeProvider;
@@ -18,7 +18,7 @@ public class SignOutClientCommandHandler : ICommandHandler<SignOutClientCommand>
 
     public async Task HandleAsync(SignOutClientCommand command)
     {
-        var session = await _sessions.FindByClientIdAsync(new UserClientId(command.ClientId));
+        var session = await _sessions.FindByClientIdAsync(new ClientId(command.ClientId));
         if (session == null || session.UserId.Value != command.UserId)
             return;
 

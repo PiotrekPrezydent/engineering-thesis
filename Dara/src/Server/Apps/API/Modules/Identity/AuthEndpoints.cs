@@ -51,7 +51,7 @@ public static class AuthEndpoints
         if (!result.Succeeded)
             return Refused(result.Error!.Value);
 
-        await http.SignInAsync(AccountCookie.Scheme, AccountCookie.CreatePrincipal(result.UserId, result.AccountSessionId),
+        await http.SignInAsync(AccountCookie.Scheme, AccountCookie.CreatePrincipal(result.UserId, result.PanelClientId, result.PanelSignInId),
             new AuthenticationProperties { IsPersistent = true });
 
         return TypedResults.Ok(new AccountSignInResponse(result.UserId));
@@ -116,7 +116,7 @@ public static class AuthEndpoints
 
         if (user.IsAccount())
         {
-            await identity.ExecuteCommandAsync(new SignOutAccountCommand(user.UserId(), user.AccountSessionId()));
+            await identity.ExecuteCommandAsync(new SignOutAccountCommand(user.UserId(), user.PanelSignInId()));
             await http.SignOutAsync(AccountCookie.Scheme);
         }
 

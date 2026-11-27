@@ -1,13 +1,15 @@
 using System.Security.Claims;
 using Dara.Server.Modules.Identity.Application;
+using Dara.Server.Modules.Identity.Application.AuthenticatePanelSignIn;
 using Dara.Shared.Contracts.Auth;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace Dara.Server.Apps.API.Common.Authentication;
 
-// the session of the account panel: the cookie holds the id of an AccountSession of the identity module, which the
-// server checks on every request, so a sign-out ends it at once; the panel is served by this host (same site)
+// the session of the account panel: the cookie holds the id of a sign-in of the panel (PanelSignIn of the identity
+// module), which the server checks on every request, so a sign-out ends it at once, and the id of the panel client of
+// the account, its subject in Authorization; the panel is served by this host (same site)
 public static class AccountCookie
 {
     public const string Scheme = "AccountCookie";
@@ -42,32 +44,34 @@ public static class AccountCookie
         };
     }
 
-    public static ClaimsPrincipal CreatePrincipal(Guid userId, Guid accountSessionId)
+    public static ClaimsPrincipal CreatePrincipal(Guid userId, Guid panelClientId, Guid panelSignInId)
     {
         var identity = new ClaimsIdentity(
         [
             new Claim(AuthClaims.Subject, userId.ToString()),
-            new Claim(AuthClaims.Session, accountSessionId.ToString()),
+            new Claim(AuthClaims.Client, panelClientId.ToString()),
+            new Claim(AuthClaims.Session, panelSignInId.ToString()),
             new Claim(AuthClaims.Scope, AuthClaims.ScopeAccount)
         ], Scheme, AuthClaims.Subject, null);
 
         return new ClaimsPrincipal(identity);
     }
 
-    // an ended, idle or unknown session (or one of another user) drops the cookie
+    // an ended, idle or unknown sign-in (or one of another user or panel client) drops the cookie
     private static async Task ValidateAsync(CookieValidatePrincipalContext context)
     {
         var principal = context.Principal;
         var userId = principal?.FindFirst(AuthClaims.Subject)?.Value;
-        Guid? validUserId = null;
+        var panelClientId = principal?.FindFirst(AuthClaims.Client)?.Value;
+        PanelSignInResult? valid = null;
 
-        if (Guid.TryParse(principal?.FindFirst(AuthClaims.Session)?.Value, out var sessionId))
+        if (Guid.TryParse(principal?.FindFirst(AuthClaims.Session)?.Value, out var signInId))
         {
             var identity = context.HttpContext.RequestServices.GetRequiredService<IIdentityModule>();
-            validUserId = await identity.AuthenticateAccountSessionAsync(sessionId);
+            valid = await identity.AuthenticatePanelSignInAsync(signInId);
         }
 
-        if (validUserId == null || validUserId.Value.ToString() != userId)
+        if (valid == null || valid.UserId.ToString() != userId || valid.PanelClientId.ToString() != panelClientId)
         {
             context.RejectPrincipal();
             await context.HttpContext.SignOutAsync(Scheme);

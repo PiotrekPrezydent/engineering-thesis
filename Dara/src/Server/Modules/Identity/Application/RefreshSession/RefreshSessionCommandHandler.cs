@@ -1,17 +1,17 @@
 using Dara.Server.BuildingBlocks.Application.Commands;
-using Dara.Server.Modules.Identity.Domain.ClientSessions;
+using Dara.Server.Modules.Identity.Domain.UserSessions;
 
 namespace Dara.Server.Modules.Identity.Application.RefreshSession;
 
 // rotation: the presented token is used up and a new one is issued; a refusal is saved too (a reuse ends the session)
 public class RefreshSessionCommandHandler : ICommandHandler<RefreshSessionCommand, ClientTokensResult>
 {
-    private readonly IClientSessionRepository _sessions;
+    private readonly IUserSessionRepository _sessions;
     private readonly IRefreshTokenFactory _tokenFactory;
     private readonly IdentityOptions _options;
     private readonly TimeProvider _timeProvider;
 
-    public RefreshSessionCommandHandler(IClientSessionRepository sessions, IRefreshTokenFactory tokenFactory, IdentityOptions options, TimeProvider timeProvider)
+    public RefreshSessionCommandHandler(IUserSessionRepository sessions, IRefreshTokenFactory tokenFactory, IdentityOptions options, TimeProvider timeProvider)
     {
         _sessions = sessions;
         _tokenFactory = tokenFactory;

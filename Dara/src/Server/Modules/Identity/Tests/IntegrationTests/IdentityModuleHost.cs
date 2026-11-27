@@ -65,10 +65,11 @@ public class IdentityModuleHost : IAsyncDisposable
         return await scope.ServiceProvider.GetRequiredService<IIdentityModule>().ExecuteQueryAsync<TQuery, TResult>(query);
     }
 
-    public async Task<Guid?> AuthenticateAsync(Guid accountSessionId)
+    // the user id of a valid sign-in of the panel
+    public async Task<Guid?> AuthenticateAsync(Guid panelSignInId)
     {
         await using var scope = _services.CreateAsyncScope();
-        return await scope.ServiceProvider.GetRequiredService<IIdentityModule>().AuthenticateAccountSessionAsync(accountSessionId);
+        return (await scope.ServiceProvider.GetRequiredService<IIdentityModule>().AuthenticatePanelSignInAsync(panelSignInId))?.UserId;
     }
 
     // reads module state that the module api has no query for

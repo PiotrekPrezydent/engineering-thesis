@@ -17,13 +17,14 @@ public static class IdentityRoles
         ManageableRoleCodes = [OwnerCode, Viewer.Code]
     };
 
-    // holds one client: the client itself and its user
+    // holds one client: the client itself and the panel client of its account
     public static readonly RoleDefinition ClientOwner = new(ClientOwnerCode, IdentityScopes.Client, [IdentityPermissions.ChangeClientContext, IdentityPermissions.ManageClientAccess])
     {
         ManageableRoleCodes = [ClientOwnerCode]
     };
 
-    // a new account holds itself, a new client holds itself (its user gets ClientOwner on it too, as the one who added it)
-    public static readonly IReadOnlyList<NewSubjectRole> ForNewUser = [new(Owner, OnItself: true)];
+    // the panel client of a new account gets Identity.Owner on the account (published by Identity itself, the scope is
+    // the account, not the panel); a new client holds itself (the panel of its account gets ClientOwner on it too)
+    public static readonly IReadOnlyList<NewSubjectRole> ForNewPanel = [];
     public static readonly IReadOnlyList<NewSubjectRole> ForNewClient = [new(ClientOwner, OnItself: true)];
 }

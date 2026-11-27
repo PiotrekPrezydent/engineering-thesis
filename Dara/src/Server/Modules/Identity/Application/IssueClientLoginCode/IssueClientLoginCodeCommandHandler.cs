@@ -1,20 +1,19 @@
 using Dara.Server.BuildingBlocks.Application.Commands;
-using Dara.Server.Modules.Identity.Domain.Users;
-using Dara.Server.Modules.Identity.Domain.Users.Clients;
+using Dara.Server.Modules.Identity.Domain.Clients;
 
 namespace Dara.Server.Modules.Identity.Application.IssueClientLoginCode;
 
-// a client of another account looks like an unknown one; a new code replaces the previous one of the client
+// a client of another account and the panel client look like an unknown one; a new code replaces the previous one
 public class IssueClientLoginCodeCommandHandler : ICommandHandler<IssueClientLoginCodeCommand, ClientCodeResult>
 {
-    private readonly IUserRepository _users;
+    private readonly IClientRepository _clients;
     private readonly IClientCodeFactory _codeFactory;
     private readonly IdentityOptions _options;
     private readonly TimeProvider _timeProvider;
 
-    public IssueClientLoginCodeCommandHandler(IUserRepository users, IClientCodeFactory codeFactory, IdentityOptions options, TimeProvider timeProvider)
+    public IssueClientLoginCodeCommandHandler(IClientRepository clients, IClientCodeFactory codeFactory, IdentityOptions options, TimeProvider timeProvider)
     {
-        _users = users;
+        _clients = clients;
         _codeFactory = codeFactory;
         _options = options;
         _timeProvider = timeProvider;
@@ -22,10 +21,8 @@ public class IssueClientLoginCodeCommandHandler : ICommandHandler<IssueClientLog
 
     public async Task<ClientCodeResult> HandleAsync(IssueClientLoginCodeCommand command)
     {
-        var user = await _users.GetByIdAsync(new UserId(command.UserId));
-        var clientId = new UserClientId(command.ClientId);
-        var client = user.Clients.FirstOrDefault(c => c.Id == clientId);
-        if (client == null)
+        var client = await _clients.FindByIdAsync(new ClientId(command.ClientId));
+        if (client == null || client.UserId.Value != command.UserId || client.Kind != ClientKind.Hub)
             return ClientCodeResult.Failed(AuthError.ClientNotFound);
 
         if (client.IsRevoked)
@@ -35,7 +32,7 @@ public class IssueClientLoginCodeCommandHandler : ICommandHandler<IssueClientLog
         var lifetime = _options.ClientLoginCodeLifetime;
         var code = _codeFactory.Create();
 
-        user.IssueClientLoginCode(clientId, code.Hash, now, lifetime);
+        client.IssueLoginCode(code.Hash, now, lifetime);
         return ClientCodeResult.Issued(code.Code, now + lifetime);
     }
 }

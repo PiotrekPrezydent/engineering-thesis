@@ -13,7 +13,7 @@ internal sealed class IdentityAuthorizationDefinition : IModuleAuthorizationDefi
 
     public IEnumerable<RoleDefinition> GetDefaultRoles() => [IdentityRoles.Owner, IdentityRoles.Viewer, IdentityRoles.ClientOwner];
 
-    public IEnumerable<NewSubjectRole> GetNewUserRoles() => IdentityRoles.ForNewUser;
+    public IEnumerable<NewSubjectRole> GetNewPanelRoles() => IdentityRoles.ForNewPanel;
 
     public IEnumerable<NewSubjectRole> GetNewClientRoles() => IdentityRoles.ForNewClient;
 }

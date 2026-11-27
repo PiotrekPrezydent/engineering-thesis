@@ -1,9 +1,12 @@
 using Dara.Server.BuildingBlocks.Domain.Exceptions;
 using Dara.Server.Modules.Identity.Application;
+using Dara.Server.Modules.Identity.Application.Clients;
+using Dara.Server.Modules.Identity.Application.GetClients;
 using Dara.Server.Modules.Identity.Application.GetUser;
 using Dara.Server.Modules.Identity.Application.RegisterUser;
 using Dara.Server.Modules.Identity.Application.SignOut;
-using Dara.Server.Modules.Identity.Domain.AccountSessions;
+using Dara.Server.Modules.Identity.Domain.Clients;
+using Dara.Server.Modules.Identity.Domain.UserSessions;
 using Dara.Server.Modules.Identity.Domain.Users;
 using Dara.Server.Modules.Identity.Domain.Users.Rules;
 
@@ -27,6 +30,27 @@ public class IdentityCommandsTests
 
         var users = await host.QueryAsync<GetAllUsersQuery, List<(Guid userId, string login)>>(new GetAllUsersQuery());
         Assert.Equal([(userId, "alice.b")], users);
+    }
+
+    // the account and its panel client are two subjects with other ids; every sign-in of the panel acts as that client
+    [Fact]
+    public async Task ANewAccountGetsItsPanelClientWithItsOwnId()
+    {
+        await using var host = await IdentityModuleHost.StartAsync(TestContext.Current.CancellationToken);
+        var userId = await host.RegisterAsync("alice");
+
+        var panelClientId = await host.QueryAsync<GetPanelClientIdQuery, Guid?>(new GetPanelClientIdQuery(userId));
+        var first = await host.SignInAccountAsync("alice");
+        var second = await host.SignInAccountAsync("alice");
+
+        Assert.NotNull(panelClientId);
+        Assert.NotEqual(userId, panelClientId.Value);
+        Assert.Equal(panelClientId.Value, first.PanelClientId);
+        Assert.Equal(panelClientId.Value, second.PanelClientId);
+        Assert.NotEqual(first.PanelSignInId, second.PanelSignInId);
+        var panel = await host.ReadAsync(r => r.Query<Client>().Single());
+        Assert.Equal(ClientKind.Panel, panel.Kind);
+        Assert.Empty(await host.QueryAsync<GetAccountClientsQuery, List<UserClientDto>>(new GetAccountClientsQuery(userId)));
     }
 
     [Fact]
@@ -55,11 +79,11 @@ public class IdentityCommandsTests
 
         Assert.Equal(AuthError.InvalidCredentials, wrongPassword.Error);
         Assert.Equal(AuthError.InvalidCredentials, unknownLogin.Error);
-        Assert.Empty(await host.ReadAsync(r => r.Query<AccountSession>().ToList()));
+        Assert.Empty(await host.ReadAsync(r => r.Query<UserSession>().ToList().SelectMany(s => s.PanelSignIns).ToList()));
     }
 
     [Fact]
-    public async Task AnAccountSessionIsValidUntilItsSignOut()
+    public async Task APanelSignInIsValidUntilItsSignOut()
     {
         await using var host = await IdentityModuleHost.StartAsync(TestContext.Current.CancellationToken);
         var userId = await host.RegisterAsync("alice");
@@ -68,12 +92,12 @@ public class IdentityCommandsTests
 
         Assert.True(account.Succeeded);
         Assert.Equal(userId, account.UserId);
-        Assert.Equal(userId, await host.AuthenticateAsync(account.AccountSessionId));
+        Assert.Equal(userId, await host.AuthenticateAsync(account.PanelSignInId));
 
-        await host.ExecuteAsync(new SignOutAccountCommand(userId, account.AccountSessionId));
+        await host.ExecuteAsync(new SignOutAccountCommand(userId, account.PanelSignInId));
 
-        Assert.Null(await host.AuthenticateAsync(account.AccountSessionId));
-        Assert.Equal(userId, await host.AuthenticateAsync(other.AccountSessionId));
+        Assert.Null(await host.AuthenticateAsync(account.PanelSignInId));
+        Assert.Equal(userId, await host.AuthenticateAsync(other.PanelSignInId));
         Assert.Null(await host.AuthenticateAsync(Guid.NewGuid()));
     }
 
@@ -81,28 +105,28 @@ public class IdentityCommandsTests
     [Fact]
     public async Task AnAuthenticatedRequestMovesTheIdleLifetimeOn()
     {
-        var options = new IdentityOptions { AccountSessionIdleLifetime = TimeSpan.FromMilliseconds(600) };
+        var options = new IdentityOptions { PanelSignInIdleLifetime = TimeSpan.FromMilliseconds(600) };
         await using var host = await IdentityModuleHost.StartAsync(TestContext.Current.CancellationToken, options);
         var userId = await host.RegisterAsync("alice");
         var account = await host.SignInAccountAsync("alice");
-        var signedInAt = await host.ReadAsync(r => r.Query<AccountSession>().Single().LastUsedAt);
+        var signedInAt = await host.ReadAsync(r => r.Query<UserSession>().ToList().SelectMany(s => s.PanelSignIns).Single().LastUsedAt);
 
         await Task.Delay(50, TestContext.Current.CancellationToken);
-        Assert.Equal(userId, await host.AuthenticateAsync(account.AccountSessionId));
+        Assert.Equal(userId, await host.AuthenticateAsync(account.PanelSignInId));
 
-        Assert.True(await host.ReadAsync(r => r.Query<AccountSession>().Single().LastUsedAt) > signedInAt);
+        Assert.True(await host.ReadAsync(r => r.Query<UserSession>().ToList().SelectMany(s => s.PanelSignIns).Single().LastUsedAt) > signedInAt);
     }
 
     [Fact]
-    public async Task AnIdleAccountSessionIsNotValid()
+    public async Task AnIdlePanelSignInIsNotValid()
     {
-        var options = new IdentityOptions { AccountSessionIdleLifetime = TimeSpan.FromMilliseconds(300) };
+        var options = new IdentityOptions { PanelSignInIdleLifetime = TimeSpan.FromMilliseconds(300) };
         await using var host = await IdentityModuleHost.StartAsync(TestContext.Current.CancellationToken, options);
         await host.RegisterAsync("alice");
         var account = await host.SignInAccountAsync("alice");
 
         await Task.Delay(500, TestContext.Current.CancellationToken);
 
-        Assert.Null(await host.AuthenticateAsync(account.AccountSessionId));
+        Assert.Null(await host.AuthenticateAsync(account.PanelSignInId));
     }
 }

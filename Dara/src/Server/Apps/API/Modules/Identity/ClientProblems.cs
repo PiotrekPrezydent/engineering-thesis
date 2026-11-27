@@ -1,6 +1,6 @@
 using Dara.Server.BuildingBlocks.Domain;
 using Dara.Server.BuildingBlocks.Domain.Exceptions;
-using Dara.Server.Modules.Identity.Domain.Users.Rules;
+using Dara.Server.Modules.Identity.Domain.Clients.Rules;
 using Dara.Shared.Contracts.Clients;
 
 namespace Dara.Server.Apps.API.Modules.Identity;
@@ -36,6 +36,8 @@ public class ClientProblems : IEndpointFilter
         return rule switch
         {
             ClientMustBelongToUserRule => NotFound(),
+            // the panel client is not a client the panel can change
+            ClientMustBeHubClientRule => NotFound(),
             ClientMustNotBeRevokedRule => Revoked(),
             _ => Problem(StatusCodes.Status400BadRequest, ClientErrorCodes.RuleBroken, rule.Message, rule.Message)
         };

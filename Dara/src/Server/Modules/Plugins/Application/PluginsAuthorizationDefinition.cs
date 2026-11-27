@@ -13,7 +13,7 @@ internal sealed class PluginsAuthorizationDefinition : IModuleAuthorizationDefin
 
     public IEnumerable<RoleDefinition> GetDefaultRoles() => [PluginsRoles.Owner, PluginsRoles.Manager, PluginsRoles.Editor, PluginsRoles.Viewer, PluginsRoles.FunctionOwner];
 
-    public IEnumerable<NewSubjectRole> GetNewUserRoles() => PluginsRoles.ForNewSubjects;
+    public IEnumerable<NewSubjectRole> GetNewPanelRoles() => PluginsRoles.ForNewSubjects;
 
     public IEnumerable<NewSubjectRole> GetNewClientRoles() => PluginsRoles.ForNewSubjects;
 }

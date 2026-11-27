@@ -2,6 +2,7 @@ using Dara.Server.Apps.API.Common.Seeding;
 using Dara.Server.Modules.Identity.Application;
 using Dara.Server.Modules.Identity.Application.ChangeClientContext;
 using Dara.Server.Modules.Identity.Application.CreateClientRegistrationCode;
+using Dara.Server.Modules.Identity.Application.GetClients;
 using Dara.Server.Modules.Identity.Application.RegisterClient;
 using Dara.Server.Modules.Identity.Application.RegisterUser;
 
@@ -32,6 +33,8 @@ public class IdentitySeeder : ISeeder
             var userId = await _identityModule.ExecuteCommandAsync<RegisterUserCommand, Guid>(
                 new RegisterUserCommand(account.Login, account.Email, _environment.UserPassword));
             data.UserIds.Add(account.Login, userId);
+            data.PanelClientIds.Add(account.Login, await _identityModule.ExecuteQueryAsync<GetPanelClientIdQuery, Guid?>(new GetPanelClientIdQuery(userId))
+                ?? throw new InvalidOperationException($"seed found no panel client of the account {account.Login}"));
         }
 
         foreach (var client in data.Clients)

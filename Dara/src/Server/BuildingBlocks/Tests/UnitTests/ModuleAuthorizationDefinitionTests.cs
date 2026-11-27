@@ -24,7 +24,7 @@ public class ModuleAuthorizationDefinitionTests
 
     private static TestDefinition Valid() => new([Item, Other], [Read, Edit, ManageAccess, OtherRead], [Owner, Editor, Viewer, OtherViewer])
     {
-        NewUserRoles = [new NewSubjectRole(Viewer), new NewSubjectRole(Owner, OnItself: true)]
+        NewPanelRoles = [new NewSubjectRole(Viewer), new NewSubjectRole(Owner, OnItself: true)]
     };
 
     [Fact]
@@ -59,7 +59,7 @@ public class ModuleAuthorizationDefinitionTests
     [Fact]
     public void APermissionInNoRoleStopsTheModule()
     {
-        var definition = Valid() with { Roles = [Editor, Viewer, OtherViewer], NewUserRoles = [] };
+        var definition = Valid() with { Roles = [Editor, Viewer, OtherViewer], NewPanelRoles = [] };
 
         var error = Assert.Throws<InvalidOperationException>(() => ModuleAuthorizationDefinitionValidator.Validate("Test", definition));
         Assert.Contains("module Test", error.Message);
@@ -180,7 +180,7 @@ public class ModuleAuthorizationDefinitionTests
     [Fact]
     public void ANewSubjectRoleTheModuleDoesNotDeclareStopsTheModule()
     {
-        var definition = Valid() with { NewUserRoles = [new NewSubjectRole(new RoleDefinition("Test.Ghost", Item, [Read]))] };
+        var definition = Valid() with { NewPanelRoles = [new NewSubjectRole(new RoleDefinition("Test.Ghost", Item, [Read]))] };
 
         var error = Assert.Throws<InvalidOperationException>(() => ModuleAuthorizationDefinitionValidator.Validate("Test", definition));
         Assert.Contains("new subjects get role Test.Ghost the module does not declare", error.Message);
@@ -199,12 +199,12 @@ public class ModuleAuthorizationDefinitionTests
         IReadOnlyList<PermissionDefinition> Permissions,
         IReadOnlyList<RoleDefinition> Roles) : IModuleAuthorizationDefinition
     {
-        public IReadOnlyList<NewSubjectRole> NewUserRoles { get; init; } = [];
+        public IReadOnlyList<NewSubjectRole> NewPanelRoles { get; init; } = [];
 
         public string ModuleName => "Test";
         public IEnumerable<ScopeDefinition> GetScopes() => Scopes;
         public IEnumerable<PermissionDefinition> GetPermissions() => Permissions;
         public IEnumerable<RoleDefinition> GetDefaultRoles() => Roles;
-        public IEnumerable<NewSubjectRole> GetNewUserRoles() => NewUserRoles;
+        public IEnumerable<NewSubjectRole> GetNewPanelRoles() => NewPanelRoles;
     }
 }

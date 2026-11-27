@@ -16,3 +16,6 @@ public record GetCurrentClientQuery(Guid ClientId) : IQuery<UserClientDto?>;
 public record GetClientQuery(Guid ClientId) : IQuery<ClientDto?>;
 
 public record GetClientsQuery(IEnumerable<Guid> ClientIds) : IQuery<List<ClientDto>>;
+
+// the panel client of the account (its subject in Authorization), for the seed of the host; null for an unknown account
+public record GetPanelClientIdQuery(Guid UserId) : IQuery<Guid?>;

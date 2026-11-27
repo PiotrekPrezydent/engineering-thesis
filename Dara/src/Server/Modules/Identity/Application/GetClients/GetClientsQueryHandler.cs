@@ -1,19 +1,20 @@
 using Dara.Server.BuildingBlocks.Application.Queries;
 using Dara.Server.BuildingBlocks.Infrastructure.DataAccess;
 using Dara.Server.Modules.Identity.Application.Clients;
+using Dara.Server.Modules.Identity.Domain.Clients;
 using Dara.Server.Modules.Identity.Domain.Users;
-using Dara.Server.Modules.Identity.Domain.Users.Clients;
 using Microsoft.EntityFrameworkCore;
 
 namespace Dara.Server.Modules.Identity.Application.GetClients;
 
-// clients are entities of User, so every query reads the accounts that have them
+// clients of the hub only; the panel client of an account is a subject of Authorization, not a client to show
 public class GetClientsQueryHandler :
     IQueryHandler<GetAccountClientsQuery, List<UserClientDto>>,
     IQueryHandler<GetAccountClientQuery, UserClientDto?>,
     IQueryHandler<GetCurrentClientQuery, UserClientDto?>,
     IQueryHandler<GetClientQuery, ClientDto?>,
-    IQueryHandler<GetClientsQuery, List<ClientDto>>
+    IQueryHandler<GetClientsQuery, List<ClientDto>>,
+    IQueryHandler<GetPanelClientIdQuery, Guid?>
 {
     private readonly IReadModel _readModel;
 
@@ -25,11 +26,8 @@ public class GetClientsQueryHandler :
     public async Task<List<UserClientDto>> HandleAsync(GetAccountClientsQuery query)
     {
         var userId = new UserId(query.UserId);
-        var user = await _readModel.Query<User>().FirstOrDefaultAsync(u => u.Id == userId);
-        if (user == null)
-            return [];
-
-        return user.Clients.OrderBy(c => c.RegisteredAt).ThenBy(c => c.Name).Select(c => c.ToAccountDto()).ToList();
+        var clients = await HubClients().Where(c => c.UserId == userId).ToListAsync();
+        return clients.OrderBy(c => c.RegisteredAt).ThenBy(c => c.Hub!.Name).Select(c => c.ToAccountDto()).ToList();
     }
 
     public async Task<UserClientDto?> HandleAsync(GetAccountClientQuery query)
@@ -50,15 +48,26 @@ public class GetClientsQueryHandler :
 
     public async Task<List<ClientDto>> HandleAsync(GetClientsQuery query)
     {
-        var clientIds = query.ClientIds.Select(id => new UserClientId(id)).ToList();
-        var users = await _readModel.Query<User>().Where(u => u.Clients.Any(c => clientIds.Contains(c.Id))).ToListAsync();
-        return users.SelectMany(u => u.Clients).Where(c => clientIds.Contains(c.Id)).Select(c => c.ToDto()).ToList();
+        var clientIds = query.ClientIds.Select(id => new ClientId(id)).ToList();
+        var clients = await HubClients().Where(c => clientIds.Contains(c.Id)).ToListAsync();
+        return clients.Select(c => c.ToDto()).ToList();
     }
 
-    private async Task<UserClient?> FindAsync(Guid id)
+    public async Task<Guid?> HandleAsync(GetPanelClientIdQuery query)
     {
-        var clientId = new UserClientId(id);
-        var user = await _readModel.Query<User>().FirstOrDefaultAsync(u => u.Clients.Any(c => c.Id == clientId));
-        return user?.Clients.First(c => c.Id == clientId);
+        var userId = new UserId(query.UserId);
+        var panel = await _readModel.Query<Client>().FirstOrDefaultAsync(c => c.UserId == userId && c.Kind == ClientKind.Panel);
+        return panel?.Id.Value;
+    }
+
+    private IQueryable<Client> HubClients()
+    {
+        return _readModel.Query<Client>().Where(c => c.Kind == ClientKind.Hub);
+    }
+
+    private async Task<Client?> FindAsync(Guid id)
+    {
+        var clientId = new ClientId(id);
+        return await HubClients().FirstOrDefaultAsync(c => c.Id == clientId);
     }
 }

@@ -1,18 +1,15 @@
 using Dara.Server.BuildingBlocks.Domain;
 using Dara.Server.BuildingBlocks.Domain.Exceptions;
 using Dara.Server.Modules.Identity.Domain.Users.ClientRegistrationCodes;
-using Dara.Server.Modules.Identity.Domain.Users.Clients;
-using Dara.Server.Modules.Identity.Domain.Users.Events;
 using Dara.Server.Modules.Identity.Domain.Users.Rules;
 
 namespace Dara.Server.Modules.Identity.Domain.Users;
 
-// the account: its id is the user id that other modules know; the password is kept only as a slow salted hash;
-// the clients of the account (apps signed in with it) are entities of this aggregate and change only through the
-// public methods here, each of which first checks that the client belongs to the account
+// the account: its id is the user id that other modules know; the password is kept only as a slow salted hash; it is
+// not a subject of Authorization: its clients are (Client, the panel client too), each with its own roles; the
+// account keeps the open registration codes, because a code says which account a new client joins
 public class User : Entity, IAggregateRoot
 {
-    private readonly List<UserClient> _clients = new();
     private readonly List<ClientRegistrationCode> _clientRegistrationCodes = new();
 
     public UserId Id { get; private set; }
@@ -22,9 +19,6 @@ public class User : Entity, IAggregateRoot
     public string NormalizedEmail { get; private set; }
     public string PasswordHash { get; private set; }
     public DateTime RegisteredAt { get; private set; }
-
-    // revoked clients stay: they keep the numbering of default names and take no change
-    public IReadOnlyList<UserClient> Clients => _clients.AsReadOnly();
 
     // open codes only: a used code is removed at once, an expired one when the next code is created
     public IReadOnlyList<ClientRegistrationCode> ClientRegistrationCodes => _clientRegistrationCodes.AsReadOnly();
@@ -39,10 +33,10 @@ public class User : Entity, IAggregateRoot
         NormalizedEmail = NormalizeEmail(email);
         PasswordHash = passwordHash;
         RegisteredAt = registeredAt;
-
-        AddDomainEvent(new NewUserCreatedDomainEvent(Id));
     }
 
+    // the application creates the panel client of the account in the same unit of work (Client.CreatePanel), which
+    // publishes the new account
     public static User Register(string login, string email, string password, DateTime now, IPasswordHasher hasher, IUserUniquenessChecker checker)
     {
         var normalizedLogin = NormalizeLogin(login);
@@ -80,70 +74,17 @@ public class User : Entity, IAggregateRoot
         return code;
     }
 
-    // uses up the code and adds the client; null when the code is unknown, used or expired (a result, not an
-    // exception, like every refused sign-in); an empty name gets the label of the type with a number; the
-    // application starts the session of the new client in the same unit of work
-    public UserClient? RegisterClient(string registrationCodeHash, ClientType type, string? name, DateTime now)
+    // uses up the code; false when it is unknown, used or expired (a result, not an exception, like every refused
+    // sign-in); the application registers the new client (Client.RegisterHub) and starts its session in the same unit
+    // of work, so a code is used once
+    public bool UseClientRegistrationCode(string registrationCodeHash, DateTime now)
     {
         var code = _clientRegistrationCodes.FirstOrDefault(c => c.Hash == registrationCodeHash);
         if (code is null || code.IsExpired(now))
-            return null;
-
-        var sameTypeCount = _clients.Count(c => c.Type == type);
-        var clientName = string.IsNullOrWhiteSpace(name) ? ClientTypeLabels.DefaultName(type, sameTypeCount) : name.Trim();
-        CheckRule(new ClientNameMustBeValidRule(clientName));
+            return false;
 
         _clientRegistrationCodes.Remove(code);
-        var client = UserClient.Create(Id, clientName, type, now);
-        _clients.Add(client);
-
-        AddDomainEvent(new UserClientRegisteredDomainEvent(Id, client.Id, client.Name, client.Type));
-        return client;
-    }
-
-    // for an existing client only (a copy of the app on another computer); a new code replaces the previous one
-    public ClientLoginCode IssueClientLoginCode(UserClientId clientId, string codeHash, DateTime now, TimeSpan lifetime)
-    {
-        return GetClient(clientId).IssueLoginCode(codeHash, now, lifetime);
-    }
-
-    // uses up the code; the id of the client whose code it was, null when no client has it or it expired; the
-    // application then signs in the session of that client in the same unit of work
-    public UserClientId? ConsumeClientLoginCode(string codeHash, DateTime now)
-    {
-        var client = _clients.FirstOrDefault(c => c.HasLoginCode(codeHash));
-        if (client is null)
-            return null;
-
-        return client.ConsumeLoginCode(codeHash, now) ? client.Id : null;
-    }
-
-    public void RenameClient(UserClientId clientId, string name)
-    {
-        var client = GetClient(clientId);
-        if (!client.Rename(name))
-            return;
-
-        AddDomainEvent(new UserClientRenamedDomainEvent(Id, client.Id, client.Name));
-    }
-
-    // replaces the whole context of the client
-    public void ChangeClientContext(UserClientId clientId, IReadOnlyDictionary<string, string> entries)
-    {
-        var client = GetClient(clientId);
-        if (!client.ChangeContext(entries))
-            return;
-
-        AddDomainEvent(new UserClientContextChangedDomainEvent(Id, client.Id, client.Context));
-    }
-
-    // the application ends the session of the client in the same unit of work
-    public void RevokeClient(UserClientId clientId, DateTime now)
-    {
-        var client = GetClient(clientId);
-        client.Revoke(now);
-
-        AddDomainEvent(new UserClientRevokedDomainEvent(Id, client.Id));
+        return true;
     }
 
     public static string NormalizeLogin(string? login)
@@ -154,14 +95,6 @@ public class User : Entity, IAggregateRoot
     public static string NormalizeEmail(string? email)
     {
         return (email ?? string.Empty).Trim().ToUpperInvariant();
-    }
-
-    // every change of a client goes through here: an id of a client of another account breaks the rule
-    private UserClient GetClient(UserClientId clientId)
-    {
-        var client = _clients.FirstOrDefault(c => c.Id == clientId);
-        CheckRule(new ClientMustBelongToUserRule(client is not null));
-        return client!;
     }
 
     // the user does not exist yet when its rules are checked, so the instance method of Entity does not fit

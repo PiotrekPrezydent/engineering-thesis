@@ -8,10 +8,10 @@ using Dara.Server.Modules.Identity.Application.RefreshSession;
 using Dara.Server.Modules.Identity.Application.RenameClient;
 using Dara.Server.Modules.Identity.Application.RevokeClient;
 using Dara.Server.Modules.Identity.Application.SignOut;
-using Dara.Server.Modules.Identity.Domain.ClientSessions;
+using Dara.Server.Modules.Identity.Domain.UserSessions;
 using Dara.Server.Modules.Identity.Domain.Users;
-using Dara.Server.Modules.Identity.Domain.Users.Clients;
-using Dara.Server.Modules.Identity.Domain.Users.Rules;
+using Dara.Server.Modules.Identity.Domain.Clients;
+using Dara.Server.Modules.Identity.Domain.Clients.Rules;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -41,12 +41,12 @@ public class ClientCommandsTests
         Assert.NotEqual(Guid.Empty, client.ClientId);
         var user = await host.ReadAsync(r => r.Query<User>().Single());
         Assert.Empty(user.ClientRegistrationCodes);
-        var registered = Assert.Single(user.Clients);
+        var registered = await host.ReadAsync(r => r.Query<Client>().Single(c => c.Kind == ClientKind.Hub));
         Assert.Equal(client.ClientId, registered.Id.Value);
-        Assert.Equal(ClientType.Phone, registered.Type);
-        Assert.Equal("Phone 1", registered.Name);
+        Assert.Equal(ClientType.Phone, registered.Hub!.Type);
+        Assert.Equal("Phone 1", registered.Hub.Name);
 
-        var session = await host.ReadAsync(r => r.Query<ClientSession>().Single());
+        var session = await host.ReadAsync(r => r.Query<UserSession>().Single(s => s.Kind == ClientKind.Hub));
         Assert.Equal(client.ClientId, session.ClientId.Value);
         Assert.DoesNotContain(client.RefreshToken, session.Tokens.Select(t => t.TokenHash));
     }
@@ -92,7 +92,7 @@ public class ClientCommandsTests
         Assert.Equal(registered.ClientId, signedIn.ClientId);
         Assert.Equal(AuthError.RefreshRevoked, (await RefreshAsync(host, registered.RefreshToken!)).Error);
         Assert.True((await RefreshAsync(host, signedIn.RefreshToken!)).Succeeded);
-        Assert.Null(await host.ReadAsync(r => r.Query<User>().Single().Clients.Single().LoginCode));
+        Assert.Null(await host.ReadAsync(r => r.Query<Client>().Single(c => c.Kind == ClientKind.Hub).Hub!.LoginCode));
     }
 
     [Fact]
@@ -200,7 +200,7 @@ public class ClientCommandsTests
         var rename = await Assert.ThrowsAsync<BuisnessRuleValidationException>(() =>
             host.ExecuteAsync(new RenameClientCommand(userId, client.ClientId, "Other")));
         Assert.IsType<ClientMustNotBeRevokedRule>(rename.BrokenRule);
-        Assert.NotNull(await host.ReadAsync(r => r.Query<ClientSession>().Single().RevokedAt));
+        Assert.NotNull(await host.ReadAsync(r => r.Query<UserSession>().Single(s => s.Kind == ClientKind.Hub).RevokedAt));
     }
 
     [Fact]
@@ -286,8 +286,8 @@ public class ClientCommandsTests
         var hash = tokens.Hash(client.RefreshToken!);
         var now = DateTime.UtcNow;
 
-        var firstSession = await first.ServiceProvider.GetRequiredService<IClientSessionRepository>().FindByTokenHashAsync(hash);
-        var secondSession = await second.ServiceProvider.GetRequiredService<IClientSessionRepository>().FindByTokenHashAsync(hash);
+        var firstSession = await first.ServiceProvider.GetRequiredService<IUserSessionRepository>().FindByTokenHashAsync(hash);
+        var secondSession = await second.ServiceProvider.GetRequiredService<IUserSessionRepository>().FindByTokenHashAsync(hash);
         Assert.Equal(RefreshOutcome.Refreshed, firstSession!.Refresh(hash, tokens.Create().Hash, now, TimeSpan.FromDays(1)));
         Assert.Equal(RefreshOutcome.Refreshed, secondSession!.Refresh(hash, tokens.Create().Hash, now, TimeSpan.FromDays(1)));
 

@@ -7,9 +7,9 @@ using Dara.Server.BuildingBlocks.Infrastructure.Configuration.Processing;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration.References;
 using Dara.Server.Modules.Identity.Application;
 using Dara.Server.Modules.Identity.Application.SignIn;
-using Dara.Server.Modules.Identity.Application.AuthenticateAccountSession;
+using Dara.Server.Modules.Identity.Application.AuthenticatePanelSignIn;
 using Dara.Server.Modules.Identity.Domain.Users;
-using Dara.Server.Modules.Identity.Infrastructure.ClientSessions;
+using Dara.Server.Modules.Identity.Infrastructure.UserSessions;
 using Dara.Server.Modules.Identity.Infrastructure.Users;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -23,7 +23,7 @@ public class IdentityCompositionRoot : ModuleCompositionRootBase
     {
     }
 
-    // tests give short lifetimes (refresh token, codes, account session) to check the expiry
+    // tests give short lifetimes (refresh token, codes, panel sign-in) to check the expiry
     public IdentityCompositionRoot(IdentityOptions options)
     {
         _options = options;
@@ -66,6 +66,6 @@ public class IdentityCompositionRoot : ModuleCompositionRootBase
         services.AddSingleton<IClientCodeFactory, ClientCodeFactory>();
         services.AddScoped<IUserUniquenessChecker, UserUniquenessChecker>();
         services.AddScoped<CredentialsVerifier>();
-        services.AddScoped<AccountSessionAuthenticator>();
+        services.AddScoped<PanelSignInAuthenticator>();
     }
 }

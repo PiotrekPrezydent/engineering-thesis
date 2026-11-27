@@ -4,7 +4,7 @@ using Dara.Server.Modules.Identity.Integration;
 
 namespace Dara.Server.Modules.Plugins.Application.NewSubjectRoles;
 
-// the roles Plugins gives every new account (PluginsRoles.ForNewSubjects); a repeated grant changes nothing in Authorization
+// the roles Plugins gives the panel client of every new account (PluginsRoles.ForNewSubjects); a repeated grant changes nothing in Authorization
 public class NewUserCreatedIntegrationEventHandler : IIntegrationEventHandler<NewUserCreatedIntegrationEvent>
 {
     private readonly IEventBus _eventBus;
@@ -17,6 +17,6 @@ public class NewUserCreatedIntegrationEventHandler : IIntegrationEventHandler<Ne
     public async Task HandleAsync(NewUserCreatedIntegrationEvent integrationEvent)
     {
         foreach (var role in PluginsRoles.ForNewSubjects)
-            await _eventBus.PublishAsync(role.ToGrant(integrationEvent.CreatedUserId, integrationEvent.OccurredOn));
+            await _eventBus.PublishAsync(role.ToGrant(integrationEvent.PanelClientId, integrationEvent.OccurredOn));
     }
 }

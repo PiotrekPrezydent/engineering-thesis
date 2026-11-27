@@ -6,9 +6,9 @@ public static class AuthClaims
 {
     public const string Subject = "sub";
     public const string Scope = "scope";
-    // the client id of a client token
+    // the client id of a client token, and of the panel client of the account in the panel cookie
     public const string Client = "client";
-    // the account session id of the panel cookie
+    // the id of the sign-in of the panel (PanelSignIn) in the panel cookie
     public const string Session = "sid";
 
     // a client token: the hub and the endpoints of a client

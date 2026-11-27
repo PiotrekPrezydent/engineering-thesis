@@ -22,11 +22,6 @@ public class UserRepository : IUserRepository
         return await _context.Users.FirstOrDefaultAsync(u => u.ClientRegistrationCodes.Any(c => c.Hash == codeHash));
     }
 
-    public async Task<User?> FindByClientLoginCodeHashAsync(string codeHash)
-    {
-        return await _context.Users.FirstOrDefaultAsync(u => u.Clients.Any(c => c.LoginCode != null && c.LoginCode.Hash == codeHash));
-    }
-
     public async Task<User?> FindByLoginAsync(string login)
     {
         var normalized = User.NormalizeLogin(login);

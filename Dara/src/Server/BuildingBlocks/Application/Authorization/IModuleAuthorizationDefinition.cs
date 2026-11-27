@@ -11,7 +11,8 @@ public interface IModuleAuthorizationDefinition
     IEnumerable<PermissionDefinition> GetPermissions();
     IEnumerable<RoleDefinition> GetDefaultRoles();
 
-    // the roles the module itself grants every new user and every new client on the events of Identity; keep them few
-    IEnumerable<NewSubjectRole> GetNewUserRoles() => [];
+    // the roles the module itself grants the panel client of every new account (NewUserCreated) and every new client of
+    // the hub (UserClientRegistered) on the events of Identity; keep them few; the account itself holds no roles
+    IEnumerable<NewSubjectRole> GetNewPanelRoles() => [];
     IEnumerable<NewSubjectRole> GetNewClientRoles() => [];
 }

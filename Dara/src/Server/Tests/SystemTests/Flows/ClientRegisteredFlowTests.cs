@@ -5,7 +5,7 @@ using Dara.Server.Modules.Identity.Application.Clients;
 using Dara.Server.Modules.Identity.Application.GetClients;
 using Dara.Server.Modules.Identity.Application.GetUser;
 using Dara.Server.Modules.Identity.Application.RevokeClient;
-using Dara.Server.Modules.Identity.Domain.ClientSessions;
+using Dara.Server.Modules.Identity.Domain.UserSessions;
 using Dara.Server.Modules.Orchestration.Domain.Participants;
 using Dara.Server.Modules.Plugins.Domain.PluginOwners;
 using Dara.Server.SystemTests.Hosting;
@@ -37,6 +37,13 @@ public class ClientRegisteredFlowTests
 
         var clients = await host.Identity.ExecuteQueryAsync<GetAccountClientsQuery, List<UserClientDto>>(new GetAccountClientsQuery(userId));
         Assert.Equal([pc.ClientId, phone.ClientId], clients.Select(c => c.ClientId));
+
+        // the panel client of the account is a subject of Authorization only: no module projects it as a client
+        var panelId = (await host.Identity.ExecuteQueryAsync<GetPanelClientIdQuery, Guid?>(new GetPanelClientIdQuery(userId)))!.Value;
+        Assert.False(await ReadMemberAsync(host, panelId, _ => true), "no groups member of the panel");
+        Assert.False(await ReadParticipantAsync(host, panelId, _ => true), "no participant of the panel");
+        Assert.False(await ModulesHost.ReadAsync(host.PluginsRoot, model => model.Query<PluginOwner>().AnyAsync(e => e.Id.Match(panelId))),
+            "no plugin owner of the panel");
 
         // an existing client signs in again with a login code of the panel
         var tokens = await host.LoginClientAsync(userId, phone.ClientId);
@@ -78,7 +85,7 @@ public class ClientRegisteredFlowTests
         await ModulesHost.WaitUntilAsync(() => ReadMemberAsync(host, phone.ClientId, m => m.IsRevoked), "groups member revoked");
         await ModulesHost.WaitUntilAsync(() => ReadParticipantAsync(host, phone.ClientId, p => p.IsRevoked), "participant revoked");
         Assert.True(await ModulesHost.ReadAsync(host.IdentityRoot,
-            model => model.Query<ClientSession>().AnyAsync(e => e.ClientId.Match(phone.ClientId) && e.RevokedAt != null)), "identity session revoked");
+            model => model.Query<UserSession>().AnyAsync(e => e.ClientId.Match(phone.ClientId) && e.RevokedAt != null)), "identity session revoked");
 
         var code = await host.IssueLoginCodeAsync(userId, phone.ClientId);
         Assert.Equal(AuthError.ClientRevoked, code.Error);
@@ -105,7 +112,7 @@ public class ClientRegisteredFlowTests
     }
 
     private static Task<bool> ClientSessionExistsAsync(ModulesHost host, Guid userId, Guid clientId)
-        => ModulesHost.ReadAsync(host.IdentityRoot, model => model.Query<ClientSession>().AnyAsync(e => e.ClientId.Match(clientId) && e.UserId.Match(userId)));
+        => ModulesHost.ReadAsync(host.IdentityRoot, model => model.Query<UserSession>().AnyAsync(e => e.ClientId.Match(clientId) && e.UserId.Match(userId)));
 
     private static async Task<bool> ReadMemberAsync(ModulesHost host, Guid clientId, Func<Member, bool> condition)
     {

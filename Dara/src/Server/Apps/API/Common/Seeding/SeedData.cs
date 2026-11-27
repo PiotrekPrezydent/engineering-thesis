@@ -27,11 +27,14 @@ public class SeedData
         new("group-3", "group-3-jc", "Bob-Smartwatch", ["Room-101-Computer-01", "Room-101-Computer-02"])
     ];
 
-    // the login of the account whose user administers the server (Authorization.ServerAdmin)
+    // the login of the account whose panel client administers the server (Authorization.ServerAdmin)
     public string ServerAdmin { get; } = "bob";
 
     // account login -> user id, filled by the identity seeder
     public Dictionary<string, Guid> UserIds { get; } = new();
+
+    // account login -> id of its panel client (its subject in Authorization), filled by the identity seeder
+    public Dictionary<string, Guid> PanelClientIds { get; } = new();
 
     // client name -> client id, filled by the identity seeder
     public Dictionary<string, Guid> ClientIds { get; } = new();
