@@ -1,14 +1,24 @@
 using Dara.Server.BuildingBlocks.Application.Authorization;
-using Dara.Server.Modules.Orchestration.Domain;
 
 namespace Dara.Server.Modules.Orchestration.Application;
 
-// Owner may do everything in the module, Viewer only read; both are given to every new account and client
-internal sealed class OrchestrationRoles : IModuleRoles
+public static class OrchestrationRoles
 {
-    public void Configure(ModuleRolesBuilder roles) => roles
-        .Role(new OrchestrationRole(OrchestrationRole.Roles.Owner), isDefault: true)
-            .AllowsAll<OrchestrationPermission>()
-        .Role(new OrchestrationRole(OrchestrationRole.Roles.Viewer), isDefault: true)
-            .Allows(new OrchestrationPermission(OrchestrationPermission.Permissions.ReadAgentSettings), new OrchestrationPermission(OrchestrationPermission.Permissions.ReadAgentRun));
+    private const string OwnerCode = "Orchestration.Owner";
+
+    // follows the runs
+    public static readonly RoleDefinition Viewer = new("Orchestration.Viewer", OrchestrationScopes.Group, [OrchestrationPermissions.ReadAgentRun]);
+
+    // approves or rejects execution plans
+    public static readonly RoleDefinition Operator = new("Orchestration.Operator", OrchestrationScopes.Group, [OrchestrationPermissions.ApproveExecutionPlan])
+    {
+        Subordinates = [Viewer]
+    };
+
+    // sets up the agent of the group and manages the access
+    public static readonly RoleDefinition Owner = new(OwnerCode, OrchestrationScopes.Group, [OrchestrationPermissions.EditAgentSettings, OrchestrationPermissions.ManageAccess])
+    {
+        Subordinates = [Operator],
+        ManageableRoleCodes = [OwnerCode, Operator.Code, Viewer.Code]
+    };
 }

@@ -22,6 +22,13 @@ public static class ClaimsPrincipalExtensions
         return RequiredGuid(principal, AuthClaims.Session);
     }
 
+    // the subject Authorization checks: the client of a client token, the user of the panel cookie; each has only its
+    // own roles (a client does not get the roles of its user)
+    public static Guid SenderId(this ClaimsPrincipal principal)
+    {
+        return principal.IsClient() ? principal.ClientId() : principal.UserId();
+    }
+
     public static bool IsClient(this ClaimsPrincipal principal)
     {
         return principal.HasClaim(AuthClaims.Scope, AuthClaims.ScopeClient) && principal.HasClaim(c => c.Type == AuthClaims.Client);

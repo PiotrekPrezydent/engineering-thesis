@@ -1,0 +1,30 @@
+# manual checks of Authorization with a client token (Auth.http: register-client or client-login) or the panel
+# cookie; the sender is the client of the token or the user of the cookie, each with only its own roles; a new account
+# holds Identity.Owner on itself (scope Identity.User), a new client Identity.ClientOwner on itself (scope
+# Identity.Client, its user too), both Plugins.Viewer on every plugin (ScopeId 00000000-0000-0000-0000-000000000000)
+@host = https://localhost:7105
+@accessToken = paste-an-access-token
+@clientId = paste-the-client-id-of-the-token
+@otherClientId = paste-the-client-id-of-another-account
+
+### every role the modules declare, with every permission (also of subordinate roles) and the roles it manages
+GET {{host}}/authorization/roles
+Authorization: Bearer {{accessToken}}
+
+### the assignments of the sender
+GET {{host}}/authorization/me/assignments
+Authorization: Bearer {{accessToken}}
+
+### the client lets another client hold it as well (403 without identity.client.manage_access on the client)
+POST {{host}}/authorization/assignments
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{ "subjectId": "{{otherClientId}}", "roleCode": "Identity.ClientOwner", "scopeId": "{{clientId}}" }
+
+### and takes it back
+POST {{host}}/authorization/assignments/revoke
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{ "subjectId": "{{otherClientId}}", "roleCode": "Identity.ClientOwner", "scopeId": "{{clientId}}" }

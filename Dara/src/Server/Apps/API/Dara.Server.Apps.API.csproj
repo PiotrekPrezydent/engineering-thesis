@@ -35,6 +35,7 @@
       <ProjectReference Include="..\..\Modules\Plugins\Infrastructure\Dara.Server.Modules.Plugins.Infrastructure.csproj" />
       <ProjectReference Include="..\..\Modules\Plugins\Integration\Dara.Server.Modules.Plugins.Integration.csproj" />
       <ProjectReference Include="..\..\Modules\Identity\Integration\Dara.Server.Modules.Identity.Integration.csproj" />
+      <ProjectReference Include="..\..\Modules\Authorization\Infrastructure\Dara.Server.Modules.Authorization.Infrastructure.csproj" />
     </ItemGroup>
     
 </Project>

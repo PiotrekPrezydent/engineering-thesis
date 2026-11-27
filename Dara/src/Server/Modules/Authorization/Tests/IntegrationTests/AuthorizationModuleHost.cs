@@ -4,15 +4,15 @@ using Dara.Server.BuildingBlocks.Application.Queries;
 using Dara.Server.BuildingBlocks.Infrastructure.DataAccess;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.EventBus;
 using Dara.Server.Modules.Authorization.Application;
-using Dara.Server.Modules.Authorization.Application.Roles.SynchronizePermissionsAndRoles;
+using Dara.Server.Modules.Authorization.Application.Definitions.SynchronizeDefinitions;
 using Dara.Server.Modules.Authorization.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace Dara.Server.Modules.Authorization.IntegrationTests;
 
-// the authorization module alone with its inbox and internal commands loops; the events of Identity are published
-// on the bus by the tests
+// the authorization module alone with its inbox and internal commands loops and the definition of a module "Test" in
+// the services of the host; the events of the modules are published on the bus by the tests
 public class AuthorizationModuleHost : IAsyncDisposable
 {
     private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(10);
@@ -24,37 +24,34 @@ public class AuthorizationModuleHost : IAsyncDisposable
 
     public AuthorizationCompositionRoot Root { get; } = new();
 
-    // a module "Test": Owner allows everything and is not default, Viewer is default and allows Read
-    public static ModuleAuthorizationCatalog TestCatalog { get; } = new("Test",
-        ["TestPermission.Edit", "TestPermission.Read"],
-        [
-            new ModuleRoleDefinition("TestRole.Owner", false, ["TestPermission.Edit", "TestPermission.Read"]),
-            new ModuleRoleDefinition("TestRole.Viewer", true, ["TestPermission.Read"])
-        ]);
-
     private AuthorizationModuleHost()
     {
         var services = new ServiceCollection();
+        services.AddSingleton<IModuleAuthorizationDefinition>(TestDefinition.Instance);
         Root.Initialize(services, EventBus);
 
         _services = services.BuildServiceProvider();
         _workers = _services.GetServices<IHostedService>().ToList();
     }
 
-    // started like the host starts it: the catalogs of the modules are synchronized before the first call
+    // started like the generic host starts it: StartingAsync of every lifecycle service (the synchronization of the
+    // definitions), then StartAsync of every hosted service
     public static async Task<AuthorizationModuleHost> StartAsync(CancellationToken cancellationToken)
     {
         var host = new AuthorizationModuleHost();
+        foreach (var worker in host._workers.OfType<IHostedLifecycleService>())
+            await worker.StartingAsync(cancellationToken);
+
         foreach (var worker in host._workers)
             await worker.StartAsync(cancellationToken);
 
-        await host.SynchronizeAsync(TestCatalog);
         return host;
     }
 
-    public Task SynchronizeAsync(params ModuleAuthorizationCatalog[] otherCatalogs)
+    // a later start with other definitions
+    public Task SynchronizeAsync(params IModuleAuthorizationDefinition[] definitions)
     {
-        return ExecuteAsync(new SynchronizePermissionsAndRolesCommand([Root.AuthorizationCatalog, .. otherCatalogs]));
+        return ExecuteAsync(new SynchronizeDefinitionsCommand([Root.AuthorizationDefinition, .. definitions]));
     }
 
     // every call has its own scope, like a call of the api
@@ -100,4 +97,43 @@ public class AuthorizationModuleHost : IAsyncDisposable
 
         await _services.DisposeAsync();
     }
+}
+
+// a module "Test" with one scope: Viewer reads, Editor edits (and reads, its subordinate), Manager passes access on
+// to every role but the owner, Owner may do everything and manages every role
+public sealed record TestDefinition(IReadOnlyList<RoleDefinition> Roles) : IModuleAuthorizationDefinition
+{
+    public static readonly ScopeDefinition Item = new("Test.Item");
+    public static readonly PermissionDefinition Read = new("test.item.read", Item);
+    public static readonly PermissionDefinition Edit = new("test.item.edit", Item);
+    public static readonly PermissionDefinition ManageAccess = new(Item.ManageAccessPermissionCode, Item);
+
+    public static readonly RoleDefinition Viewer = new("Test.Viewer", Item, [Read]);
+    public static readonly RoleDefinition Editor = new("Test.Editor", Item, [Edit]) { Subordinates = [Viewer] };
+    public static readonly RoleDefinition Manager = new("Test.Manager", Item, [ManageAccess])
+    {
+        Subordinates = [Viewer],
+        ManageableRoleCodes = ["Test.Manager", "Test.Editor", "Test.Viewer"]
+    };
+    // a child scope: one part of an item has its own id; the owner of the item gets PartOwner on each part with it
+    public static readonly ScopeDefinition Part = new("Test.Item.Part");
+    public static readonly PermissionDefinition UsePart = new("test.item.part.use", Part);
+    public static readonly PermissionDefinition ManagePartAccess = new(Part.ManageAccessPermissionCode, Part);
+    public static readonly RoleDefinition PartOwner = new("Test.PartOwner", Part, [UsePart, ManagePartAccess])
+    {
+        ManageableRoleCodes = ["Test.PartOwner"]
+    };
+
+    public static readonly RoleDefinition Owner = new("Test.Owner", Item, [])
+    {
+        Subordinates = [Manager, Editor, PartOwner],
+        ManageableRoleCodes = ["Test.Owner", "Test.Manager", "Test.Editor", "Test.Viewer"]
+    };
+
+    public static readonly TestDefinition Instance = new([Owner, Manager, Editor, Viewer, PartOwner]);
+
+    public string ModuleName => "Test";
+    public IEnumerable<ScopeDefinition> GetScopes() => [Item, Part];
+    public IEnumerable<PermissionDefinition> GetPermissions() => [Read, Edit, ManageAccess, UsePart, ManagePartAccess];
+    public IEnumerable<RoleDefinition> GetDefaultRoles() => Roles;
 }

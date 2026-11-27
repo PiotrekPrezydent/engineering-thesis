@@ -15,6 +15,7 @@ public class PermissionEntityTypeConfiguration : IEntityTypeConfiguration<Permis
         builder.Property(p => p.Id).ValueGeneratedNever();
 
         builder.Property(p => p.Code).IsRequired();
+        builder.Property(p => p.ScopeCode).IsRequired();
         builder.Property(p => p.Module).IsRequired();
         // a relational provider keeps the natural key unique; the synchronization never adds a code twice
         builder.HasIndex(p => p.Code).IsUnique();

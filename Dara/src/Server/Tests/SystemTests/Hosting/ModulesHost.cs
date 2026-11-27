@@ -2,6 +2,8 @@ using Dara.Server.BuildingBlocks.Infrastructure.Messaging;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration;
 using Dara.Server.BuildingBlocks.Infrastructure.DataAccess;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.EventBus;
+using Dara.Server.Modules.Authorization.Application;
+using Dara.Server.Modules.Authorization.Infrastructure;
 using Dara.Server.Modules.Groups.Application;
 using Dara.Server.Modules.Groups.Infrastructure;
 using Dara.Server.Modules.Identity.Application;
@@ -40,11 +42,13 @@ public class ModulesHost : IAsyncDisposable
     public InMemoryEventBus EventBus { get; } = new();
 
     public IdentityCompositionRoot IdentityRoot { get; } = new() { ProcessingOptions = ProcessingOptions };
+    public AuthorizationCompositionRoot AuthorizationRoot { get; } = new() { ProcessingOptions = ProcessingOptions };
     public GroupsCompositionRoot GroupsRoot { get; } = new() { ProcessingOptions = ProcessingOptions };
     public PluginsCompositionRoot PluginsRoot { get; } = new() { ProcessingOptions = ProcessingOptions };
     public OrchestrationCompositionRoot OrchestrationRoot { get; }
 
     public IIdentityModule Identity { get; }
+    public IAuthorizationModule Authorization { get; }
     public IGroupsModule Groups { get; }
     public IPluginsModule Plugins { get; }
     public IOrchestrationModule Orchestration { get; }
@@ -59,7 +63,7 @@ public class ModulesHost : IAsyncDisposable
         var services = new ServiceCollection();
 
         // same order as in the api host
-        IModuleCompositionRoot[] roots = [IdentityRoot, GroupsRoot, PluginsRoot, OrchestrationRoot];
+        IModuleCompositionRoot[] roots = [IdentityRoot, AuthorizationRoot, GroupsRoot, PluginsRoot, OrchestrationRoot];
         foreach (var root in roots)
             root.Initialize(services, EventBus);
 
@@ -67,6 +71,7 @@ public class ModulesHost : IAsyncDisposable
         _workers = _services.GetServices<IHostedService>().ToList();
 
         Identity = _services.GetRequiredService<IIdentityModule>();
+        Authorization = _services.GetRequiredService<IAuthorizationModule>();
         Groups = _services.GetRequiredService<IGroupsModule>();
         Plugins = _services.GetRequiredService<IPluginsModule>();
         Orchestration = _services.GetRequiredService<IOrchestrationModule>();
@@ -75,6 +80,10 @@ public class ModulesHost : IAsyncDisposable
     public static async Task<ModulesHost> StartAsync(CancellationToken cancellationToken, IChatClientProvider? chatClientProvider = null)
     {
         var host = new ModulesHost(chatClientProvider);
+        // like the generic host: StartingAsync of every lifecycle service (the authorization definitions) first
+        foreach (var worker in host._workers.OfType<IHostedLifecycleService>())
+            await worker.StartingAsync(cancellationToken);
+
         foreach (var worker in host._workers)
             await worker.StartAsync(cancellationToken);
 

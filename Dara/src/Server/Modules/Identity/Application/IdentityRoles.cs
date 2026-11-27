@@ -1,14 +1,29 @@
 using Dara.Server.BuildingBlocks.Application.Authorization;
-using Dara.Server.Modules.Identity.Domain;
 
 namespace Dara.Server.Modules.Identity.Application;
 
-// Owner may do everything in the module, Viewer only read; both are given to every new account and client
-internal sealed class IdentityRoles : IModuleRoles
+public static class IdentityRoles
 {
-    public void Configure(ModuleRolesBuilder roles) => roles
-        .Role(new IdentityRole(IdentityRole.Roles.Owner), isDefault: true)
-            .AllowsAll<IdentityPermission>()
-        .Role(new IdentityRole(IdentityRole.Roles.Viewer), isDefault: true)
-            .Allows(new IdentityPermission(IdentityPermission.Permissions.ReadClients));
+    private const string OwnerCode = "Identity.Owner";
+    private const string ClientOwnerCode = "Identity.ClientOwner";
+
+    // sees the clients of the account
+    public static readonly RoleDefinition Viewer = new("Identity.Viewer", IdentityScopes.User, [IdentityPermissions.ReadClients]);
+
+    // the account holder: everything a viewer may, manages the clients and who has which role on the account
+    public static readonly RoleDefinition Owner = new(OwnerCode, IdentityScopes.User, [IdentityPermissions.ManageClients, IdentityPermissions.ManageAccess])
+    {
+        Subordinates = [Viewer],
+        ManageableRoleCodes = [OwnerCode, Viewer.Code]
+    };
+
+    // holds one client: the client itself and its user
+    public static readonly RoleDefinition ClientOwner = new(ClientOwnerCode, IdentityScopes.Client, [IdentityPermissions.ChangeClientContext, IdentityPermissions.ManageClientAccess])
+    {
+        ManageableRoleCodes = [ClientOwnerCode]
+    };
+
+    // a new account holds itself, a new client holds itself (its user gets ClientOwner on it too, as the one who added it)
+    public static readonly IReadOnlyList<NewSubjectRole> ForNewUser = [new(Owner, OnItself: true)];
+    public static readonly IReadOnlyList<NewSubjectRole> ForNewClient = [new(ClientOwner, OnItself: true)];
 }

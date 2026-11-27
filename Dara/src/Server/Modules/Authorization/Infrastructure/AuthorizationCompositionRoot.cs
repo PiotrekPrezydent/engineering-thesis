@@ -7,12 +7,14 @@ using Dara.Server.BuildingBlocks.Infrastructure.Configuration.Processing;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration.References;
 using Dara.Server.Modules.Authorization.Application;
 using Dara.Server.Modules.Authorization.Domain.Permissions;
+using Dara.Server.Modules.Authorization.Domain.RoleAssignments;
 using Dara.Server.Modules.Authorization.Domain.Roles;
-using Dara.Server.Modules.Authorization.Domain.Users;
+using Dara.Server.Modules.Authorization.Infrastructure.Definitions;
 using Dara.Server.Modules.Authorization.Infrastructure.Permissions;
+using Dara.Server.Modules.Authorization.Infrastructure.RoleAssignments;
 using Dara.Server.Modules.Authorization.Infrastructure.Roles;
-using Dara.Server.Modules.Authorization.Infrastructure.Users;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace Dara.Server.Modules.Authorization.Infrastructure;
 
@@ -51,7 +53,13 @@ public class AuthorizationCompositionRoot : ModuleCompositionRootBase
     {
         services.AddScoped<IPermissionRepository, PermissionRepository>();
         services.AddScoped<IRoleRepository, RoleRepository>();
-        services.AddScoped<IRoleExistenceChecker, RoleExistenceChecker>();
-        services.AddScoped<IUserRolesRepository, UserRolesRepository>();
+        services.AddScoped<IRoleAssignmentRepository, RoleAssignmentRepository>();
+        services.AddScoped<IRoleAssignmentChecker, RoleAssignmentChecker>();
+    }
+
+    // the definitions of all modules are known only in the host
+    protected override void ConfigureRootServices(IServiceCollection rootServices)
+    {
+        rootServices.AddSingleton<IHostedService, AuthorizationDefinitionsSynchronizer>();
     }
 }

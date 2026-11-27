@@ -2,6 +2,7 @@ using System.Net.Http.Json;
 using System.Security.Cryptography;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration;
 using Dara.Server.Modules.Groups.Domain.Members;
+using Dara.Server.Modules.Authorization.Infrastructure;
 using Dara.Server.Modules.Groups.Infrastructure;
 using Dara.Server.Apps.API.Common.Authentication;
 using Dara.Server.Modules.Identity.Application;
@@ -37,6 +38,7 @@ public class AppHubTestHost : IAsyncDisposable
     private readonly List<HubTestClient> _clients = new();
 
     public IdentityCompositionRoot IdentityRoot { get; } = new() { ProcessingOptions = ModulesHost.ProcessingOptions };
+    public AuthorizationCompositionRoot AuthorizationRoot { get; } = new() { ProcessingOptions = ModulesHost.ProcessingOptions };
     public GroupsCompositionRoot GroupsRoot { get; } = new() { ProcessingOptions = ModulesHost.ProcessingOptions };
     public PluginsCompositionRoot PluginsRoot { get; } = new() { ProcessingOptions = ModulesHost.ProcessingOptions };
     public OrchestrationCompositionRoot OrchestrationRoot { get; }
@@ -58,7 +60,7 @@ public class AppHubTestHost : IAsyncDisposable
         OrchestrationRoot = new OrchestrationCompositionRoot([Model], new ExecutionPlanGeneratorOptions(TimeoutSeconds: 5)) { ProcessingOptions = ModulesHost.ProcessingOptions };
 
         // same order as in the api host, the seed is off so tests see only their own data
-        IModuleCompositionRoot[] roots = [IdentityRoot, GroupsRoot, PluginsRoot, OrchestrationRoot];
+        IModuleCompositionRoot[] roots = [IdentityRoot, AuthorizationRoot, GroupsRoot, PluginsRoot, OrchestrationRoot];
         List<string> args =
         [
             "--urls", "http://127.0.0.1:0", "--Seed:Enabled", "false", "--Logging:LogLevel:Default", "Warning",

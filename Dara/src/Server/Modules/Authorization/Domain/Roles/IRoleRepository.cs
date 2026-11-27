@@ -6,8 +6,7 @@ public interface IRoleRepository : IRepository
 {
     public Task<IReadOnlyList<Role>> GetAllAsync();
 
-    // the codes of the roles every new account and every new client gets
-    public Task<IReadOnlyList<string>> GetDefaultRoleCodesAsync();
+    public Task<Role?> FindByCodeAsync(string code);
 
     public Task AddAsync(Role role);
 

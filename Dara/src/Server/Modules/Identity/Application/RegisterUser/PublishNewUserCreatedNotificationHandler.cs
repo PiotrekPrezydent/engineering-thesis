@@ -12,12 +12,15 @@ public class PublishNewUserCreatedNotificationHandler : IDomainEventNotification
     {
         _eventBus = eventBus;
     }
-    
+
     public async Task HandleAsync(NewUserCreatedNotification notification)
     {
         await _eventBus.PublishAsync(new NewUserCreatedIntegrationEvent(notification.NotificationId,
             notification.DomainEvent.OccuredOn,
             notification.DomainEvent.UserId));
+
+        // the roles Identity gives every new account (its own account); Authorization gets them without a reference to it
+        foreach (var role in IdentityRoles.ForNewUser)
+            await _eventBus.PublishAsync(role.ToGrant(notification.DomainEvent.UserId, notification.DomainEvent.OccuredOn));
     }
 }
-

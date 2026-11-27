@@ -15,11 +15,20 @@ public class RoleEntityTypeConfiguration : IEntityTypeConfiguration<Role>
         builder.Property(r => r.Id).ValueGeneratedNever();
 
         builder.Property(r => r.Code).IsRequired();
+        builder.Property(r => r.ScopeCode).IsRequired();
         builder.Property(r => r.Module).IsRequired();
         builder.HasIndex(r => r.Code).IsUnique();
 
         builder.PrimitiveCollection(r => r.PermissionCodes)
             .HasField("_permissionCodes")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+
+        builder.PrimitiveCollection(r => r.ManageableRoleCodes)
+            .HasField("_manageableRoleCodes")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+
+        builder.PrimitiveCollection(r => r.CompanionRoleCodes)
+            .HasField("_companionRoleCodes")
             .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

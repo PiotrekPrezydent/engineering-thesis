@@ -4,12 +4,14 @@ using Dara.Server.Apps.API.Common.Diagnostics;
 using Dara.Server.Apps.API.Common.Hubs;
 using Dara.Server.Apps.API.Common.Notifications;
 using Dara.Server.Apps.API.Common.Seeding;
+using Dara.Server.Apps.API.Modules.Authorization;
 using Dara.Server.Apps.API.Modules.Groups;
 using Dara.Server.Apps.API.Modules.Identity;
 using Dara.Server.Apps.API.Modules.Orchestration;
 using Dara.Server.Apps.API.Modules.Plugins;
 using Dara.Server.BuildingBlocks.Infrastructure.Configuration;
 using Dara.Server.BuildingBlocks.Infrastructure.Messaging.EventBus;
+using Dara.Server.Modules.Authorization.Infrastructure;
 using Dara.Server.Modules.Groups.Infrastructure;
 using Dara.Server.Modules.Identity.Infrastructure;
 using Dara.Server.Modules.Orchestration.Infrastructure;
@@ -33,6 +35,7 @@ public class Program
         var modulesRoots = new IModuleCompositionRoot[]
         {
             new IdentityCompositionRoot(),
+            new AuthorizationCompositionRoot(),
             new GroupsCompositionRoot(),
             new PluginsCompositionRoot(),
             new OrchestrationCompositionRoot()
@@ -51,6 +54,8 @@ public class Program
         builder.Services.AddSignalR(options =>
         {
             options.AddFilter<AppHubFilter>();
+            // inside AppHubFilter, so a refused call is logged like any other HubException
+            options.AddFilter<AuthorizationHubFilter>();
         });
         builder.Services.AddSingleton<IUserIdProvider, ClientUserIdProvider>();
         builder.Services.AddSingleton<ClientConnections>();
@@ -70,6 +75,7 @@ public class Program
 
         // seeders run in this order: accounts and clients first, then what the other modules build on them
         builder.AddIdentityApi();
+        builder.AddAuthorizationApi();
         builder.AddGroupsApi();
         builder.AddPluginsApi();
         builder.AddOrchestrationApi();
@@ -95,6 +101,7 @@ public class Program
         // await app.StopAsync();
 
         app.MapIdentityApi();
+        app.MapAuthorizationApi();
 
         // only a client token connects; the server closes the connection when the token expires or the client is
         // revoked, the client refreshes the token over http and connects again

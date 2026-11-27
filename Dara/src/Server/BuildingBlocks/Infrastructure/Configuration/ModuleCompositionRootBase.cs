@@ -40,7 +40,7 @@ namespace Dara.Server.BuildingBlocks.Infrastructure.Configuration;
 public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
 {
     private IServiceProvider _services = null!;
-    private ModuleAuthorizationCatalog? _authorizationCatalog;
+    private IModuleAuthorizationDefinition? _authorizationDefinition;
 
     // how the outbox, inbox and internal commands workers of the module process and retry messages
     public MessageProcessingOptions ProcessingOptions { get; init; } = new();
@@ -48,9 +48,9 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
     // the clock of retries and of the queue order; tests may give a fake one
     public TimeProvider TimeProvider { get; init; } = TimeProvider.System;
 
-    // the permissions and roles of the module, checked by Initialize
-    public ModuleAuthorizationCatalog AuthorizationCatalog =>
-        _authorizationCatalog ?? throw new InvalidOperationException($"{GetType().FullName} is not initialized.");
+    // the scopes, permissions and roles of the module, checked by Initialize and added to the services of the host
+    public IModuleAuthorizationDefinition AuthorizationDefinition =>
+        _authorizationDefinition ?? throw new InvalidOperationException($"{GetType().FullName} is not initialized.");
 
     public IServiceScope CreateScope()
     { 
@@ -183,8 +183,8 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
         var processing = processingBuilder.Build();
         var messaging = messagingBuilder.Build();
 
-        // the module does not start when a permission is in no role; checked before anything is registered
-        _authorizationCatalog = ModuleAuthorizationCatalog.FromAssembly(this.GetModuleName(), references.ApplicationAssembly);
+        // the module does not start with an invalid authorization definition; checked before anything is registered
+        _authorizationDefinition = ModuleAuthorizationDefinitionValidator.FromAssembly(this.GetModuleName(), references.ApplicationAssembly);
 
         ModuleMediationVisitor mediationVisitor = new(references,services);
         ModuleDataAccessVisitor dataAccessVisitor = new(references,services);
@@ -238,6 +238,10 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
         rootServices.AddKeyedScoped<IServiceScope>(this, (_, _) => CreateScope());
         rootServices.AddScoped(moduleDeclaration.Interface, sp => sp.GetRequiredKeyedService<IServiceScope>(this).ServiceProvider.GetRequiredService(moduleDeclaration.Interface));
         
+        // Authorization reads the definitions of all modules from the services of the host
+        rootServices.AddSingleton(_authorizationDefinition);
+        ConfigureRootServices(rootServices);
+
         rootServices.AddSingleton<IHostedService>(_ => _services.GetRequiredService<OutboxBackgroundWorker>());
         rootServices.AddSingleton<IHostedService>(_ => _services.GetRequiredService<InboxBackgroundWorker>());
         rootServices.AddSingleton<IHostedService>(_ => _services.GetRequiredService<InternalCommandsBackgroundWorker>());
@@ -253,6 +257,11 @@ public abstract class ModuleCompositionRootBase : IModuleCompositionRoot
     }
 
     protected virtual void OnServiceProviderCreated(IServiceProvider serviceProvider)
+    {
+    }
+
+    // services the module adds to the host (e.g. a hosted service that needs the services of all modules)
+    protected virtual void ConfigureRootServices(IServiceCollection rootServices)
     {
     }
 

@@ -17,9 +17,9 @@ public class RoleRepository : IRoleRepository
         return await _context.Roles.ToListAsync();
     }
 
-    public async Task<IReadOnlyList<string>> GetDefaultRoleCodesAsync()
+    public async Task<Role?> FindByCodeAsync(string code)
     {
-        return await _context.Roles.Where(r => r.IsDefault).Select(r => r.Code).ToListAsync();
+        return await _context.Roles.FirstOrDefaultAsync(r => r.Code == code);
     }
 
     public async Task AddAsync(Role role)
