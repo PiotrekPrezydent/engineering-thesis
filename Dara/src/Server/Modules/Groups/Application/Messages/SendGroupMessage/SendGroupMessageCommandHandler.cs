@@ -1,3 +1,4 @@
+using Dara.Server.BuildingBlocks.Domain.Exceptions;
 using Dara.Server.BuildingBlocks.Application.Commands;
 using Dara.Server.BuildingBlocks.Infrastructure.DataAccess;
 using Dara.Server.Modules.Groups.Domain.GroupMessages;
@@ -21,7 +22,7 @@ public class SendGroupMessageCommandHandler : ICommandHandler<SendGroupMessageCo
     {
         Group group = await _readModel.Query<Group>()
             .Include(g => g.Members)
-            .FirstAsync(e => e.Id.Match(command.GroupId));
+            .FirstOrDefaultAsync(e => e.Id.Match(command.GroupId)) ?? throw new EntityNotFoundException("Group", command.GroupId);
 
         var message = group.SendMessageToGroup(new(command.AuthorId), command.Content);
         
