@@ -5,6 +5,7 @@ using Dara.Server.Modules.Groups.Domain.Members;
 using Dara.Server.Modules.Authorization.Infrastructure;
 using Dara.Server.Modules.Groups.Infrastructure;
 using Dara.Server.Apps.API.Common.Authentication;
+using Dara.Server.Apps.API.Common.FunctionCalls;
 using Dara.Server.Modules.Identity.Application;
 using Dara.Server.Modules.Identity.Application.Clients;
 using Dara.Server.Modules.Identity.Application.GetClients;
@@ -45,6 +46,9 @@ public class AppHubTestHost : IAsyncDisposable
     public PluginsCompositionRoot PluginsRoot { get; } = new() { ProcessingOptions = ModulesHost.ProcessingOptions };
     public OrchestrationCompositionRoot OrchestrationRoot { get; }
 
+    // every result of a function call the host takes, instead of orchestration (TASK-ENG-013)
+    public RecordingFunctionCallResultPort FunctionCallResults { get; } = new();
+
     // no test calls the api of a model provider, every plan comes from this script
     public ScriptedChatClientProvider Model { get; } = new();
 
@@ -83,7 +87,8 @@ public class AppHubTestHost : IAsyncDisposable
         if (clientCodePermitsPerMinute is { } permits)
             args.AddRange(["--Auth:ClientCodePermitsPerMinute", permits.ToString()]);
 
-        _app = ApiProgram.CreateApplication(args.ToArray(), roots, mapExtra);
+        _app = ApiProgram.CreateApplication(args.ToArray(), roots, mapExtra,
+            services => services.AddSingleton<IFunctionCallResultPort>(FunctionCallResults));
     }
 
     public static async Task<AppHubTestHost> StartAsync(CancellationToken cancellationToken, TimeSpan? accessTokenLifetime = null,

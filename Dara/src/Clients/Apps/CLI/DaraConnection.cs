@@ -1,3 +1,4 @@
+using Dara.Clients.Core.Api;
 using Dara.Shared.Common.CLI;
 using Dara.Shared.Contracts;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -33,7 +34,7 @@ public class DaraConnection
         builder.WithServerTimeout(Connections.ClientServerTimeout);
         builder.WithAutomaticReconnect();
         var connection = builder.Build();
-        connection.Register<IAppHubClient>(new HubEvents());
+        connection.Register<IAppHubClient>(new HubEvents(new DaraApiClient(new HttpClient { BaseAddress = new Uri(ServerUrl) }, _auth.GetAccessTokenAsync)));
 
         // the server closes the connection when the token expires; when the automatic reconnect does not run,
         // the connection starts again with a refreshed token

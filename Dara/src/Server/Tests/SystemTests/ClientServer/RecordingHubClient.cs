@@ -1,5 +1,6 @@
 using Dara.Server.SystemTests.Hosting;
 using Dara.Shared.Contracts;
+using Dara.Shared.Contracts.FunctionCalls;
 using Dara.Shared.Contracts.Notifications;
 using Dara.Shared.Contracts.StateSnapshots;
 
@@ -32,6 +33,16 @@ public class RecordingHubClient : IAppHubClient
     public Task OnClientRenamed(ClientRenamedNotification notification)
     {
         return Record(notification);
+    }
+
+    public Task OnClientPluginsChanged(ClientPluginsChangedNotification notification)
+    {
+        return Record(notification);
+    }
+
+    public Task CallFunction(FunctionCallRequest request)
+    {
+        return Record(request);
     }
 
     public Task OnClientRevoked(ClientRevokedNotification notification)

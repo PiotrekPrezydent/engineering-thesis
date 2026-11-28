@@ -2,6 +2,7 @@ using System.Reflection;
 using Dara.Server.Apps.API.Common.Authentication;
 using Dara.Server.Apps.API.Common.Authorization;
 using Dara.Server.Apps.API.Common.Endpoints;
+using Dara.Server.Apps.API.Common.FunctionCalls;
 using Dara.Server.Apps.API.Common.Diagnostics;
 using Dara.Server.Apps.API.Common.Hubs;
 using Dara.Server.Apps.API.Common.Notifications;
@@ -49,8 +50,10 @@ public class Program
     }
 
     // modules build their containers before the host, so tests pass their own roots here (e.g. a scripted model provider);
-    // mapExtra maps endpoints of a test host (e.g. probes of the authorization policies)
-    public static WebApplication CreateApplication(string[] args, IReadOnlyList<IModuleCompositionRoot> modulesRoots, Action<WebApplication>? mapExtra = null)
+    // mapExtra maps endpoints of a test host (e.g. probes of the authorization policies); configureServices runs after the
+    // registrations of the host, so a test replaces a service (e.g. the port of function call results)
+    public static WebApplication CreateApplication(string[] args, IReadOnlyList<IModuleCompositionRoot> modulesRoots, Action<WebApplication>? mapExtra = null,
+        Action<IServiceCollection>? configureServices = null)
     {
         var builder = WebApplication.CreateBuilder(args);
 
@@ -77,6 +80,10 @@ public class Program
 
         builder.Services.AddScoped<LogModulesDataService>();
         builder.Services.AddScoped<ActingClientResolver>();
+        builder.Services.AddSingleton(TimeProvider.System);
+        builder.Services.AddSingleton<PendingFunctionCalls>();
+        // TASK-ENG-013 replaces it with the port of orchestration
+        builder.Services.AddSingleton<IFunctionCallResultPort, LoggingFunctionCallResultPort>();
         builder.Services.AddSingleton<SeedEnvironment>();
 
         // seeders run in this order: accounts and clients first, then what the other modules build on them
@@ -89,6 +96,8 @@ public class Program
 
         foreach (var module in modulesRoots)
             module.Initialize(builder.Services, eventBus);
+
+        configureServices?.Invoke(builder.Services);
 
         var app = builder.Build();
 
@@ -112,6 +121,7 @@ public class Program
         app.MapOrchestrationApi();
         app.MapPluginsApi();
         app.MapAccountAntiforgeryEndpoints();
+        app.MapFunctionCallEndpoints();
 
         // only a client token connects; the server closes the connection when the token expires or the client is
         // revoked, the client refreshes the token over http and connects again

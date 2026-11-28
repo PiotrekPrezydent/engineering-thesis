@@ -3,6 +3,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Dara.Shared.Contracts.Clients;
+using Dara.Shared.Contracts.FunctionCalls;
 using Dara.Shared.Contracts.Groups;
 using Dara.Shared.Contracts.Orchestration;
 using Dara.Shared.Contracts.Plugins;
@@ -61,6 +62,12 @@ public class DaraApiClient
     public Task RegisterPluginsAsync(IReadOnlyList<PluginManifest> plugins, CancellationToken cancellationToken = default)
     {
         return SendAsync(HttpMethod.Put, PluginRoutes.CurrentClientPlugins, new RegisterPluginsRequest(plugins), cancellationToken);
+    }
+
+    // the result of a call of the server (IAppHubClient.CallFunction), from the client the call went to
+    public Task SubmitFunctionCallResultAsync(Guid callId, FunctionCallResultRequest result, CancellationToken cancellationToken = default)
+    {
+        return SendAsync(HttpMethod.Post, FunctionCallRoutes.Result(callId), result, cancellationToken);
     }
 
     protected async Task SendAsync(HttpMethod method, string path, object? body, CancellationToken cancellationToken)
