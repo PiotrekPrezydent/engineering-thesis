@@ -1,3 +1,4 @@
+using Dara.Server.BuildingBlocks.Domain.Exceptions;
 using Dara.Server.Modules.Plugins.Domain.PluginOwners;
 using Dara.Server.Modules.Plugins.Domain.Plugins;
 using Microsoft.EntityFrameworkCore;
@@ -20,7 +21,7 @@ public class PluginRepository : IPluginRepository
 
     public async Task<Plugin> GetByIdAsync(PluginId id)
     {
-        return await _context.Plugins.Include(e => e.Functions).FirstAsync(e => e.Id == id);
+        return await _context.Plugins.Include(e => e.Functions).FirstOrDefaultAsync(e => e.Id == id) ?? throw new EntityNotFoundException("Plugin", id);
     }
 
     public async Task<IReadOnlyList<Plugin>> GetByOwnerIdAsync(PluginOwnerId ownerId)

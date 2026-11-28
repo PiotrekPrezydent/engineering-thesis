@@ -13,6 +13,7 @@ using Dara.Shared.Contracts.Auth;
 using Dara.Shared.Contracts.Clients;
 using Dara.Server.Modules.Identity.Infrastructure;
 using Dara.Server.Modules.Orchestration.Application;
+using Dara.Server.Modules.Orchestration.Application.Groups.GetGroupAgentSettings;
 using Dara.Server.Modules.Orchestration.Application.Participants.GetParticipantFunctions;
 using Dara.Server.Modules.Orchestration.Domain.Participants;
 using Dara.Server.Modules.Orchestration.Infrastructure;
@@ -31,7 +32,8 @@ using ApiProgram = Dara.Server.Apps.API.Program;
 
 namespace Dara.Server.SystemTests.ClientServer;
 
-// the api host of the app on a free loopback port, with a scripted model; clients connect over signalr like the cli
+// the api host of the app on a free loopback port, with a scripted model; clients call http and listen on the hub
+// like the cli, the panel of an account calls http with its cookie
 public class AppHubTestHost : IAsyncDisposable
 {
     private readonly WebApplication _app;
@@ -103,23 +105,33 @@ public class AppHubTestHost : IAsyncDisposable
         return client;
     }
 
-    // the owner creates the group over the hub, members join with its code; ready when orchestration has them all
+    // the panel of the owner creates the group with the owner client, the panel of each member joins it with its
+    // code; ready when orchestration has them all
     public async Task<GroupCreatedNotification> CreateGroupAsync(HubTestClient owner, string groupName, params HubTestClient[] members)
     {
-        await owner.Hub.CreateGroup(groupName);
+        var ownerPanel = await PanelOfAsync(owner);
+        await ownerPanel.CreateGroupAsync(groupName, owner.ClientId);
         var group = await owner.Events.WaitForAsync<GroupCreatedNotification>(g => g.Name == groupName, $"group {groupName} created");
 
         foreach (var member in members)
         {
-            await member.Hub.JoinGroup(group.GroupId, group.JoinCode);
+            var memberPanel = await PanelOfAsync(member);
+            await EnsureAsync(await memberPanel.JoinGroupAsync(member.ClientId, group.GroupId, group.JoinCode), $"{member.Identifier} joins {groupName}");
             await member.Events.WaitForAsync<GroupSnapshot>(g => g.GroupId == group.GroupId, $"{member.Identifier} joined {groupName}");
         }
 
         foreach (var client in members.Prepend(owner))
-            await ModulesHost.WaitUntilAsync(async () => await client.Hub.GetGroupAgentSettings(group.GroupId) is not null,
+            await ModulesHost.WaitUntilAsync(async () => await QueryAsync<IOrchestrationModule, GroupAgentSettingsDto?>(module =>
+                    module.ExecuteQueryAsync<GetGroupAgentSettingsQuery, GroupAgentSettingsDto?>(new GetGroupAgentSettingsQuery(group.GroupId, client.ClientId))) is not null,
                 $"{client.Identifier} in the orchestration group {groupName}");
 
         return group;
+    }
+
+    // the panel of the account of the client (every test client has an account of its own, named by its identifier)
+    public async Task<PanelTestClient> PanelOfAsync(HubTestClient client)
+    {
+        return new PanelTestClient(this, await SignInAccountAsync(client.Identifier));
     }
 
     // the alias of a tool comes from the participant name, so a plan needs the name and the functions in orchestration
@@ -247,7 +259,7 @@ public class AppHubTestHost : IAsyncDisposable
         return (await response.Content.ReadFromJsonAsync<AuthTokensResponse>())!;
     }
 
-    private static async Task EnsureAsync(HttpResponseMessage response, string what)
+    public static async Task EnsureAsync(HttpResponseMessage response, string what)
     {
         if (!response.IsSuccessStatusCode)
             throw new InvalidOperationException($"{what} failed: {(int)response.StatusCode} {await response.Content.ReadAsStringAsync()}");

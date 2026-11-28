@@ -32,7 +32,6 @@ public class DaraConnection
         builder.WithAutomaticReconnect();
         var connection = builder.Build();
         connection.Register<IAppHubClient>(new HubEvents());
-        HubCommands.Proxy = connection.CreateHubProxy<IAppHub>();
 
         // the server closes the connection when the token expires; when the automatic reconnect does not run,
         // the connection starts again with a refreshed token

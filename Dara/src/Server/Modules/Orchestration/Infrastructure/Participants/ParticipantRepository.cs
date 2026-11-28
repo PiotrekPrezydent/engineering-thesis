@@ -1,3 +1,4 @@
+using Dara.Server.BuildingBlocks.Domain.Exceptions;
 using Dara.Server.Modules.Orchestration.Domain.Participants;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,7 +20,7 @@ public class ParticipantRepository : IParticipantRepository
 
     public async Task<Participant> GetByIdAsync(ParticipantId id)
     {
-        return await _context.Participants.Include(p=>p.Functions).FirstAsync(x => x.Id == id);
+        return await _context.Participants.Include(p=>p.Functions).FirstOrDefaultAsync(x => x.Id == id) ?? throw new EntityNotFoundException("Participant", id);
     }
 
     public async Task<Participant?> FindByIdAsync(ParticipantId id)

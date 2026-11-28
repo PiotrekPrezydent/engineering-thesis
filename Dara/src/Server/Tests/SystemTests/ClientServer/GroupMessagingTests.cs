@@ -1,10 +1,9 @@
 using Dara.Shared.Contracts.Notifications;
 using Dara.Shared.Contracts.StateSnapshots;
-using Microsoft.AspNetCore.SignalR;
 
 namespace Dara.Server.SystemTests.ClientServer;
 
-// groups, messages and names over the hub; signalr keeps the order of messages to one connection,
+// messages over http, notifications of groups and names over the hub; signalr keeps the order of messages to one connection,
 // so a later notification of a client proves that an earlier one did not come
 public class GroupMessagingTests
 {
@@ -21,7 +20,7 @@ public class GroupMessagingTests
         await owner.Events.WaitForAsync<GroupMemberJoinedGroupNotification>(n => n.GroupId == group.GroupId && n.GroupMember.MemberId == member.ClientId,
             "owner told about the new member");
 
-        await member.Hub.SendGroupMessage(group.GroupId, "dinner at seven");
+        await member.Api.SendGroupMessageAsync(group.GroupId, "dinner at seven", cancellationToken);
 
         var atOwner = await owner.Events.WaitForAsync<GroupMessageReceivedNotification>(m => m.Message == "dinner at seven", "message at the owner");
         var atMember = await member.Events.WaitForAsync<GroupMessageReceivedNotification>(m => m.Message == "dinner at seven", "message at its author");
@@ -51,7 +50,7 @@ public class GroupMessagingTests
     }
 
     [Fact]
-    public async Task WrongJoinCodeIsAnErrorForTheCaller()
+    public async Task WrongJoinCodeIsRefusedForThePanel()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var host = await AppHubTestHost.StartAsync(cancellationToken);
@@ -59,9 +58,11 @@ public class GroupMessagingTests
         var guest = await host.ConnectAsync("code-guest", cancellationToken);
         var group = await host.CreateGroupAsync(owner, "locked");
 
-        var error = await Assert.ThrowsAsync<HubException>(() => guest.Hub.JoinGroup(group.GroupId, "wrong-code"));
+        var guestPanel = await host.PanelOfAsync(guest);
+        var error = await PanelTestClient.ProblemAsync(await guestPanel.JoinGroupAsync(guest.ClientId, group.GroupId, "wrong-code"));
 
-        Assert.Contains("Group code must be valid", error.Message);
+        Assert.Equal((403, "forbidden", "ProvidedGroupJoiningCodeMustBeValidRule"), (error.Status, error.Code, error.Rule));
+        Assert.Contains("Group code must be valid", error.Detail);
         Assert.Empty(guest.Events.Received<GroupSnapshot>());
     }
 }

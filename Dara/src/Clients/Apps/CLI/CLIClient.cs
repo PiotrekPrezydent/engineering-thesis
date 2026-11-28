@@ -19,14 +19,14 @@ public class CLIClient
         // BasicCommands bc = new();
         AuthSession auth = new(DaraConnection.ServerUrl);
         DaraConnection con = new(auth);
-        HubCommands hc = new();
+        ApiCommands api = new(auth, DaraConnection.ServerUrl);
         // ConnectionCommands cc = new(con.Connection);
         // ClientCommands acc = new(con.Connection);
         //
         // ci.BindObjectCommands(bc);
         ci.BindObjectCommands(auth);
         ci.BindObjectCommands(con);
-        ci.BindObjectCommands(hc);
+        ci.BindObjectCommands(api);
         // ci.BindObjectCommands(cc);
         // ci.BindObjectCommands(acc);
         

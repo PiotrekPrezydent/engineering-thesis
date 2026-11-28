@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using Dara.Clients.Core.Api;
 using Dara.Shared.Contracts;
 using Dara.Shared.Contracts.Auth;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -6,8 +7,8 @@ using TypedSignalR.Client;
 
 namespace Dara.Server.SystemTests.ClientServer;
 
-// one signed-in client built like DaraConnection of the cli: a client token from AccessTokenProvider,
-// typed hub proxy and typed receiver; it keeps its tokens, so a new connection is the same client
+// one signed-in client built like the cli: commands and queries over http (Api), notifications over the hub with
+// a typed receiver; a client token from its session, so a new connection is the same client
 public class HubTestClient : IAsyncDisposable
 {
     // like the cli: a token that expires sooner is refreshed before a connection
@@ -23,7 +24,7 @@ public class HubTestClient : IAsyncDisposable
     public Guid UserId { get; set; }
     public Guid ClientId { get; }
     public AuthTokensResponse Tokens { get; private set; }
-    public IAppHub Hub { get; private set; } = null!;
+    public DaraApiClient Api { get; }
     public HubConnection Connection => _connection;
 
     // kept across connections, so a test sees everything the client got
@@ -37,6 +38,7 @@ public class HubTestClient : IAsyncDisposable
         ClientId = tokens.ClientId;
         Tokens = tokens;
         UserId = tokens.UserId;
+        Api = new DaraApiClient(http, GetAccessTokenAsync);
         _connection = BuildConnection();
     }
 
@@ -86,7 +88,6 @@ public class HubTestClient : IAsyncDisposable
             .Build();
 
         connection.Register<IAppHubClient>(Events);
-        Hub = connection.CreateHubProxy<IAppHub>();
 
         return connection;
     }

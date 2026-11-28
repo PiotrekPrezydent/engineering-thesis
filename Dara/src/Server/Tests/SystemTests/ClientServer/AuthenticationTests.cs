@@ -14,13 +14,13 @@ namespace Dara.Server.SystemTests.ClientServer;
 public class AuthenticationTests
 {
     [Fact]
-    public async Task AClientRegisteredWithACodeFromThePanelConnectsAndCallsTheHub()
+    public async Task AClientRegisteredWithACodeFromThePanelConnectsAndCallsTheApi()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var host = await AppHubTestHost.StartAsync(cancellationToken);
 
         var client = await host.ConnectAsync("auth-client", cancellationToken);
-        await client.Hub.GetMyPlugins();
+        await client.Api.GetCurrentClientPluginsAsync(cancellationToken);
 
         Assert.NotEqual(Guid.Empty, client.UserId);
         // the server gives the client its own id, never the id of the account
@@ -224,7 +224,7 @@ public class AuthenticationTests
         await closed.Task.WaitAsync(TimeSpan.FromSeconds(10), cancellationToken);
 
         await client.ReconnectAsync(cancellationToken);
-        await client.Hub.GetMyPlugins();
+        await client.Api.GetCurrentClientPluginsAsync(cancellationToken);
         Assert.NotEqual(firstToken, client.Tokens.AccessToken);
     }
 

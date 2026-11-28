@@ -1,29 +1,20 @@
 using Dara.Server.Apps.API.Common.Authentication;
-using Dara.Server.Modules.Groups.Application;
-using Dara.Server.Modules.Orchestration.Application;
-using Dara.Server.Modules.Plugins.Application;
 using Dara.Shared.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Dara.Server.Apps.API.Common.Hubs;
 
-// a client token only (claims sub and client); an account cookie gets 403 at the negotiation; the methods of each
-// module are a partial file in the folder of the module (Modules/<Module>/AppHub.<Module>.cs) with this namespace
+// a client token only (claims sub and client); an account cookie gets 403 at the negotiation. The hub only sends:
+// notifications and calls of the server; every command and query of a client goes over http (TASK-ENG-032-D01)
 [Authorize(Policy = AuthPolicies.Client)]
-public partial class AppHub : Hub<IAppHubClient>, IAppHub
+public class AppHub : Hub<IAppHubClient>
 {
-    private readonly IGroupsModule _groupsModule;
-    private readonly IPluginsModule _pluginsModule;
-    private readonly IOrchestrationModule _orchestrationModule;
     private readonly ClientConnections _connections;
     private readonly ILogger<AppHub> _logger;
 
-    public AppHub(IGroupsModule groupsModule, IPluginsModule pluginsModule, IOrchestrationModule orchestrationModule, ClientConnections connections, ILogger<AppHub> logger)
+    public AppHub(ClientConnections connections, ILogger<AppHub> logger)
     {
-        _groupsModule = groupsModule;
-        _pluginsModule = pluginsModule;
-        _orchestrationModule = orchestrationModule;
         _connections = connections;
         _logger = logger;
     }

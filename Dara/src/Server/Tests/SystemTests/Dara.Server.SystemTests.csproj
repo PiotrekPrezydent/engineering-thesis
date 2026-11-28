@@ -28,6 +28,7 @@
         <ProjectReference Include="..\..\Modules\Plugins\Infrastructure\Dara.Server.Modules.Plugins.Infrastructure.csproj" />
         <ProjectReference Include="..\..\Modules\Orchestration\Infrastructure\Dara.Server.Modules.Orchestration.Infrastructure.csproj" />
         <ProjectReference Include="..\..\..\Shared\Contracts\Dara.Shared.Contracts.csproj" />
+        <ProjectReference Include="..\..\..\Clients\Core\Dara.Clients.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup>

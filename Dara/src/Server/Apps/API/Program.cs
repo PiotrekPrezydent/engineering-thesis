@@ -1,5 +1,7 @@
 using System.Reflection;
 using Dara.Server.Apps.API.Common.Authentication;
+using Dara.Server.Apps.API.Common.Authorization;
+using Dara.Server.Apps.API.Common.Endpoints;
 using Dara.Server.Apps.API.Common.Diagnostics;
 using Dara.Server.Apps.API.Common.Hubs;
 using Dara.Server.Apps.API.Common.Notifications;
@@ -23,7 +25,7 @@ using Microsoft.AspNetCore.SignalR;
 namespace Dara.Server.Apps.API;
 
 // the host: Common/ holds what every module shares (authentication, the hub, hub notifications, the seed), each
-// folder in Modules/ what the host adds for one module (endpoints, hub methods, notifications, seeder, mapping to
+// folder in Modules/ what the host adds for one module (http endpoints, hub notifications, seeder, mapping to
 // the contract) behind its Add<Module>Api and Map<Module>Api
 public class Program
 {
@@ -53,8 +55,7 @@ public class Program
 
         builder.Services.AddSignalR(options =>
         {
-            options.AddFilter<AppHubFilter>();
-            // inside AppHubFilter, so a refused call is logged like any other HubException
+            // the app hub has no methods, the filter checks marked methods of any other hub (tests)
             options.AddFilter<AuthorizationHubFilter>();
         });
         builder.Services.AddSingleton<IUserIdProvider, ClientUserIdProvider>();
@@ -71,6 +72,7 @@ public class Program
         builder.Services.AddHubNotifications(Assembly.GetExecutingAssembly(), eventBus);
 
         builder.Services.AddScoped<LogModulesDataService>();
+        builder.Services.AddScoped<ActingClientResolver>();
         builder.Services.AddSingleton<SeedEnvironment>();
 
         // seeders run in this order: accounts and clients first, then what the other modules build on them
@@ -102,6 +104,10 @@ public class Program
 
         app.MapIdentityApi();
         app.MapAuthorizationApi();
+        app.MapGroupsApi();
+        app.MapOrchestrationApi();
+        app.MapPluginsApi();
+        app.MapAccountAntiforgeryEndpoints();
 
         // only a client token connects; the server closes the connection when the token expires or the client is
         // revoked, the client refreshes the token over http and connects again

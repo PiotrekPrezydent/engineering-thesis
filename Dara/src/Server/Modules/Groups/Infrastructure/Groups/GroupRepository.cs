@@ -1,3 +1,4 @@
+using Dara.Server.BuildingBlocks.Domain.Exceptions;
 using Dara.Server.Modules.Groups.Domain.Groups;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,6 +20,6 @@ public class GroupRepository : IGroupRepository
 
     public async Task<Group> GetByIdAsync(GroupId groupId)
     {
-        return await _context.Groups.Include(g=>g.Members).FirstAsync(e=>e.Id == groupId);
+        return await _context.Groups.Include(g=>g.Members).FirstOrDefaultAsync(e=>e.Id == groupId) ?? throw new EntityNotFoundException("Group", groupId);
     }
 }

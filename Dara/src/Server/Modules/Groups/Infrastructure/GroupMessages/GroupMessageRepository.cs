@@ -1,3 +1,4 @@
+using Dara.Server.BuildingBlocks.Domain.Exceptions;
 using Dara.Server.Modules.Groups.Domain.GroupMessages;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,6 +20,6 @@ public class GroupMessageRepository : IGroupMessageRepository
 
     public async Task<GroupMessage> GetByIdAsync(GroupMessageId groupMessageId)
     {
-        return await _context.GroupMessages.FirstAsync(e=>e.Id == groupMessageId);
+        return await _context.GroupMessages.FirstOrDefaultAsync(e=>e.Id == groupMessageId) ?? throw new EntityNotFoundException("GroupMessage", groupMessageId);
     }
 }

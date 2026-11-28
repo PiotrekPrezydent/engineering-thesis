@@ -1,3 +1,4 @@
+using Dara.Server.BuildingBlocks.Domain.Exceptions;
 using Dara.Server.Modules.Groups.Domain.Members;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,6 +20,6 @@ public class MemberRepository : IMemberRepository
 
     public async Task<Member> GetByIdAsync(MemberId memberId)
     {
-        return await _context.Members.FirstAsync(e => e.Id == memberId);
+        return await _context.Members.FirstOrDefaultAsync(e => e.Id == memberId) ?? throw new EntityNotFoundException("Member", memberId);
     }
 }

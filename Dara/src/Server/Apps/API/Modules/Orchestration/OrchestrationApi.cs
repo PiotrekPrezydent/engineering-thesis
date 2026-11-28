@@ -9,5 +9,11 @@ public static class OrchestrationApi
     public static void AddOrchestrationApi(this WebApplicationBuilder builder)
     {
         builder.Services.AddScoped<ISeeder, OrchestrationSeeder>();
+        builder.Services.AddScoped<GroupOwnerResolver>();
+    }
+
+    public static void MapOrchestrationApi(this WebApplication app)
+    {
+        app.MapOrchestrationEndpoints();
     }
 }

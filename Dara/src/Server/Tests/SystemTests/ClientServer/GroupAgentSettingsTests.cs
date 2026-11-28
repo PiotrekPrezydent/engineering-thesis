@@ -1,52 +1,51 @@
-using Microsoft.AspNetCore.SignalR;
+using System.Net;
 
 namespace Dara.Server.SystemTests.ClientServer;
 
-// agent settings of a group over the hub: participants read them, only the owner edits them and sees the api key
+// agent settings of a group over http: only the panel of the account of the owner client reads and edits them
 public class GroupAgentSettingsTests
 {
     private const string ApiKey = "settings-test-key-not-real";
 
     [Fact]
-    public async Task OwnerEditsTheSettingsAndOnlyTheOwnerReadsTheKey()
+    public async Task OwnerEditsTheSettingsAndOnlyThePanelOfTheOwnerReadsThem()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var host = await AppHubTestHost.StartAsync(cancellationToken);
         var owner = await host.ConnectAsync("settings-owner", cancellationToken);
         var member = await host.ConnectAsync("settings-member", cancellationToken);
-        var outsider = await host.ConnectAsync("settings-outsider", cancellationToken);
         var group = await host.CreateGroupAsync(owner, "settings", member);
+        var ownerPanel = await host.PanelOfAsync(owner);
+        var memberPanel = await host.PanelOfAsync(member);
 
-        await owner.Hub.EditGroupPromptMessagePrefix(group.GroupId, "/dara");
-        await owner.Hub.EditGroupChatClientProviderName(group.GroupId, "google");
-        await owner.Hub.EditGroupClientModelName(group.GroupId, "gemini-test");
-        await owner.Hub.EditGroupApiKey(group.GroupId, ApiKey);
+        await AppHubTestHost.EnsureAsync(await ownerPanel.EditPromptPrefixAsync(group.GroupId, "/dara"), "prefix");
+        await ownerPanel.SetModelAsync(group.GroupId, "google", "gemini-test", ApiKey);
 
-        var atOwner = await owner.Hub.GetGroupAgentSettings(group.GroupId);
-        var atMember = await member.Hub.GetGroupAgentSettings(group.GroupId);
+        var settings = await ownerPanel.ReadAgentSettingsAsync(group.GroupId);
         Assert.Equal(("/dara", "google", "gemini-test", ApiKey),
-            (atOwner!.PromptMessagePrefix, atOwner.ChatClientProviderName, atOwner.ClientModelName, atOwner.ApiKey));
-        Assert.Equal(owner.ClientId, atMember!.OwnerId);
-        Assert.Equal(("/dara", "google", "gemini-test"), (atMember.PromptMessagePrefix, atMember.ChatClientProviderName, atMember.ClientModelName));
-        Assert.Null(atMember.ApiKey);
-        Assert.Null(await outsider.Hub.GetGroupAgentSettings(group.GroupId));
+            (settings.PromptMessagePrefix, settings.ChatClientProviderName, settings.ClientModelName, settings.ApiKey));
+        Assert.Equal(owner.ClientId, settings.OwnerId);
+        Assert.Equal(HttpStatusCode.NotFound, (await memberPanel.GetAgentSettingsAsync(group.GroupId)).StatusCode);
     }
 
     [Fact]
-    public async Task MemberCannotEditTheSettings()
+    public async Task OtherAccountCannotEditAndAWrongPrefixIsARuleOfTheCaller()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         await using var host = await AppHubTestHost.StartAsync(cancellationToken);
         var owner = await host.ConnectAsync("guarded-owner", cancellationToken);
         var member = await host.ConnectAsync("guarded-member", cancellationToken);
         var group = await host.CreateGroupAsync(owner, "guarded", member);
+        var ownerPanel = await host.PanelOfAsync(owner);
+        var memberPanel = await host.PanelOfAsync(member);
 
-        var keyError = await Assert.ThrowsAsync<HubException>(() => member.Hub.EditGroupApiKey(group.GroupId, "stolen"));
-        var prefixError = await Assert.ThrowsAsync<HubException>(() => owner.Hub.EditGroupPromptMessagePrefix(group.GroupId, "with space"));
+        var stolen = await PanelTestClient.ProblemAsync(await memberPanel.EditApiKeyAsync(group.GroupId, "stolen"));
+        var prefix = await PanelTestClient.ProblemAsync(await ownerPanel.EditPromptPrefixAsync(group.GroupId, "with space"));
 
-        Assert.Contains("Only the group owner can change the agent settings of the group", keyError.Message);
-        Assert.Contains("Prompt message prefix must be provided", prefixError.Message);
-        var settings = await owner.Hub.GetGroupAgentSettings(group.GroupId);
-        Assert.Equal(("/prompt", ""), (settings!.PromptMessagePrefix, settings.ApiKey));
+        Assert.Equal((404, "not_found"), (stolen.Status, stolen.Code));
+        Assert.Equal((400, "rule_broken", "PromptMessagePrefixMustBeProvidedRule"), (prefix.Status, prefix.Code, prefix.Rule));
+        Assert.Contains("Prompt message prefix must be provided", prefix.Detail);
+        var settings = await ownerPanel.ReadAgentSettingsAsync(group.GroupId);
+        Assert.Equal(("/prompt", ""), (settings.PromptMessagePrefix, settings.ApiKey));
     }
 }

@@ -1,12 +1,13 @@
 using Dara.Shared.Contracts.Functions;
 using Dara.Shared.Contracts.Notifications;
 using Dara.Shared.Contracts.Plugins;
-using Microsoft.AspNetCore.SignalR;
+using System.Net;
+using Dara.Clients.Core.Api;
 using static Dara.Server.Modules.Orchestration.IntegrationTests.Fakes.ScriptedPlanningChatClient;
 
 namespace Dara.Server.SystemTests.ClientServer;
 
-// a prompt sent as a group message over the hub, its plan goes only to the author, who approves or rejects it
+// a prompt sent as a group message over http, its plan goes only to the author, who approves or rejects it
 public class PromptPlanTests
 {
     private const string ApiKey = "client-server-test-key-not-real";
@@ -35,7 +36,7 @@ public class PromptPlanTests
             Calls(("BobPhone_SaveFile", """{"path":"/photos/new.jpg","content":"{{result:1}}"}""")),
             Text("Photo taken on the laptop and saved on the phone."));
 
-        await phone.Hub.SendGroupMessage(groupId, Prompt);
+        await phone.Api.SendGroupMessageAsync(groupId, Prompt);
 
         var started = await phone.Events.WaitForAsync<AgentRunStartedNotification>(n => n.GroupId == groupId, "agent run started");
         var plan = await phone.Events.WaitForAsync<ExecutionPlanCreatedNotification>(n => n.AgentRunId == started.AgentRunId, "plan at the author");
@@ -47,18 +48,19 @@ public class PromptPlanTests
         Assert.Equal([(ApiKey, "gemini-test")], host.Model.CreatedClients);
 
         await AssertNoAgentRunNotificationsAsync(laptop, groupId);
-        Assert.Null(await laptop.Hub.GetAgentRun(started.AgentRunId));
-        var run = await phone.Hub.GetAgentRun(started.AgentRunId);
+        Assert.Null(await laptop.Api.GetAgentRunAsync(started.AgentRunId));
+        var run = await phone.Api.GetAgentRunAsync(started.AgentRunId);
         Assert.Equal("AwaitingApproval", run!.Status);
         Assert.Equal(2, run.Calls.Count);
 
-        var error = await Assert.ThrowsAsync<HubException>(() => laptop.Hub.ApproveExecutionPlan(started.AgentRunId));
-        Assert.Contains("Only the author of the prompt can approve or reject its plan", error.Message);
+        var error = await Assert.ThrowsAsync<DaraApiException>(() => laptop.Api.ApproveExecutionPlanAsync(started.AgentRunId, cancellationToken));
+        Assert.Equal((HttpStatusCode.Forbidden, "forbidden", "OnlyAuthorCanDecideAboutPlanRule"), (error.StatusCode, error.Code, error.Rule));
+        Assert.Contains("Only the author of the prompt can approve or reject its plan", error.Detail);
 
-        await phone.Hub.ApproveExecutionPlan(started.AgentRunId);
+        await phone.Api.ApproveExecutionPlanAsync(started.AgentRunId, cancellationToken);
 
         await phone.Events.WaitForAsync<ExecutionPlanApprovedNotification>(n => n.AgentRunId == started.AgentRunId, "plan approved");
-        Assert.Equal("Approved", (await phone.Hub.GetAgentRun(started.AgentRunId))!.Status);
+        Assert.Equal("Approved", (await phone.Api.GetAgentRunAsync(started.AgentRunId))!.Status);
         await AssertNoAgentRunNotificationsAsync(laptop, groupId);
     }
 
@@ -70,15 +72,16 @@ public class PromptPlanTests
         var (phone, _, groupId) = await CreateClientsAsync(host, cancellationToken);
         host.Model.Script(Calls(("BobLaptop_TakePhoto", "{}")), Text("Photo taken."));
 
-        await phone.Hub.SendGroupMessage(groupId, "/prompt take a photo on my laptop");
+        await phone.Api.SendGroupMessageAsync(groupId, "/prompt take a photo on my laptop");
         var plan = await phone.Events.WaitForAsync<ExecutionPlanCreatedNotification>(n => n.GroupId == groupId, "plan at the author");
 
-        await phone.Hub.RejectExecutionPlan(plan.AgentRunId);
+        await phone.Api.RejectExecutionPlanAsync(plan.AgentRunId, cancellationToken);
 
         await phone.Events.WaitForAsync<AgentRunRejectedNotification>(n => n.AgentRunId == plan.AgentRunId, "run rejected");
-        var error = await Assert.ThrowsAsync<HubException>(() => phone.Hub.ApproveExecutionPlan(plan.AgentRunId));
-        Assert.Contains("Cannot approve", error.Message);
-        Assert.Equal("Rejected", (await phone.Hub.GetAgentRun(plan.AgentRunId))!.Status);
+        var error = await Assert.ThrowsAsync<DaraApiException>(() => phone.Api.ApproveExecutionPlanAsync(plan.AgentRunId, cancellationToken));
+        Assert.Equal((HttpStatusCode.Conflict, "conflict", "AgentRunMustBeInStatusRule"), (error.StatusCode, error.Code, error.Rule));
+        Assert.Contains("Cannot approve", error.Detail);
+        Assert.Equal("Rejected", (await phone.Api.GetAgentRunAsync(plan.AgentRunId))!.Status);
     }
 
     [Fact]
@@ -89,11 +92,11 @@ public class PromptPlanTests
         var (phone, laptop, groupId) = await CreateClientsAsync(host, cancellationToken);
         host.Model.Script(Text("I cannot do that."));
 
-        await laptop.Hub.SendGroupMessage(groupId, "/prompt make me a coffee");
+        await laptop.Api.SendGroupMessageAsync(groupId, "/prompt make me a coffee");
 
         var failed = await laptop.Events.WaitForAsync<ExecutionPlanGenerationFailedNotification>(n => n.GroupId == groupId, "failure at the author");
         Assert.False(string.IsNullOrWhiteSpace(failed.Reason));
-        Assert.Equal("PlanGenerationFailed", (await laptop.Hub.GetAgentRun(failed.AgentRunId))!.Status);
+        Assert.Equal("PlanGenerationFailed", (await laptop.Api.GetAgentRunAsync(failed.AgentRunId))!.Status);
         await AssertNoAgentRunNotificationsAsync(phone, groupId);
     }
 
@@ -105,15 +108,14 @@ public class PromptPlanTests
 
         await host.RenameClientAsync(phone, "Bob-Phone");
         await host.RenameClientAsync(laptop, "Bob-Laptop");
-        await phone.Hub.RegisterPlugins([Files]);
-        await laptop.Hub.RegisterPlugins([Camera]);
+        await phone.Api.RegisterPluginsAsync([Files]);
+        await laptop.Api.RegisterPluginsAsync([Camera]);
         await host.WaitForParticipantAsync(phone.ClientId, "Bob-Phone", "SaveFile");
         await host.WaitForParticipantAsync(laptop.ClientId, "Bob-Laptop", "TakePhoto");
 
         var group = await host.CreateGroupAsync(phone, "bob-devices", laptop);
-        await phone.Hub.EditGroupChatClientProviderName(group.GroupId, "google");
-        await phone.Hub.EditGroupClientModelName(group.GroupId, "gemini-test");
-        await phone.Hub.EditGroupApiKey(group.GroupId, ApiKey);
+        var panel = await host.PanelOfAsync(phone);
+        await panel.SetModelAsync(group.GroupId, "google", "gemini-test", ApiKey);
 
         return (phone, laptop, group.GroupId);
     }
@@ -122,7 +124,7 @@ public class PromptPlanTests
     private static async Task AssertNoAgentRunNotificationsAsync(HubTestClient client, Guid groupId)
     {
         var marker = $"marker-{Guid.NewGuid():N}";
-        await client.Hub.SendGroupMessage(groupId, marker);
+        await client.Api.SendGroupMessageAsync(groupId, marker);
         await client.Events.WaitForAsync<GroupMessageReceivedNotification>(m => m.Message == marker, $"marker at {client.Identifier}");
 
         Assert.Empty(client.Events.Received<AgentRunStartedNotification>());

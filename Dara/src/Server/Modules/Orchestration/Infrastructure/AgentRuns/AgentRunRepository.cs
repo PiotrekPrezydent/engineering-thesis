@@ -1,3 +1,4 @@
+using Dara.Server.BuildingBlocks.Domain.Exceptions;
 using Dara.Server.Modules.Orchestration.Domain.AgentRuns;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,6 +20,6 @@ public class AgentRunRepository : IAgentRunRepository
 
     public async Task<AgentRun> GetByIdAsync(AgentRunId id)
     {
-        return await _context.AgentRuns.Include(x => x.Plan).FirstAsync(x => x.Id == id);
+        return await _context.AgentRuns.Include(x => x.Plan).FirstOrDefaultAsync(x => x.Id == id) ?? throw new EntityNotFoundException("AgentRun", id);
     }
 }
