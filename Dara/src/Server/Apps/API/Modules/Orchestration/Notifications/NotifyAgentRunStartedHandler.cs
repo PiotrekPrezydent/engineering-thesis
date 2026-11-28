@@ -18,7 +18,7 @@ public class NotifyAgentRunStartedHandler : IHubNotificationHandler<AgentRunStar
 
     public async Task HandleAsync(AgentRunStartedIntegrationEvent notification, CancellationToken cancellationToken)
     {
-        var client = _context.Clients.User(notification.AuthorId.ToString());
+        var client = _context.Clients.Group(HubGroups.Client(notification.AuthorId));
 
         await client.OnAgentRunStarted(new AgentRunStartedNotification(notification.AgentRunId, notification.GroupId, notification.MessageId));
     }

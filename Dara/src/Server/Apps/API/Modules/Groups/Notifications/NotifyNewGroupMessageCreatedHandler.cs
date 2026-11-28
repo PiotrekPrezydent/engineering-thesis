@@ -26,10 +26,7 @@ public class NotifyNewGroupMessageCreatedHandler : IHubNotificationHandler<Group
         var messageNotification = new GroupMessageReceivedNotification(notification.GroupId, notification.MessageId, notification.AuthorId, notification.Content);
 
         // the author too, so its other connections see the message
-        foreach (var member in group.Members)
-        {
-            var memberClient = _context.Clients.User(member.ToString());
-            await memberClient.OnGroupMessageReceived(messageNotification);
-        }
+        // one call for every member
+        await _context.Clients.Groups(HubGroups.Clients(group.Members)).OnGroupMessageReceived(messageNotification);
     }
 }

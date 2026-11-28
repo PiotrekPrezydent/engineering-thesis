@@ -57,7 +57,11 @@ public class AppHubTestHost : IAsyncDisposable
     // the key of this host only, random per run, never in the repository
     public string SigningKey { get; } = Convert.ToBase64String(RandomNumberGenerator.GetBytes(48));
 
-    private AppHubTestHost(TimeSpan? accessTokenLifetime, Action<WebApplication>? mapExtra, int? clientCodePermitsPerMinute)
+    // keep-alive of the clients and how long they wait for the server; short with a short ClientTimeoutInterval
+    public TimeSpan ClientKeepAlive { get; private init; } = Connections.ClientKeepAliveInterval;
+    public TimeSpan ClientServerTimeout { get; private init; } = Connections.ClientServerTimeout;
+
+    private AppHubTestHost(TimeSpan? accessTokenLifetime, Action<WebApplication>? mapExtra, int? clientCodePermitsPerMinute, HubTiming? timing)
     {
         OrchestrationRoot = new OrchestrationCompositionRoot([Model], new ExecutionPlanGeneratorOptions(TimeoutSeconds: 5)) { ProcessingOptions = ModulesHost.ProcessingOptions };
 
@@ -70,6 +74,12 @@ public class AppHubTestHost : IAsyncDisposable
         ];
         if (accessTokenLifetime is { } lifetime)
             args.AddRange(["--Jwt:AccessTokenLifetime", lifetime.ToString("c")]);
+        if (timing is { } hub)
+        {
+            args.AddRange(["--SignalR:KeepAliveInterval", hub.KeepAlive.ToString("c"), "--SignalR:ClientTimeoutInterval", hub.ClientTimeout.ToString("c")]);
+            ClientKeepAlive = hub.KeepAlive;
+            ClientServerTimeout = hub.ClientTimeout;
+        }
         if (clientCodePermitsPerMinute is { } permits)
             args.AddRange(["--Auth:ClientCodePermitsPerMinute", permits.ToString()]);
 
@@ -77,9 +87,9 @@ public class AppHubTestHost : IAsyncDisposable
     }
 
     public static async Task<AppHubTestHost> StartAsync(CancellationToken cancellationToken, TimeSpan? accessTokenLifetime = null,
-        Action<WebApplication>? mapExtra = null, int? clientCodePermitsPerMinute = null)
+        Action<WebApplication>? mapExtra = null, int? clientCodePermitsPerMinute = null, HubTiming? timing = null)
     {
-        var host = new AppHubTestHost(accessTokenLifetime, mapExtra, clientCodePermitsPerMinute);
+        var host = new AppHubTestHost(accessTokenLifetime, mapExtra, clientCodePermitsPerMinute, timing);
         await host._app.StartAsync(cancellationToken);
 
         // kestrel puts the port it got for port 0 into the addresses
@@ -91,12 +101,12 @@ public class AppHubTestHost : IAsyncDisposable
 
     // registers an account and one client of it like the app does (a registration code of the panel) and connects
     // the client; ready when every module knows the client, like a client that waits for the seed
-    public async Task<HubTestClient> ConnectAsync(string login, CancellationToken cancellationToken)
+    public async Task<HubTestClient> ConnectAsync(string login, CancellationToken cancellationToken, bool silent = false)
     {
         await RegisterAsync(login);
         var tokens = await RegisterClientAsync(login);
 
-        var client = new HubTestClient(HubUrl, Http, login, tokens);
+        var client = new HubTestClient(HubUrl, Http, login, tokens, ClientKeepAlive, ClientServerTimeout, silent);
         _clients.Add(client);
         await client.StartAsync(cancellationToken);
 
@@ -126,6 +136,23 @@ public class AppHubTestHost : IAsyncDisposable
                 $"{client.Identifier} in the orchestration group {groupName}");
 
         return group;
+    }
+
+    // another client of the account of the first one (its own registration code from the same panel), connected
+    public async Task<HubTestClient> ConnectAnotherClientAsync(HubTestClient first, CancellationToken cancellationToken)
+    {
+        var tokens = await RegisterClientAsync(first.Identifier);
+        var client = new HubTestClient(HubUrl, Http, first.Identifier, tokens, ClientKeepAlive, ClientServerTimeout);
+        _clients.Add(client);
+        await client.StartAsync(cancellationToken);
+        await WaitForClientAsync(client.ClientId);
+        return client;
+    }
+
+    // a singleton of the host (the presence of the clients, the event bus)
+    public T Service<T>() where T : notnull
+    {
+        return _app.Services.GetRequiredService<T>();
     }
 
     // the panel of the account of the client (every test client has an account of its own, named by its identifier)
@@ -289,3 +316,6 @@ public class AppHubTestHost : IAsyncDisposable
         Http.Dispose();
     }
 }
+
+// server keep-alive and ClientTimeoutInterval of a test host; its clients ping with the same keep-alive
+public record HubTiming(TimeSpan KeepAlive, TimeSpan ClientTimeout);

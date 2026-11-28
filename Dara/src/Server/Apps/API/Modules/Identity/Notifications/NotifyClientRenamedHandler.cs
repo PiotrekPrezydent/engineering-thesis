@@ -19,7 +19,7 @@ public class NotifyClientRenamedHandler : IHubNotificationHandler<UserClientRena
     // only the connections of the client; members of its groups are told in TASK-ENG-030 and 032
     public async Task HandleAsync(UserClientRenamedIntegrationEvent notification, CancellationToken cancellationToken)
     {
-        var client = _context.Clients.User(notification.ClientId.ToString());
+        var client = _context.Clients.Group(HubGroups.Client(notification.ClientId));
 
         await client.OnClientRenamed(new ClientRenamedNotification(notification.ClientId, notification.NewName));
     }

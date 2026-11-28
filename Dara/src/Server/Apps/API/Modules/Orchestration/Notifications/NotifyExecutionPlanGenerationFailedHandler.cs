@@ -18,7 +18,7 @@ public class NotifyExecutionPlanGenerationFailedHandler : IHubNotificationHandle
 
     public async Task HandleAsync(ExecutionPlanGenerationFailedIntegrationEvent notification, CancellationToken cancellationToken)
     {
-        var client = _context.Clients.User(notification.AuthorId.ToString());
+        var client = _context.Clients.Group(HubGroups.Client(notification.AuthorId));
 
         await client.OnExecutionPlanGenerationFailed(new ExecutionPlanGenerationFailedNotification(notification.AgentRunId, notification.GroupId, notification.Reason));
     }

@@ -28,7 +28,7 @@ public class NotifyNewMemberJoinedGroupHandler : IHubNotificationHandler<MemberJ
 
     public async Task HandleAsync(MemberJoinedGroupIntegrationEvent notification, CancellationToken cancellationToken)
     {
-        var client = _context.Clients.User(notification.MemberId.ToString());
+        var client = _context.Clients.Group(HubGroups.Client(notification.MemberId));
         var group = await _groupModule.ExecuteQueryAsync<GetGroupDetailsQuery,GroupDetailsDto>(new GetGroupDetailsQuery(notification.GroupId));
         
         var joining = await _identityModule.ExecuteQueryAsync<GetClientQuery, ClientDto?>(new GetClientQuery(notification.MemberId));
@@ -51,10 +51,7 @@ public class NotifyNewMemberJoinedGroupHandler : IHubNotificationHandler<MemberJ
         var groupMemberJoinedNotification = new GroupMemberJoinedGroupNotification(notification.GroupId,
             new GroupMemberSnapshot(joining.ClientId, joining.Name));
         
-        foreach (var member in group.Members)
-        {
-            var memberClient = _context.Clients.User(member.ToString());
-            await memberClient.OnGroupMemberJoined(groupMemberJoinedNotification);
-        }
+        // one call for every member
+        await _context.Clients.Groups(HubGroups.Clients(group.Members)).OnGroupMemberJoined(groupMemberJoinedNotification);
     }
 }

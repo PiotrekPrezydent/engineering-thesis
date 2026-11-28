@@ -24,7 +24,7 @@ public class NotifyPluginsRegisteredHandler : IHubNotificationHandler<PluginFunc
 
     public async Task HandleAsync(PluginFunctionsChangedIntegrationEvent notification, CancellationToken cancellationToken)
     {
-        var client = _context.Clients.User(notification.PluginOwnerId.ToString());
+        var client = _context.Clients.Group(HubGroups.Client(notification.PluginOwnerId));
         var plugins = await _pluginsModule.ExecuteQueryAsync<GetOwnerPluginsQuery, List<OwnerPluginDto>>(new GetOwnerPluginsQuery(notification.PluginOwnerId));
 
         await client.OnPluginsRegistered(new PluginsRegisteredNotification(plugins.Select(p => p.ToSnapshot()).ToList()));

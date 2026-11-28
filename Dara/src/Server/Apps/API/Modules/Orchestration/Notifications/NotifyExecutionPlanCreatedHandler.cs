@@ -20,7 +20,7 @@ public class NotifyExecutionPlanCreatedHandler : IHubNotificationHandler<Executi
 
     public async Task HandleAsync(ExecutionPlanCreatedIntegrationEvent notification, CancellationToken cancellationToken)
     {
-        var client = _context.Clients.User(notification.AuthorId.ToString());
+        var client = _context.Clients.Group(HubGroups.Client(notification.AuthorId));
         var calls = notification.Calls.Select(c => c.ToSnapshot()).ToList();
 
         await client.OnExecutionPlanCreated(new ExecutionPlanCreatedNotification(notification.AgentRunId, notification.GroupId, calls));

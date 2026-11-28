@@ -5,8 +5,8 @@ namespace Dara.Server.Apps.API.Common.Hubs;
 
 public static class HubCallerContextExtensions
 {
-    // the hub takes client tokens only, so the claim is always there; it is also Context.UserIdentifier
-    // (ClientUserIdProvider) and the id of the member, the plugin owner and the participant
+    // the hub takes client tokens only, so the claim is always there; it is the id of the member, the plugin owner
+    // and the participant
     public static Guid ClientId(this HubCallerContext context)
     {
         if (!Guid.TryParse(context.User?.FindFirst(AuthClaims.Client)?.Value, out var guid))

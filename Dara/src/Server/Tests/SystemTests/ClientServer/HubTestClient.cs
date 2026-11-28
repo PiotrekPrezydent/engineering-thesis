@@ -30,8 +30,16 @@ public class HubTestClient : IAsyncDisposable
     // kept across connections, so a test sees everything the client got
     public RecordingHubClient Events { get; } = new();
 
-    public HubTestClient(string hubUrl, HttpClient http, string identifier, AuthTokensResponse tokens)
+    // a silent client sends no keep-alive for an hour and waits as long for the server, so the server takes it for a
+    // broken connection after its ClientTimeoutInterval
+    private readonly TimeSpan _keepAlive;
+    private readonly TimeSpan _serverTimeout;
+
+    public HubTestClient(string hubUrl, HttpClient http, string identifier, AuthTokensResponse tokens, TimeSpan keepAlive, TimeSpan serverTimeout,
+        bool silent = false)
     {
+        _keepAlive = silent ? TimeSpan.FromHours(1) : keepAlive;
+        _serverTimeout = silent ? TimeSpan.FromHours(2) : serverTimeout;
         _hubUrl = hubUrl;
         _http = http;
         Identifier = identifier;
@@ -45,6 +53,17 @@ public class HubTestClient : IAsyncDisposable
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         await _connection.StartAsync(cancellationToken);
+    }
+
+    // the renewal of a token (TASK-ENG-032-D08): the new connection opens before the old one closes, so the client
+    // never looks offline
+    public async Task RenewAsync(CancellationToken cancellationToken)
+    {
+        var old = _connection;
+        var renewed = BuildConnection();
+        await renewed.StartAsync(cancellationToken);
+        _connection = renewed;
+        await old.DisposeAsync();
     }
 
     // a new connection of the same client, like the cli after a restart
@@ -85,6 +104,8 @@ public class HubTestClient : IAsyncDisposable
             {
                 options.AccessTokenProvider = GetAccessTokenAsync;
             })
+            .WithKeepAliveInterval(_keepAlive)
+            .WithServerTimeout(_serverTimeout)
             .Build();
 
         connection.Register<IAppHubClient>(Events);

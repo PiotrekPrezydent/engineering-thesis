@@ -29,6 +29,8 @@ public class DaraConnection
         {
             options.AccessTokenProvider = _auth.GetAccessTokenAsync;
         });
+        builder.WithKeepAliveInterval(Connections.ClientKeepAliveInterval);
+        builder.WithServerTimeout(Connections.ClientServerTimeout);
         builder.WithAutomaticReconnect();
         var connection = builder.Build();
         connection.Register<IAppHubClient>(new HubEvents());

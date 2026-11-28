@@ -18,7 +18,7 @@ public class NotifyAgentRunRejectedHandler : IHubNotificationHandler<AgentRunRej
 
     public async Task HandleAsync(AgentRunRejectedIntegrationEvent notification, CancellationToken cancellationToken)
     {
-        var client = _context.Clients.User(notification.AuthorId.ToString());
+        var client = _context.Clients.Group(HubGroups.Client(notification.AuthorId));
 
         await client.OnAgentRunRejected(new AgentRunRejectedNotification(notification.AgentRunId, notification.GroupId));
     }

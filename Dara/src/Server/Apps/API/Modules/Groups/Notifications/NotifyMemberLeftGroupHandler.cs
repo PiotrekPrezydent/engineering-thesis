@@ -27,7 +27,7 @@ public class NotifyMemberLeftGroupHandler : IHubNotificationHandler<MemberLeftGr
 
     public async Task HandleAsync(MemberLeftGroupIntegrationEvent notification, CancellationToken cancellationToken)
     {
-        var client = _context.Clients.User(notification.MemberId.ToString());
+        var client = _context.Clients.Group(HubGroups.Client(notification.MemberId));
         var group = await _groupModule.ExecuteQueryAsync<GetGroupDetailsQuery, GroupDetailsDto>(new GetGroupDetailsQuery(notification.GroupId));
         var leaving = await _identityModule.ExecuteQueryAsync<GetClientQuery, ClientDto?>(new GetClientQuery(notification.MemberId));
         if (leaving is null)
@@ -36,11 +36,8 @@ public class NotifyMemberLeftGroupHandler : IHubNotificationHandler<MemberLeftGr
             new GroupMemberLeftGroupNotification(notification.GroupId, new(leaving.ClientId, leaving.Name));
         
         await client.OnGroupLeft(notification.GroupId);
-        foreach (var member in group.Members)
-        {
-            var memberClient = _context.Clients.User(member.ToString());
-            await memberClient.OnGroupMemberLeft(memberLeftNotification);
-        }
+        // one call for every member
+        await _context.Clients.Groups(HubGroups.Clients(group.Members)).OnGroupMemberLeft(memberLeftNotification);
         
     }
 }

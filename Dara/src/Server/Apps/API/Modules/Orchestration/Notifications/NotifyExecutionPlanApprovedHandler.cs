@@ -18,7 +18,7 @@ public class NotifyExecutionPlanApprovedHandler : IHubNotificationHandler<Execut
 
     public async Task HandleAsync(ExecutionPlanApprovedIntegrationEvent notification, CancellationToken cancellationToken)
     {
-        var client = _context.Clients.User(notification.AuthorId.ToString());
+        var client = _context.Clients.Group(HubGroups.Client(notification.AuthorId));
 
         await client.OnExecutionPlanApproved(new ExecutionPlanApprovedNotification(notification.AgentRunId, notification.GroupId));
     }

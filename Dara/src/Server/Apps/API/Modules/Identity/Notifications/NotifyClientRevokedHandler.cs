@@ -1,5 +1,6 @@
 using Dara.Server.Apps.API.Common.Authentication;
 using Dara.Server.Apps.API.Common.Hubs;
+using Dara.Server.Apps.API.Common.Presence;
 using Dara.Server.Apps.API.Common.Notifications;
 using Dara.Server.Modules.Identity.Integration;
 using Dara.Shared.Contracts;
@@ -14,22 +15,22 @@ public class NotifyClientRevokedHandler : IHubNotificationHandler<UserClientRevo
 {
     private readonly IHubContext<AppHub, IAppHubClient> _context;
     private readonly RevokedClientsRegistry _revokedClients;
-    private readonly ClientConnections _connections;
+    private readonly ClientPresenceTracker _presence;
 
-    public NotifyClientRevokedHandler(IHubContext<AppHub, IAppHubClient> context, RevokedClientsRegistry revokedClients, ClientConnections connections)
+    public NotifyClientRevokedHandler(IHubContext<AppHub, IAppHubClient> context, RevokedClientsRegistry revokedClients, ClientPresenceTracker presence)
     {
         _context = context;
         _revokedClients = revokedClients;
-        _connections = connections;
+        _presence = presence;
     }
 
     public async Task HandleAsync(UserClientRevokedIntegrationEvent notification, CancellationToken cancellationToken)
     {
         _revokedClients.Add(notification.ClientId);
 
-        var client = _context.Clients.User(notification.ClientId.ToString());
+        var client = _context.Clients.Group(HubGroups.Client(notification.ClientId));
         await client.OnClientRevoked(new ClientRevokedNotification(notification.ClientId));
 
-        _connections.CloseAll(notification.ClientId);
+        _presence.CloseAll(notification.ClientId);
     }
 }

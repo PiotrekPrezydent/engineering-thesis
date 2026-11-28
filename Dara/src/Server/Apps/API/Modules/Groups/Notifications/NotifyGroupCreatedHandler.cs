@@ -22,7 +22,7 @@ public class NotifyGroupCreatedHandler : IHubNotificationHandler<NewGroupCreated
 
     public async Task HandleAsync(NewGroupCreatedIntegrationEvent notification, CancellationToken cancellationToken)
     {
-        var client = _context.Clients.User(notification.GroupOwnerId.ToString());
+        var client = _context.Clients.Group(HubGroups.Client(notification.GroupOwnerId));
         var details = await _groupModule.ExecuteQueryAsync<GetGroupDetailsQuery,GroupDetailsDto>(new GetGroupDetailsQuery(notification.GroupId));
         
         await client.OnGroupCreated(new GroupCreatedNotification(details.GroupId, details.GroupName, details.JoinCode));

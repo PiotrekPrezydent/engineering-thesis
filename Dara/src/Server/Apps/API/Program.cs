@@ -5,6 +5,7 @@ using Dara.Server.Apps.API.Common.Endpoints;
 using Dara.Server.Apps.API.Common.Diagnostics;
 using Dara.Server.Apps.API.Common.Hubs;
 using Dara.Server.Apps.API.Common.Notifications;
+using Dara.Server.Apps.API.Common.Presence;
 using Dara.Server.Apps.API.Common.Seeding;
 using Dara.Server.Apps.API.Modules.Authorization;
 using Dara.Server.Apps.API.Modules.Groups;
@@ -53,13 +54,16 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+        var timing = SignalRTimingOptions.Read(builder.Configuration);
         builder.Services.AddSignalR(options =>
         {
+            options.KeepAliveInterval = timing.KeepAliveInterval;
+            options.ClientTimeoutInterval = timing.ClientTimeoutInterval;
             // the app hub has no methods, the filter checks marked methods of any other hub (tests)
             options.AddFilter<AuthorizationHubFilter>();
         });
-        builder.Services.AddSingleton<IUserIdProvider, ClientUserIdProvider>();
-        builder.Services.AddSingleton<ClientConnections>();
+        builder.Services.AddSingleton<ClientPresenceTracker>();
+        builder.Services.AddSingleton<IClientPresence>(sp => sp.GetRequiredService<ClientPresenceTracker>());
 
         builder.AddDaraAuthentication();
         // minimal api checks the token only on endpoints that bind a form (the panel, TASK-ENG-036);
