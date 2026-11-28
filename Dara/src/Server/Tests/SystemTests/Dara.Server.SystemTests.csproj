@@ -12,8 +12,8 @@
     <ItemGroup>
         <PackageReference Include="xunit.v3" Version="4.0.3" />
         <!-- the client side of the client-server tests, the same packages as the cli -->
-        <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.5" />
-        <PackageReference Include="TypedSignalR.Client" Version="1.17.0" />
+        <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.15" />
+        <PackageReference Include="TypedSignalR.Client" Version="2.0.0" />
     </ItemGroup>
 
     <ItemGroup>

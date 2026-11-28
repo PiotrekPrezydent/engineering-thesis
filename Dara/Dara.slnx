@@ -44,10 +44,10 @@
     <Project Path="src/Server/Modules/Groups/Integration/Dara.Server.Modules.Groups.Integration.csproj" />
   </Folder>
   <Folder Name="/Server/Modules/Identity/">
-    <Project Path="src\Server\Modules\Identity\Application\Dara.Server.Modules.Identity.Application.csproj" />
-    <Project Path="src\Server\Modules\Identity\Domain\Dara.Server.Modules.Identity.Domain.csproj" />
-    <Project Path="src\Server\Modules\Identity\Infrastructure\Dara.Server.Modules.Identity.Infrastructure.csproj" />
-    <Project Path="src\Server\Modules\Identity\Integration\Dara.Server.Modules.Identity.Integration.csproj" />
+    <Project Path="src/Server/Modules/Identity/Application/Dara.Server.Modules.Identity.Application.csproj" />
+    <Project Path="src/Server/Modules/Identity/Domain/Dara.Server.Modules.Identity.Domain.csproj" />
+    <Project Path="src/Server/Modules/Identity/Infrastructure/Dara.Server.Modules.Identity.Infrastructure.csproj" />
+    <Project Path="src/Server/Modules/Identity/Integration/Dara.Server.Modules.Identity.Integration.csproj" />
   </Folder>
   <Folder Name="/Server/Modules/Identity/Tests/">
     <Project Path="src/Server/Modules/Identity/Tests/IntegrationTests/Dara.Server.Modules.Identity.IntegrationTests.csproj" />
@@ -83,7 +83,7 @@
     <Project Path="src/Shared/Contracts/Dara.Shared.Contracts.csproj" />
     <Project Path="src/Shared/Testing/Dara.Shared.Testing.csproj" />
     <Project Path="src/Shared/Logging/Dara.Shared.Logging.csproj" />
-    <Project Path="src\Shared\SourceGenerators\Dara.Shared.SourceGenerators.csproj" />
+    <Project Path="src/Shared/SourceGenerators/Dara.Shared.SourceGenerators.csproj" />
   </Folder>
   
 </Solution>
